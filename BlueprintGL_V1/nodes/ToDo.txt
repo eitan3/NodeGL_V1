@@ -1,0 +1,2 @@
+Finish pin's link pointer, need to assign when create new link and delete it to nullptr
+Change Link's structure and use pointers instead of pinid to pointer
