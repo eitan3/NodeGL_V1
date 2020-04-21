@@ -41,6 +41,8 @@ std::vector<std::shared_ptr<Link>>    s_Links;
 ImTextureID          s_HeaderBackground = nullptr;
 ImTextureID          s_SaveIcon = nullptr;
 ImTextureID          s_RestoreIcon = nullptr;
+std::string search_node_str = "";
+bool reset_search_node = false;
 
 
 
@@ -814,6 +816,7 @@ void Application_Frame()
                         newLinkPin = nullptr;
                         ed::Suspend();
                         ImGui::OpenPopup("Create New Node");
+                        reset_search_node = true;
                         ed::Resume();
                     }
                 }
@@ -897,6 +900,7 @@ void Application_Frame()
     else if (ed::ShowBackgroundContextMenu())
     {
         ImGui::OpenPopup("Create New Node");
+        reset_search_node = true;
         newNodeLinkPin = nullptr;
     }
     ed::Resume();
@@ -969,6 +973,13 @@ void Application_Frame()
 
     if (ImGui::BeginPopup("Create New Node"))
     {
+        ImGui::PushItemWidth(100.0f);
+        if (reset_search_node)
+            search_node_str = "";
+        reset_search_node = false;
+        ImGui::InputText("##edit", (char*)search_node_str.data(), 128);
+        ImGui::PopItemWidth();
+
         auto newNodePostion = openPopupPosition;
 
         std::shared_ptr<Node> node = nullptr;

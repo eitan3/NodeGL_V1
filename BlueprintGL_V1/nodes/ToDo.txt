@@ -1,2 +1,0 @@
-Fix pin's args system. Now the input pin can get multiple links and this is wrong, second the output pin can be link only to one input. 
-The second bug we can fix by adding new condition, if the pin is flow allow only one connection.
