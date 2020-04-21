@@ -8,8 +8,6 @@ enum class PinType
     Int,
     Float,
     String,
-    Object,
-    Function,
     Delegate,
 };
 

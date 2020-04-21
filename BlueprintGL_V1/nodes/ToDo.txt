@@ -1,2 +1,2 @@
-Finish pin's link pointer, need to assign when create new link and delete it to nullptr
-Change Link's structure and use pointers instead of pinid to pointer
+Fix pin's args system. Now the input pin can get multiple links and this is wrong, second the output pin can be link only to one input. 
+The second bug we can fix by adding new condition, if the pin is flow allow only one connection.

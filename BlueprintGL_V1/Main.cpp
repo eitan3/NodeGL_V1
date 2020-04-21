@@ -34,13 +34,13 @@ using ax::Widgets::IconType;
 
 
 // Set main variables
-static ed::EditorContext* m_Editor = nullptr;
-static const int            s_PinIconSize = 24;
-static std::vector< std::shared_ptr<Node>>    s_Nodes;
-static std::vector<std::shared_ptr<Link>>    s_Links;
-static ImTextureID          s_HeaderBackground = nullptr;
-static ImTextureID          s_SaveIcon = nullptr;
-static ImTextureID          s_RestoreIcon = nullptr;
+ed::EditorContext* m_Editor = nullptr;
+const int            s_PinIconSize = 24;
+std::vector< std::shared_ptr<Node>>    s_Nodes;
+std::vector<std::shared_ptr<Link>>    s_Links;
+ImTextureID          s_HeaderBackground = nullptr;
+ImTextureID          s_SaveIcon = nullptr;
+ImTextureID          s_RestoreIcon = nullptr;
 
 
 
@@ -174,13 +174,11 @@ ImColor GetIconColor(PinType type)
     case PinType::Int:      return ImColor(68, 201, 156);
     case PinType::Float:    return ImColor(147, 226, 74);
     case PinType::String:   return ImColor(124, 21, 153);
-    case PinType::Object:   return ImColor(51, 150, 215);
-    case PinType::Function: return ImColor(218, 0, 183);
     case PinType::Delegate: return ImColor(255, 48, 48);
     }
 };
 
-void DrawPinIcon(std::shared_ptr<Pin> pin, bool connected, int alpha)
+void DrawPinIcon(std::shared_ptr<BasePin> pin, bool connected, int alpha)
 {
     IconType iconType;
     ImColor  color = GetIconColor(pin->type);
@@ -192,8 +190,6 @@ void DrawPinIcon(std::shared_ptr<Pin> pin, bool connected, int alpha)
     case PinType::Int:      iconType = IconType::Circle; break;
     case PinType::Float:    iconType = IconType::Circle; break;
     case PinType::String:   iconType = IconType::Circle; break;
-    case PinType::Object:   iconType = IconType::Circle; break;
-    case PinType::Function: iconType = IconType::Circle; break;
     case PinType::Delegate: iconType = IconType::Square; break;
     default:
         return;
@@ -292,7 +288,7 @@ void ShowLeftPane(float paneWidth)
     ImGui::Spring(0.0f);
     if (ImGui::Button("Show Flow"))
     {
-        for (auto link : s_Links)
+        for (auto& link : s_Links)
             ed::Flow(link->id);
     }
     ImGui::Spring();
@@ -454,7 +450,6 @@ void Application_GL_Frame()
 {
     std::shared_ptr<Node> node = s_Nodes.at(0);
     node->node_funcs->Run();
-    std::cout << std::endl;
 }
 
 void Application_Frame()
@@ -471,8 +466,8 @@ void Application_Frame()
     static ed::LinkId contextLinkId = 0;
     static ed::PinId  contextPinId = 0;
     static bool createNewNode = false;
-    static std::shared_ptr<Pin> newNodeLinkPin = nullptr;
-    static std::shared_ptr<Pin> newLinkPin = nullptr;
+    static std::shared_ptr<BasePin> newNodeLinkPin = nullptr;
+    static std::shared_ptr<BasePin> newLinkPin = nullptr;
 
     static float leftPaneWidth = 400.0f;
     static float rightPaneWidth = 800.0f;
@@ -497,7 +492,7 @@ void Application_Frame()
             const auto isSimple = node->type == NodeType::Simple;
 
             bool hasOutputDelegates = false;
-            for (auto output : node->outputs)
+            for (auto& output : node->outputs)
                 if (output->type == PinType::Delegate)
                     hasOutputDelegates = true;
 
@@ -513,7 +508,7 @@ void Application_Frame()
                 {
                     ImGui::BeginVertical("delegates", ImVec2(0, 28));
                     ImGui::Spring(1, 0);
-                    for (auto output : node->outputs)
+                    for (auto& output : node->outputs)
                     {
                         if (output->type != PinType::Delegate)
                             continue;
@@ -549,7 +544,7 @@ void Application_Frame()
                 builder.EndHeader();
             }
 
-            for (auto input : node->inputs)
+            for (auto& input : node->inputs)
             {
                 auto alpha = ImGui::GetStyle().Alpha;
                 if (newLinkPin && !CanCreateLink(newLinkPin, input) && input != newLinkPin)
@@ -559,44 +554,10 @@ void Application_Frame()
                 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
                 DrawPinIcon(input, IsPinLinked(input->id, s_Links), (int)(alpha * 255));
                 ImGui::Spring(0);
-                if (!input->name.empty())
+                static bool wasActive = false;
+                if (input->type == PinType::String)
                 {
-                    ImGui::TextUnformatted(input->name.c_str());
-                    ImGui::Spring(0);
-                }
-                if (input->type == PinType::Bool)
-                {
-                    ImGui::Button("Hello");
-                    ImGui::Spring(0);
-                }
-                ImGui::PopStyleVar();
-                builder.EndInput();
-            }
-
-            if (isSimple)
-            {
-                builder.Middle();
-
-                ImGui::Spring(1, 0);
-                ImGui::TextUnformatted(node->name.c_str());
-                ImGui::Spring(1, 0);
-            }
-
-            for (auto output : node->outputs)
-            {
-                if (!isSimple && output->type == PinType::Delegate)
-                    continue;
-
-                auto alpha = ImGui::GetStyle().Alpha;
-                if (newLinkPin && !CanCreateLink(newLinkPin, output) && output != newLinkPin)
-                    alpha = alpha * (48.0f / 255.0f);
-
-                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-                builder.Output(output->id);
-                if (output->type == PinType::String)
-                {
-                    static char buffer[128] = "Edit Me\nMultiline!";
-                    static bool wasActive = false;
+                    static char buffer[128] = "BLATTT";
 
                     ImGui::PushItemWidth(100.0f);
                     ImGui::InputText("##edit", buffer, 127);
@@ -613,6 +574,56 @@ void Application_Frame()
                     }
                     ImGui::Spring(0);
                 }
+                else if (input->type == PinType::Float)
+                {
+                    std::shared_ptr<PinValue<float>> input_pin_value = std::dynamic_pointer_cast<PinValue<float>>(input);
+                    ImGui::PushItemWidth(100.0f);
+                    if (input_pin_value->links.size() > 0)
+                        ImGui::InputFloat("##edit", &input_pin_value->value, 0.0, 0.0, "%.6f", 0);
+                    else
+                        ImGui::InputFloat("##edit", &input_pin_value->default_value, 0.0, 0.0, "%.6f", 0);
+                    ImGui::PopItemWidth();
+                    if (ImGui::IsItemActive() && !wasActive)
+                    {
+                        ed::EnableShortcuts(false);
+                        wasActive = true;
+                    }
+                    else if (!ImGui::IsItemActive() && wasActive)
+                    {
+                        ed::EnableShortcuts(true);
+                        wasActive = false;
+                    }
+                    ImGui::Spring(0);
+                }
+                if (!input->name.empty())
+                {
+                    ImGui::TextUnformatted(input->name.c_str());
+                    ImGui::Spring(0);
+                }
+                ImGui::PopStyleVar();
+                builder.EndInput();
+            }
+
+            if (isSimple)
+            {
+                builder.Middle();
+
+                ImGui::Spring(1, 0);
+                ImGui::TextUnformatted(node->name.c_str());
+                ImGui::Spring(1, 0);
+            }
+
+            for (auto& output : node->outputs)
+            {
+                if (!isSimple && output->type == PinType::Delegate)
+                    continue;
+
+                auto alpha = ImGui::GetStyle().Alpha;
+                if (newLinkPin && !CanCreateLink(newLinkPin, output) && output != newLinkPin)
+                    alpha = alpha * (48.0f / 255.0f);
+
+                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+                builder.Output(output->id);
                 if (!output->name.empty())
                 {
                     ImGui::Spring(0);
@@ -756,18 +767,33 @@ void Application_Frame()
                                 bool startPinConnected = false;
                                 for (int link_i = 0; link_i < s_Links.size(); link_i++)
                                 {
-                                    if (s_Links.at(link_i)->startPinID == startPinId)
+                                    if (s_Links.at(link_i)->startPinID == startPinId && startPin->type == PinType::Flow)
                                     {
-                                        startPinConnected = true;
-                                        s_Links.at(link_i)->endPinID = endPinId;
-                                        s_Links.at(link_i)->endPin = endPin;
+                                        // s_Links.at(link_i)->endPin->link = nullptr;
+                                        s_Links.at(link_i)->endPin->links.erase(std::remove(s_Links.at(link_i)->endPin->links.begin(), s_Links.at(link_i)->endPin->links.end(), s_Links.at(link_i)), s_Links.at(link_i)->endPin->links.end());
+                                        s_Links.at(link_i)->startPin->links.erase(std::remove(s_Links.at(link_i)->startPin->links.begin(), s_Links.at(link_i)->startPin->links.end(), s_Links.at(link_i)), s_Links.at(link_i)->startPin->links.end());
+                                        s_Links.at(link_i)->startPin = nullptr;
+                                        s_Links.at(link_i)->endPin = nullptr;
+                                        ed::DeleteLink(s_Links.at(link_i)->id);
+                                        link_i = s_Links.size();
+                                    }
+                                    else if (s_Links.at(link_i)->endPinID == endPinId && endPin->type != PinType::Flow && endPin->kind == PinKind::Input)
+                                    {
+                                        //s_Links.at(link_i)->startPin->link = nullptr;
+                                        s_Links.at(link_i)->endPin->links.erase(std::remove(s_Links.at(link_i)->endPin->links.begin(), s_Links.at(link_i)->endPin->links.end(), s_Links.at(link_i)), s_Links.at(link_i)->endPin->links.end());
+                                        s_Links.at(link_i)->startPin->links.erase(std::remove(s_Links.at(link_i)->startPin->links.begin(), s_Links.at(link_i)->startPin->links.end(), s_Links.at(link_i)), s_Links.at(link_i)->startPin->links.end());
+                                        s_Links.at(link_i)->startPin = nullptr;
+                                        s_Links.at(link_i)->endPin = nullptr;
+                                        ed::DeleteLink(s_Links.at(link_i)->id);
+                                        link_i = s_Links.size();
                                     }
                                 }
                                 if (startPinConnected == false)
                                 {
                                     s_Links.emplace_back(new Link(GetNextId(), startPinId, endPinId, startPin, endPin));
                                     s_Links.back()->color = GetIconColor(startPin->type);
-                                    startPin->link = s_Links.back();
+                                    startPin->links.push_back(s_Links.back());
+                                    endPin->links.push_back(s_Links.back());
                                 }
                             }
                         }
@@ -816,8 +842,10 @@ void Application_Frame()
                         }
                         if (link_found)
                         {
-                            s_Links.at(link_index)->startPin->link = nullptr;
-                            s_Links.at(link_index)->endPin->link = nullptr;
+                            if (s_Links.at(link_index)->startPin)
+                                s_Links.at(link_index)->startPin->links.clear();
+                            if (s_Links.at(link_index)->endPin)
+                                s_Links.at(link_index)->endPin->links.clear();
                             s_Links.at(link_index)->startPin = nullptr;
                             s_Links.at(link_index)->endPin = nullptr;
                             s_Links.erase(s_Links.begin() + link_index);
@@ -946,6 +974,12 @@ void Application_Frame()
         std::shared_ptr<Node> node = nullptr;
         if (ImGui::MenuItem("Dummy Node"))
             node = DummyNode(s_Nodes);
+        if (ImGui::MenuItem("Dummy Send Float"))
+            node = DummySendFloat(s_Nodes);
+        if (ImGui::MenuItem("Dummy Receive Send Float"))
+            node = DummyRecvSendFloat(s_Nodes);
+        if (ImGui::MenuItem("Dummy Print Float"))
+            node = DummyPrintFloat(s_Nodes);
         /*
         if (ImGui::MenuItem("Output Action"))
             node = SpawnOutputActionNode(s_Nodes);
@@ -975,28 +1009,7 @@ void Application_Frame()
         if (node)
         {
             createNewNode = false;
-
             ed::SetNodePosition(node->id, newNodePostion);
-
-            if (auto startPin = newNodeLinkPin)
-            {
-                auto pins = startPin->kind == PinKind::Input ? node->outputs : node->inputs;
-
-                for (auto pin : pins)
-                {
-                    if (CanCreateLink(startPin, pin))
-                    {
-                        auto endPin = pin;
-                        if (startPin->kind == PinKind::Input)
-                            std::swap(startPin, endPin);
-
-                        s_Links.emplace_back(new Link(GetNextId(), startPin->id, endPin->id, startPin, endPin));
-                        s_Links.back()->color = GetIconColor(startPin->type);
-                        startPin->link = s_Links.back();
-                        break;
-                    }
-                }
-            }
         }
         ImGui::EndPopup();
     }

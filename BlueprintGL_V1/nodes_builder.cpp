@@ -1,6 +1,6 @@
 #include "nodes_builder.h"
 
-void BuildNode(std::shared_ptr<Node> node)
+void BuildNode(std::shared_ptr<Node>& node)
 {
     for (auto& input : node->inputs)
     {

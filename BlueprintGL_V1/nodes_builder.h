@@ -3,7 +3,7 @@
 #include "nodes_utils.h"
 #include "id_generator.h"
 
-void BuildNode(std::shared_ptr<Node> node);
+void BuildNode(std::shared_ptr<Node>& node);
 
 /*
 Node* SpawnInputActionNode(std::vector<Node>& s_Nodes);

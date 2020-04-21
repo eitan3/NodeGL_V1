@@ -4,6 +4,13 @@
 
 std::shared_ptr<Node> FindNode(ed::NodeId id, std::vector<std::shared_ptr<Node>>& s_Nodes);
 std::shared_ptr<Link> FindLink(ed::LinkId id, std::vector<std::shared_ptr<Link>>& s_Links);
-std::shared_ptr<Pin> FindPin(ed::PinId id, std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<BasePin> FindPin(ed::PinId id, std::vector<std::shared_ptr<Node>>& s_Nodes);
 bool IsPinLinked(ed::PinId id, std::vector<std::shared_ptr<Link>>& s_Links);
-bool CanCreateLink(std::shared_ptr<Pin> a, std::shared_ptr<Pin> b);
+bool CanCreateLink(std::shared_ptr<BasePin>& a, std::shared_ptr<BasePin>& b);
+void RunNextNodeFunc(std::shared_ptr<Node>& parent_node, int pin_index);
+
+template<typename T>
+std::shared_ptr<PinValue<T>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
+
+template<typename T>
+T GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
