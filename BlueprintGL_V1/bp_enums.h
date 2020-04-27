@@ -3,6 +3,7 @@
 
 enum class PinType
 {
+    Unknown,
     Flow,
     Bool,
     Int,

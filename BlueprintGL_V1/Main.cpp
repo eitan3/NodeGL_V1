@@ -1,5 +1,8 @@
 #include "Application.h"
 #include <string>
+#include <sstream>
+#include <iostream>
+#include <iterator>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -11,18 +14,19 @@
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
-#include <iostream>
 #include <memory>
+#include <functional>
 
+#include "InstanceConfig.h"
 #include "imgui_utils.h"
 #include "bp_enums.h"
 #include "bp_structs.h"
-#include "nodes_utils.h"
+#include "utils.h"
 #include "id_generator.h"
 #include "nodes_builder.h"
+#include "nodes/collect_search_nodes.h"
 
-#include "nodes/gl_main_loop.h"
-#include "nodes/dummy_nodes.h"
+#include "nodes/gl_nodes_1.h"
 
 namespace ed = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;
@@ -35,15 +39,19 @@ using ax::Widgets::IconType;
 
 // Set main variables
 ed::EditorContext* m_Editor = nullptr;
+
 const int            s_PinIconSize = 24;
-std::vector< std::shared_ptr<Node>>    s_Nodes;
-std::vector<std::shared_ptr<Link>>    s_Links;
 ImTextureID          s_HeaderBackground = nullptr;
 ImTextureID          s_SaveIcon = nullptr;
 ImTextureID          s_RestoreIcon = nullptr;
+
+std::vector<SearchNodeObj> search_nodes_vector;
 std::string search_node_str = "";
 bool reset_search_node = false;
 
+std::string pin_type_selected_item;
+
+std::string preview_texture;
 
 
 // Set timer functions variables
@@ -90,15 +98,17 @@ const char* Application_GetName()
 
 void Application_Initialize()
 {
+    auto config = InstanceConfig::instance();
     s_HeaderBackground = Application_LoadTexture("Data/BlueprintBackground.png");
     s_SaveIcon = Application_LoadTexture("Data/ic_save_white_24dp.png");
     s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
 
-    ed::Config config;
-    config.SettingsFile = "Blueprints.json";
-    config.LoadNodeSettings = [](ed::NodeId nodeId, char* data, void* userPointer) -> size_t
+    ed::Config ed_config;
+    ed_config.SettingsFile = "Blueprints.json";
+    ed_config.LoadNodeSettings = [](ed::NodeId nodeId, char* data, void* userPointer) -> size_t
     {
-        auto node = FindNode(nodeId, s_Nodes);
+        auto config = InstanceConfig::instance();
+        auto node = FindNode(nodeId, config->s_Nodes);
         if (!node)
             return 0;
 
@@ -108,9 +118,10 @@ void Application_Initialize()
         node = nullptr;
         return ret_size;
     };
-    config.SaveNodeSettings = [](ed::NodeId nodeId, const char* data, size_t size, ed::SaveReasonFlags reason, void* userPointer) -> bool
+    ed_config.SaveNodeSettings = [](ed::NodeId nodeId, const char* data, size_t size, ed::SaveReasonFlags reason, void* userPointer) -> bool
     {
-        auto node = FindNode(nodeId, s_Nodes);
+        auto config = InstanceConfig::instance();
+        auto node = FindNode(nodeId, config->s_Nodes);
         if (!node)
             return false;
 
@@ -121,15 +132,17 @@ void Application_Initialize()
         return true;
     };
 
-    m_Editor = ed::CreateEditor(&config);
+    m_Editor = ed::CreateEditor(&ed_config);
     ed::SetCurrentEditor(m_Editor);
 
     std::shared_ptr<Node> node;
-    node = GlMainLoop(s_Nodes);      ed::SetNodePosition(node->id, ImVec2(0, 0));
+    node = GlMainLoop(config->s_Nodes);      ed::SetNodePosition(node->id, ImVec2(0, 0));
     //s_Links.push_back(Link(GetNextLinkId(), s_Nodes[5].Outputs[0].id, s_Nodes[6].Inputs[0].id));
 
-    BuildNodes(s_Nodes);
+    BuildNodes(config->s_Nodes);
     ed::NavigateToContent();
+    search_node_str.reserve(128);
+    CollectSearchNodes(search_nodes_vector);
 }
 
 void Application_Finalize()
@@ -185,16 +198,23 @@ void DrawPinIcon(std::shared_ptr<BasePin> pin, bool connected, int alpha)
     IconType iconType;
     ImColor  color = GetIconColor(pin->type);
     color.Value.w = alpha / 255.0f;
-    switch (pin->type)
+    if (pin->isTemplate == false)
     {
-    case PinType::Flow:     iconType = IconType::Flow;   break;
-    case PinType::Bool:     iconType = IconType::Circle; break;
-    case PinType::Int:      iconType = IconType::Circle; break;
-    case PinType::Float:    iconType = IconType::Circle; break;
-    case PinType::String:   iconType = IconType::Circle; break;
-    case PinType::Delegate: iconType = IconType::Square; break;
-    default:
-        return;
+        switch (pin->type)
+        {
+        case PinType::Flow:     iconType = IconType::Flow;   break;
+        case PinType::Bool:     iconType = IconType::Circle; break;
+        case PinType::Int:      iconType = IconType::Circle; break;
+        case PinType::Float:    iconType = IconType::Circle; break;
+        case PinType::String:   iconType = IconType::Circle; break;
+        case PinType::Delegate: iconType = IconType::Square; break;
+        default:
+            return;
+        }
+    }
+    else
+    {
+        iconType = IconType::Diamond;
     }
 
     ax::Widgets::Icon(ImVec2(s_PinIconSize, s_PinIconSize), iconType, connected, color, ImColor(32, 32, 32, alpha));
@@ -274,8 +294,44 @@ void ShowStyleEditor(bool* show = nullptr)
     ImGui::End();
 }
 
+void ShowTextureViewer(bool* show = nullptr)
+{
+    if (!ImGui::Begin("Texture Viewer", show))
+    {
+        ImGui::End();
+        return;
+    }
+
+    auto config = InstanceConfig::instance();
+    std::vector<std::string> textures_keys = config->GetTextureMapKeys();
+
+    if (textures_keys.size() > 0)
+    {
+        if (preview_texture == "" || std::find(textures_keys.begin(), textures_keys.end(), preview_texture) == textures_keys.end())
+            preview_texture = textures_keys.at(0);
+        if (ImGui::BeginCombo("##texture_combo", preview_texture.data())) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < textures_keys.size(); n++)
+            {
+                bool is_selected = (preview_texture == textures_keys.at(n));
+                if (ImGui::Selectable(textures_keys.at(n).c_str(), is_selected))
+                {
+                    preview_texture = textures_keys.at(n);
+                }
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::Image((void*)(intptr_t)config->GetTexture(preview_texture), ImVec2(256, 256));
+    }
+
+    ImGui::End();
+}
+
 void ShowLeftPane(float paneWidth)
 {
+    auto config = InstanceConfig::instance();
     auto& io = ImGui::GetIO();
 
     ImGui::BeginChild("Selection", ImVec2(paneWidth, 0));
@@ -283,6 +339,7 @@ void ShowLeftPane(float paneWidth)
     paneWidth = ImGui::GetContentRegionAvailWidth();
 
     static bool showStyleEditor = false;
+    static bool showTextureViewer = false;
     ImGui::BeginHorizontal("Style Editor", ImVec2(paneWidth, 0));
     ImGui::Spring(0.0f, 0.0f);
     if (ImGui::Button("Zoom to Content"))
@@ -290,16 +347,18 @@ void ShowLeftPane(float paneWidth)
     ImGui::Spring(0.0f);
     if (ImGui::Button("Show Flow"))
     {
-        for (auto& link : s_Links)
+        for (auto& link : config->s_Links)
             ed::Flow(link->id);
     }
     ImGui::Spring();
     if (ImGui::Button("Edit Style"))
         showStyleEditor = true;
+    if (ImGui::Button("Texture Viewer"))
+        showTextureViewer = true;
     ImGui::EndHorizontal();
 
-    if (showStyleEditor)
-        ShowStyleEditor(&showStyleEditor);
+    if (showTextureViewer)
+        ShowTextureViewer(&showTextureViewer);
 
     std::vector<ed::NodeId> selectedNodes;
     std::vector<ed::LinkId> selectedLinks;
@@ -324,7 +383,7 @@ void ShowLeftPane(float paneWidth)
     ImGui::Spacing(); ImGui::SameLine();
     ImGui::TextUnformatted("Nodes");
     ImGui::Indent();
-    for (auto& node : s_Nodes)
+    for (auto& node : config->s_Nodes)
     {
         ImGui::PushID(node->id.AsPointer());
         auto start = ImGui::GetCursorScreenPos();
@@ -448,9 +507,28 @@ void ShowLeftPane(float paneWidth)
     ImGui::EndChild();
 }
 
+std::vector<std::string> split_string(std::string s_tmp, char splitter)
+{
+    std::vector<std::string> tokens;
+    std::size_t start = 0, end = 0;
+    while ((end = s_tmp.find(splitter, start)) != std::string::npos) {
+        if (end != start) {
+            tokens.push_back(s_tmp.substr(start, end - start));
+        }
+        start = end + 1;
+    }
+    if (end != start) {
+        std::string last_one = s_tmp.substr(start);
+        if (last_one != "" && last_one != " ")
+            tokens.push_back(last_one);
+    }
+    return tokens;
+}
+
 void Application_GL_Frame()
 {
-    std::shared_ptr<Node> node = s_Nodes.at(0);
+    auto config = InstanceConfig::instance();
+    std::shared_ptr<Node> node = config->s_Nodes.at(0);
     node->node_funcs->Run();
 }
 
@@ -459,6 +537,7 @@ void Application_Frame()
     UpdateTouch();
 
     auto& io = ImGui::GetIO();
+    auto config = InstanceConfig::instance();
 
     ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 
@@ -486,7 +565,7 @@ void Application_Frame()
         util::BlueprintNodeBuilder builder(s_HeaderBackground, Application_GetTextureWidth(s_HeaderBackground), Application_GetTextureHeight(s_HeaderBackground));
 
         // Blueprint and simple
-        for (auto& node : s_Nodes)
+        for (auto& node : config->s_Nodes)
         {
             if (node->type != NodeType::Blueprint && node->type != NodeType::Simple)
                 continue;
@@ -503,7 +582,12 @@ void Application_Frame()
             {
                 builder.Header(node->color);
                 ImGui::Spring(0);
-                ImGui::TextUnformatted(node->name.c_str());
+                std::string name = node->name;
+                if (node->info != "")
+                    name += "\n" + node->info;
+                if (node->error != "")
+                    name += "\n" + node->error;
+                ImGui::TextUnformatted(name.c_str());
                 ImGui::Spring(1);
                 ImGui::Dummy(ImVec2(0, 28));
                 if (hasOutputDelegates)
@@ -529,7 +613,7 @@ void Application_Frame()
                             ImGui::TextUnformatted(output->name.c_str());
                             ImGui::Spring(0);
                         }
-                        DrawPinIcon(output, IsPinLinked(output->id, s_Links), (int)(alpha * 255));
+                        DrawPinIcon(output, IsPinLinked(output->id, config->s_Links), (int)(alpha * 255));
                         ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.x / 2);
                         ImGui::EndHorizontal();
                         ImGui::PopStyleVar();
@@ -554,15 +638,44 @@ void Application_Frame()
 
                 builder.Input(input->id);
                 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-                DrawPinIcon(input, IsPinLinked(input->id, s_Links), (int)(alpha * 255));
+                DrawPinIcon(input, IsPinLinked(input->id, config->s_Links), (int)(alpha * 255));
                 ImGui::Spring(0);
                 static bool wasActive = false;
                 if (input->type == PinType::String)
                 {
-                    static char buffer[128] = "BLATTT";
-
                     ImGui::PushItemWidth(100.0f);
-                    ImGui::InputText("##edit", buffer, 127);
+                    std::shared_ptr<PinValue<std::string>> input_pin_value = std::dynamic_pointer_cast<PinValue<std::string>>(input);
+                    if (input_pin_value->links.size() > 0)
+                    {
+                        ImGui::InputText("##edit", (char*)input_pin_value->value.data(), input_pin_value->value.capacity() + 1.0);
+                        input_pin_value->value = std::string(input_pin_value->value.data());
+                    }
+                    else
+                    {
+                        ImGui::InputText("##edit", (char*)input_pin_value->default_value.data(), input_pin_value->default_value.capacity() + 1.0);
+                        input_pin_value->default_value = std::string(input_pin_value->default_value.data());
+                    }
+                    ImGui::PopItemWidth();
+                    if (ImGui::IsItemActive() && !wasActive)
+                    {
+                        ed::EnableShortcuts(false);
+                        wasActive = true;
+                    }
+                    else if (!ImGui::IsItemActive() && wasActive)
+                    {
+                        ed::EnableShortcuts(true);
+                        wasActive = false;
+                    }
+                    ImGui::Spring(0);
+                }
+                else if (input->type == PinType::Bool)
+                {
+                    std::shared_ptr<PinValue<bool>> input_pin_value = std::dynamic_pointer_cast<PinValue<bool>>(input);
+                    ImGui::PushItemWidth(100.0f);
+                    if (input_pin_value->links.size() > 0)
+                        ImGui::Checkbox("##edit", &input_pin_value->value);
+                    else
+                        ImGui::Checkbox("##edit", &input_pin_value->default_value);
                     ImGui::PopItemWidth();
                     if (ImGui::IsItemActive() && !wasActive)
                     {
@@ -584,6 +697,27 @@ void Application_Frame()
                         ImGui::InputFloat("##edit", &input_pin_value->value, 0.0, 0.0, "%.6f", 0);
                     else
                         ImGui::InputFloat("##edit", &input_pin_value->default_value, 0.0, 0.0, "%.6f", 0);
+                    ImGui::PopItemWidth();
+                    if (ImGui::IsItemActive() && !wasActive)
+                    {
+                        ed::EnableShortcuts(false);
+                        wasActive = true;
+                    }
+                    else if (!ImGui::IsItemActive() && wasActive)
+                    {
+                        ed::EnableShortcuts(true);
+                        wasActive = false;
+                    }
+                    ImGui::Spring(0);
+                }
+                else if (input->type == PinType::Int)
+                {
+                    std::shared_ptr<PinValue<int>> input_pin_value = std::dynamic_pointer_cast<PinValue<int>>(input);
+                    ImGui::PushItemWidth(100.0f);
+                    if (input_pin_value->links.size() > 0)
+                        ImGui::InputInt("##edit", &input_pin_value->value, 0, 0, 0);
+                    else
+                        ImGui::InputInt("##edit", &input_pin_value->default_value, 0, 0, 0);
                     ImGui::PopItemWidth();
                     if (ImGui::IsItemActive() && !wasActive)
                     {
@@ -632,16 +766,17 @@ void Application_Frame()
                     ImGui::TextUnformatted(output->name.c_str());
                 }
                 ImGui::Spring(0);
-                DrawPinIcon(output, IsPinLinked(output->id, s_Links), (int)(alpha * 255));
+                DrawPinIcon(output, IsPinLinked(output->id, config->s_Links), (int)(alpha * 255));
                 ImGui::PopStyleVar();
                 builder.EndOutput();
             }
+
 
             builder.End();
         }
 
         // Comment
-        for (auto& node : s_Nodes)
+        for (auto& node : config->s_Nodes)
         {
             if (node->type != NodeType::Comment)
                 continue;
@@ -701,7 +836,7 @@ void Application_Frame()
             ed::EndGroupHint();
         }
 
-        for (auto& link : s_Links)
+        for (auto& link : config->s_Links)
             ed::Link(link->id, link->startPinID, link->endPinID, link->color, 2.0f);
 
         if (!createNewNode)
@@ -729,8 +864,8 @@ void Application_Frame()
                 ed::PinId startPinId = 0, endPinId = 0;
                 if (ed::QueryNewLink(&startPinId, &endPinId))
                 {
-                    auto startPin = FindPin(startPinId, s_Nodes);
-                    auto endPin = FindPin(endPinId, s_Nodes);
+                    auto startPin = FindPin(startPinId, config->s_Nodes);
+                    auto endPin = FindPin(endPinId, config->s_Nodes);
 
                     newLinkPin = startPin ? startPin : endPin;
 
@@ -766,37 +901,33 @@ void Application_Frame()
                             showLabel("+ Create Link", ImColor(32, 45, 32, 180));
                             if (ed::AcceptNewItem(ImColor(128, 255, 128), 4.0f))
                             {
-                                bool startPinConnected = false;
-                                for (int link_i = 0; link_i < s_Links.size(); link_i++)
+                                for (int link_i = 0; link_i < config->s_Links.size(); link_i++)
                                 {
-                                    if (s_Links.at(link_i)->startPinID == startPinId && startPin->type == PinType::Flow)
+                                    if (config->s_Links.at(link_i)->startPinID == startPinId && startPin->type == PinType::Flow)
                                     {
                                         // s_Links.at(link_i)->endPin->link = nullptr;
-                                        s_Links.at(link_i)->endPin->links.erase(std::remove(s_Links.at(link_i)->endPin->links.begin(), s_Links.at(link_i)->endPin->links.end(), s_Links.at(link_i)), s_Links.at(link_i)->endPin->links.end());
-                                        s_Links.at(link_i)->startPin->links.erase(std::remove(s_Links.at(link_i)->startPin->links.begin(), s_Links.at(link_i)->startPin->links.end(), s_Links.at(link_i)), s_Links.at(link_i)->startPin->links.end());
-                                        s_Links.at(link_i)->startPin = nullptr;
-                                        s_Links.at(link_i)->endPin = nullptr;
-                                        ed::DeleteLink(s_Links.at(link_i)->id);
-                                        link_i = s_Links.size();
+                                        config->s_Links.at(link_i)->endPin->links.erase(std::remove(config->s_Links.at(link_i)->endPin->links.begin(), config->s_Links.at(link_i)->endPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->endPin->links.end());
+                                        config->s_Links.at(link_i)->startPin->links.erase(std::remove(config->s_Links.at(link_i)->startPin->links.begin(), config->s_Links.at(link_i)->startPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->startPin->links.end());
+                                        config->s_Links.at(link_i)->startPin = nullptr;
+                                        config->s_Links.at(link_i)->endPin = nullptr;
+                                        ed::DeleteLink(config->s_Links.at(link_i)->id);
+                                        link_i = config->s_Links.size();
                                     }
-                                    else if (s_Links.at(link_i)->endPinID == endPinId && endPin->type != PinType::Flow && endPin->kind == PinKind::Input)
+                                    else if (config->s_Links.at(link_i)->endPinID == endPinId && endPin->type != PinType::Flow && endPin->kind == PinKind::Input)
                                     {
                                         //s_Links.at(link_i)->startPin->link = nullptr;
-                                        s_Links.at(link_i)->endPin->links.erase(std::remove(s_Links.at(link_i)->endPin->links.begin(), s_Links.at(link_i)->endPin->links.end(), s_Links.at(link_i)), s_Links.at(link_i)->endPin->links.end());
-                                        s_Links.at(link_i)->startPin->links.erase(std::remove(s_Links.at(link_i)->startPin->links.begin(), s_Links.at(link_i)->startPin->links.end(), s_Links.at(link_i)), s_Links.at(link_i)->startPin->links.end());
-                                        s_Links.at(link_i)->startPin = nullptr;
-                                        s_Links.at(link_i)->endPin = nullptr;
-                                        ed::DeleteLink(s_Links.at(link_i)->id);
-                                        link_i = s_Links.size();
+                                        config->s_Links.at(link_i)->endPin->links.erase(std::remove(config->s_Links.at(link_i)->endPin->links.begin(), config->s_Links.at(link_i)->endPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->endPin->links.end());
+                                        config->s_Links.at(link_i)->startPin->links.erase(std::remove(config->s_Links.at(link_i)->startPin->links.begin(), config->s_Links.at(link_i)->startPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->startPin->links.end());
+                                        config->s_Links.at(link_i)->startPin = nullptr;
+                                        config->s_Links.at(link_i)->endPin = nullptr;
+                                        ed::DeleteLink(config->s_Links.at(link_i)->id);
+                                        link_i = config->s_Links.size();
                                     }
                                 }
-                                if (startPinConnected == false)
-                                {
-                                    s_Links.emplace_back(new Link(GetNextId(), startPinId, endPinId, startPin, endPin));
-                                    s_Links.back()->color = GetIconColor(startPin->type);
-                                    startPin->links.push_back(s_Links.back());
-                                    endPin->links.push_back(s_Links.back());
-                                }
+                                config->s_Links.emplace_back(new Link(GetNextId(), startPinId, endPinId, startPin, endPin));
+                                config->s_Links.back()->color = GetIconColor(startPin->type);
+                                startPin->links.push_back(config->s_Links.back());
+                                endPin->links.push_back(config->s_Links.back());
                             }
                         }
                     }
@@ -805,14 +936,14 @@ void Application_Frame()
                 ed::PinId pinId = 0;
                 if (ed::QueryNewNode(&pinId))
                 {
-                    newLinkPin = FindPin(pinId, s_Nodes);
+                    newLinkPin = FindPin(pinId, config->s_Nodes);
                     if (newLinkPin)
                         showLabel("+ Create Node", ImColor(32, 45, 32, 180));
 
                     if (ed::AcceptNewItem())
                     {
                         createNewNode = true;
-                        newNodeLinkPin = FindPin(pinId, s_Nodes);
+                        newNodeLinkPin = FindPin(pinId, config->s_Nodes);
                         newLinkPin = nullptr;
                         ed::Suspend();
                         ImGui::OpenPopup("Create New Node");
@@ -835,9 +966,9 @@ void Application_Frame()
                     {
                         bool link_found = false;
                         int link_index = 0;
-                        for (int link_i = 0; link_i < s_Links.size(); link_i++)
+                        for (int link_i = 0; link_i < config->s_Links.size(); link_i++)
                         {
-                            if (s_Links.at(link_i)->id == linkId)
+                            if (config->s_Links.at(link_i)->id == linkId)
                             {
                                 link_found = true;
                                 link_index = link_i;
@@ -845,13 +976,13 @@ void Application_Frame()
                         }
                         if (link_found)
                         {
-                            if (s_Links.at(link_index)->startPin)
-                                s_Links.at(link_index)->startPin->links.clear();
-                            if (s_Links.at(link_index)->endPin)
-                                s_Links.at(link_index)->endPin->links.clear();
-                            s_Links.at(link_index)->startPin = nullptr;
-                            s_Links.at(link_index)->endPin = nullptr;
-                            s_Links.erase(s_Links.begin() + link_index);
+                            if (config->s_Links.at(link_index)->startPin)
+                                config->s_Links.at(link_index)->startPin->links.clear();
+                            if (config->s_Links.at(link_index)->endPin)
+                                config->s_Links.at(link_index)->endPin->links.clear();
+                            config->s_Links.at(link_index)->startPin = nullptr;
+                            config->s_Links.at(link_index)->endPin = nullptr;
+                            config->s_Links.erase(config->s_Links.begin() + link_index);
                         }
                     }
                 }
@@ -863,9 +994,9 @@ void Application_Frame()
                     {
                         bool node_found = false;
                         int node_index = 0;
-                        for (int node_i = 0; node_i < s_Nodes.size(); node_i++)
+                        for (int node_i = 0; node_i < config->s_Nodes.size(); node_i++)
                         {
-                            if (s_Nodes.at(node_i)->id == nodeId && s_Nodes.at(node_i)->name != "GL Main Loop")
+                            if (config->s_Nodes.at(node_i)->id == nodeId && config->s_Nodes.at(node_i)->name != "GL Main Loop")
                             {
                                 node_found = true;
                                 node_index = node_i;
@@ -873,11 +1004,11 @@ void Application_Frame()
                         }
                         if (node_found)
                         {
-                            s_Nodes.at(node_index)->node_funcs->Delete();
-                            s_Nodes.at(node_index)->inputs.clear();
-                            s_Nodes.at(node_index)->outputs.clear();
-                            s_Nodes.at(node_index)->node_funcs = nullptr;
-                            s_Nodes.erase(s_Nodes.begin() + node_index);
+                            config->s_Nodes.at(node_index)->node_funcs->Delete();
+                            config->s_Nodes.at(node_index)->inputs.clear();
+                            config->s_Nodes.at(node_index)->outputs.clear();
+                            config->s_Nodes.at(node_index)->node_funcs = nullptr;
+                            config->s_Nodes.erase(config->s_Nodes.begin() + node_index);
                         }
                     }
                 }
@@ -909,7 +1040,7 @@ void Application_Frame()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
     if (ImGui::BeginPopup("Node Context Menu"))
     {
-        auto node = FindNode(contextNodeId, s_Nodes);
+        auto node = FindNode(contextNodeId, config->s_Nodes);
 
         ImGui::TextUnformatted("Node Context Menu");
         ImGui::Separator();
@@ -933,7 +1064,7 @@ void Application_Frame()
 
     if (ImGui::BeginPopup("Pin Context Menu"))
     {
-        auto pin = FindPin(contextPinId, s_Nodes);
+        auto pin = FindPin(contextPinId, config->s_Nodes);
 
         ImGui::TextUnformatted("Pin Context Menu");
         ImGui::Separator();
@@ -944,6 +1075,34 @@ void Application_Frame()
                 ImGui::Text("Node: %p", pin->node->id.AsPointer());
             else
                 ImGui::Text("Node: %s", "<none>");
+
+            if (pin->isTemplate)
+            {
+                ImGui::Separator();
+                ImGui::Text("Select Type:");
+
+                pin_type_selected_item = PinTypeToString(pin->type);
+                if (ImGui::BeginCombo("##combo", pin_type_selected_item.data())) // The second parameter is the label previewed before opening the combo.
+                {
+                    for (int n = 0; n < pin->template_allowed_types.size(); n++)
+                    {
+                        bool is_selected = (pin_type_selected_item == PinTypeToString(pin->template_allowed_types[n]));
+                        if (ImGui::Selectable(PinTypeToString(pin->template_allowed_types[n]).c_str(), is_selected))
+                        {
+                            pin_type_selected_item = PinTypeToString(pin->template_allowed_types[n]);
+                            for (int link_i = 0; link_i < pin->links.size(); link_i++)
+                            {
+                                ed::DeleteLink(pin->links.at(link_i)->id);
+                            }
+                            pin->links.clear();
+                            pin->node->node_funcs->ChangePinType(pin->kind, pin->index, StringToPinType(pin_type_selected_item));
+                        }
+                        if (is_selected)
+                            ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                    }
+                    ImGui::EndCombo();
+                }
+            }
         }
         else
             ImGui::Text("Unknown pin: %p", contextPinId.AsPointer());
@@ -953,7 +1112,7 @@ void Application_Frame()
 
     if (ImGui::BeginPopup("Link Context Menu"))
     {
-        auto link = FindLink(contextLinkId, s_Links);
+        auto link = FindLink(contextLinkId, config->s_Links);
 
         ImGui::TextUnformatted("Link Context Menu");
         ImGui::Separator();
@@ -975,52 +1134,89 @@ void Application_Frame()
     {
         ImGui::PushItemWidth(100.0f);
         if (reset_search_node)
+        {
             search_node_str = "";
+            search_node_str.reserve(128);
+        }
         reset_search_node = false;
-        ImGui::InputText("##edit", (char*)search_node_str.data(), 128);
+        ImGui::InputText("##edit", (char*)search_node_str.data(), search_node_str.capacity() + 1);
         ImGui::PopItemWidth();
 
-        auto newNodePostion = openPopupPosition;
+        search_node_str = std::string(search_node_str.c_str());
+        search_node_str.reserve(128);
+        std::string s_tmp = std::string(search_node_str.c_str());
+        std::vector<std::string> search_input_split = split_string(s_tmp, ' ');
 
         std::shared_ptr<Node> node = nullptr;
-        if (ImGui::MenuItem("Dummy Node"))
-            node = DummyNode(s_Nodes);
-        if (ImGui::MenuItem("Dummy Send Float"))
-            node = DummySendFloat(s_Nodes);
-        if (ImGui::MenuItem("Dummy Receive Send Float"))
-            node = DummyRecvSendFloat(s_Nodes);
-        if (ImGui::MenuItem("Dummy Print Float"))
-            node = DummyPrintFloat(s_Nodes);
-        /*
-        if (ImGui::MenuItem("Output Action"))
-            node = SpawnOutputActionNode(s_Nodes);
-        if (ImGui::MenuItem("Branch"))
-            node = SpawnBranchNode(s_Nodes);
-        if (ImGui::MenuItem("Do N"))
-            node = SpawnDoNNode(s_Nodes);
-        if (ImGui::MenuItem("Set Timer"))
-            node = SpawnSetTimerNode(s_Nodes);
-        if (ImGui::MenuItem("Less"))
-            node = SpawnLessNode(s_Nodes);
-        if (ImGui::MenuItem("Weird"))
-            node = SpawnWeirdNode(s_Nodes);
-        if (ImGui::MenuItem("Trace by Channel"))
-            node = SpawnTraceByChannelNode(s_Nodes);
-        if (ImGui::MenuItem("Print String"))
-            node = SpawnPrintStringNode(s_Nodes);
-        ImGui::Separator();
-        if (ImGui::MenuItem("Comment"))
-            node = SpawnComment(s_Nodes);
-        ImGui::Separator();
-        if (ImGui::MenuItem("Message"))
-            node = SpawnMessageNode(s_Nodes);
-        */
+        for (int node_i = 0; node_i < search_nodes_vector.size(); node_i++)
+        {
+            if (search_input_split.size() == 0)
+            {
+                if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
+                    node = search_nodes_vector.at(node_i).func(config->s_Nodes);
+            }
+            else if (search_nodes_vector.at(node_i).title.rfind(search_node_str, 0) == 0)
+            {
+                if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
+                    node = search_nodes_vector.at(node_i).func(config->s_Nodes);
+            }
+            else if (search_input_split.size() == 1)
+            {
+                bool added = false;
+                if (search_nodes_vector.at(node_i).title.rfind(search_input_split.at(0), 0) == 0)
+                {
+                    added = true;
+                    if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
+                        node = search_nodes_vector.at(node_i).func(config->s_Nodes);
+                }
+                if (added == false)
+                {
+                    for (int kw_i = 0; kw_i < search_nodes_vector.at(node_i).keywords.size() && added == false; kw_i++)
+                    {
+                        if (search_nodes_vector.at(node_i).keywords.at(kw_i).rfind(search_input_split.at(0), 0) == 0)
+                        {
+                            added = true;
+                            if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
+                                node = search_nodes_vector.at(node_i).func(config->s_Nodes);
+                        }
+                    }
+                }
+            }
+            else if (search_input_split.size() > 1)
+            {
+                bool match = true;
+                for (int si_i = 0; si_i < search_input_split.size() - 1 && match; si_i++)
+                {
+                    if (std::find(search_nodes_vector.at(node_i).keywords.begin(), search_nodes_vector.at(node_i).keywords.end(), search_input_split.at(si_i)) != search_nodes_vector.at(node_i).keywords.end()) {
+                        match = true;
+                    }
+                    else {
+                        match = false;
+                    }
+
+                }
+                if (match)
+                {
+                    bool added = false;
+                    for (int kw_i = 0; kw_i < search_nodes_vector.at(node_i).keywords.size() && added == false; kw_i++)
+                    {
+                        if (search_nodes_vector.at(node_i).keywords.at(kw_i).rfind(search_input_split.at(search_input_split.size() - 1), 0) == 0)
+                        {
+                            added = true;
+                            if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
+                                node = search_nodes_vector.at(node_i).func(config->s_Nodes);
+                        }
+                    }
+                }
+            }
+        }
+        
         ImGui::Separator();
 
         if (node)
         {
             createNewNode = false;
-            ed::SetNodePosition(node->id, newNodePostion);
+            ed::SetNodePosition(node->id, openPopupPosition);
         }
         ImGui::EndPopup();
     }

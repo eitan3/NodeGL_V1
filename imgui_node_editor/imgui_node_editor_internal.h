@@ -1246,6 +1246,7 @@ inline SuspendFlags operator &(SuspendFlags lhs, SuspendFlags rhs) { return stat
 
 struct EditorContext
 {
+public:
     EditorContext(const ax::NodeEditor::Config* config = nullptr);
     ~EditorContext();
 

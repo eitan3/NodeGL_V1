@@ -1,6 +1,6 @@
 #pragma once
 #include "bp_structs.h"
-#include "nodes_utils.h"
+#include "utils.h"
 #include "id_generator.h"
 
 void BuildNode(std::shared_ptr<Node>& node);

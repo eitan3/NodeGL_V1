@@ -6,6 +6,7 @@
 #include <imgui_node_editor.h>
 #include <ax/Builders.h>
 #include <memory>
+#include <functional>
 #include "bp_enums.h"
 #include "nodes/node_function_interface.h"
 
@@ -19,8 +20,8 @@ struct Link;
 class BasePin
 {
 public:
-    BasePin(int id, const char* name, PinType type) :
-        id(id), node(), name(name), type(type), kind(PinKind::Input)
+    BasePin(int index, int id, const char* name, PinType type) :
+        index(index), id(id), node(), name(name), type(type), kind(PinKind::Input), isTemplate(false)
     {
     }
 
@@ -28,23 +29,28 @@ public:
     {
         node = nullptr;
         links.clear();
+        template_allowed_types.clear();
     }
 
+    int index;
     ed::PinId   id;
     std::shared_ptr<::Node> node;
     std::vector<std::shared_ptr<::Link>> links;
     std::string name;
     PinType     type;
     PinKind     kind;
+
+    bool isTemplate;
+    std::vector<PinType> template_allowed_types;
 };
 
 
 template<class T>
 class PinValue : public BasePin {
 public:
-    //using BasePin::BasePin;
-    PinValue(int id, const char* name, PinType type, T default_val) : BasePin(id, name, type)
+    PinValue(int index, int id, const char* name, PinType type, T default_val) : BasePin(index, id, name, type)
     {
+        value = default_val;
         default_value = default_val;
     }
 
@@ -66,8 +72,13 @@ public:
 class Node
 {
 public:
-    Node(int id, const char* name, ImColor color = ImColor(255, 255, 255)) :
-        id(id), name(name), color(color), type(NodeType::Blueprint), size(0, 0)
+    Node(int id, const char* name, ImColor color = ImColor(128, 128, 128)) :
+        id(id), name(name), no_flow_node(false), color(color), type(NodeType::Blueprint), size(0, 0)
+    {
+    }
+
+    Node(int id, const char* name, bool no_flow_node, ImColor color = ImColor(255, 255, 255)) :
+        id(id), name(name), no_flow_node(no_flow_node), color(color), type(NodeType::Blueprint), size(0, 0)
     {
     }
 
@@ -80,6 +91,7 @@ public:
 
     ed::NodeId id;
     std::string name;
+    bool no_flow_node;
     std::vector<std::shared_ptr<BasePin>> inputs;
     std::vector<std::shared_ptr<BasePin>> outputs;
     ImColor color;
@@ -87,8 +99,23 @@ public:
     ImVec2 size;
     std::string state;
     std::string savedState;
-
+    std::string info;
+    std::string error;
     std::shared_ptr<NodeFunctions> node_funcs;
+};
+
+
+class SearchNodeObj
+{
+public:
+    SearchNodeObj(std::string title, std::vector<std::string> keywords, std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func) :
+        title(title), keywords(keywords), func(func)
+    {
+    }
+
+    std::string title;
+    std::vector<std::string> keywords;
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func;
 };
 
 

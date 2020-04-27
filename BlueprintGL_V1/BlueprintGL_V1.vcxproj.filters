@@ -27,19 +27,28 @@
     <ClCompile Include="imgui_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="nodes_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="nodes_builder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="id_generator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="nodes\gl_main_loop.cpp">
+    <ClCompile Include="nodes\dummy_nodes.cpp">
       <Filter>Source Files\nodes</Filter>
     </ClCompile>
-    <ClCompile Include="nodes\dummy_nodes.cpp">
+    <ClCompile Include="nodes\collect_search_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nodes\utils_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="nodes\math_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="nodes\gl_nodes_1.cpp">
       <Filter>Source Files\nodes</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,23 +62,35 @@
     <ClInclude Include="bp_structs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="nodes_utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="nodes_builder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="id_generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="nodes\gl_main_loop.h">
-      <Filter>Header Files\nodes</Filter>
-    </ClInclude>
     <ClInclude Include="nodes\node_function_interface.h">
       <Filter>Header Files\nodes</Filter>
     </ClInclude>
     <ClInclude Include="nodes\dummy_nodes.h">
       <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\collect_search_nodes.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\utils_nodes.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\math_nodes.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\gl_nodes_1.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="InstanceConfig.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
