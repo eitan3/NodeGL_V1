@@ -1,0 +1,2 @@
+Add TextureObject to PinType (pass it as smart pointer)
+Add placeholder somehow

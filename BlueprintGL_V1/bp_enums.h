@@ -11,7 +11,6 @@ enum class PinType
     Int,
     Float,
     String,
-    Delegate,
 };
 
 enum class PinKind

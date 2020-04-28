@@ -189,7 +189,6 @@ ImColor GetIconColor(PinType type)
     case PinType::Int:      return ImColor(68, 201, 156);
     case PinType::Float:    return ImColor(147, 226, 74);
     case PinType::String:   return ImColor(124, 21, 153);
-    case PinType::Delegate: return ImColor(255, 48, 48);
     }
 };
 
@@ -207,7 +206,6 @@ void DrawPinIcon(std::shared_ptr<BasePin> pin, bool connected, int alpha)
         case PinType::Int:      iconType = IconType::Circle; break;
         case PinType::Float:    iconType = IconType::Circle; break;
         case PinType::String:   iconType = IconType::Circle; break;
-        case PinType::Delegate: iconType = IconType::Square; break;
         default:
             return;
         }
@@ -572,11 +570,6 @@ void Application_Frame()
 
             const auto isSimple = node->type == NodeType::Simple;
 
-            bool hasOutputDelegates = false;
-            for (auto& output : node->outputs)
-                if (output->type == PinType::Delegate)
-                    hasOutputDelegates = true;
-
             builder.Begin(node->id);
             if (!isSimple)
             {
@@ -590,43 +583,7 @@ void Application_Frame()
                 ImGui::TextUnformatted(name.c_str());
                 ImGui::Spring(1);
                 ImGui::Dummy(ImVec2(0, 28));
-                if (hasOutputDelegates)
-                {
-                    ImGui::BeginVertical("delegates", ImVec2(0, 28));
-                    ImGui::Spring(1, 0);
-                    for (auto& output : node->outputs)
-                    {
-                        if (output->type != PinType::Delegate)
-                            continue;
-
-                        auto alpha = ImGui::GetStyle().Alpha;
-                        if (newLinkPin && !CanCreateLink(newLinkPin, output) && output != newLinkPin)
-                            alpha = alpha * (48.0f / 255.0f);
-
-                        ed::BeginPin(output->id, ed::PinKind::Output);
-                        ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
-                        ed::PinPivotSize(ImVec2(0, 0));
-                        ImGui::BeginHorizontal(output->id.AsPointer());
-                        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-                        if (!output->name.empty())
-                        {
-                            ImGui::TextUnformatted(output->name.c_str());
-                            ImGui::Spring(0);
-                        }
-                        DrawPinIcon(output, IsPinLinked(output->id, config->s_Links), (int)(alpha * 255));
-                        ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.x / 2);
-                        ImGui::EndHorizontal();
-                        ImGui::PopStyleVar();
-                        ed::EndPin();
-
-                        //DrawItemRect(ImColor(255, 0, 0));
-                    }
-                    ImGui::Spring(1, 0);
-                    ImGui::EndVertical();
-                    ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.x / 2);
-                }
-                else
-                    ImGui::Spring(0);
+                ImGui::Spring(0);
                 builder.EndHeader();
             }
 
@@ -751,9 +708,6 @@ void Application_Frame()
 
             for (auto& output : node->outputs)
             {
-                if (!isSimple && output->type == PinType::Delegate)
-                    continue;
-
                 auto alpha = ImGui::GetStyle().Alpha;
                 if (newLinkPin && !CanCreateLink(newLinkPin, output) && output != newLinkPin)
                     alpha = alpha * (48.0f / 255.0f);
