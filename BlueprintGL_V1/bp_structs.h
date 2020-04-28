@@ -109,13 +109,18 @@ class SearchNodeObj
 {
 public:
     SearchNodeObj(std::string title, std::vector<std::string> keywords, std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func) :
-        title(title), keywords(keywords), func(func)
+        title(title), keywords(keywords), func(func), show_in_global_search(true)
+    {
+    }
+    SearchNodeObj(std::string title, std::vector<std::string> keywords, std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func, bool show_in_global_search) :
+        title(title), keywords(keywords), func(func), show_in_global_search(show_in_global_search)
     {
     }
 
     std::string title;
     std::vector<std::string> keywords;
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func;
+    bool show_in_global_search;
 };
 
 

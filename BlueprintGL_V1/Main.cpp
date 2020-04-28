@@ -1152,8 +1152,9 @@ void Application_Frame()
         {
             if (search_input_split.size() == 0)
             {
-                if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
-                    node = search_nodes_vector.at(node_i).func(config->s_Nodes);
+                if (search_nodes_vector.at(node_i).show_in_global_search)
+                    if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
+                        node = search_nodes_vector.at(node_i).func(config->s_Nodes);
             }
             else if (search_nodes_vector.at(node_i).title.rfind(search_node_str, 0) == 0)
             {

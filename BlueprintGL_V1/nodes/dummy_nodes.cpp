@@ -262,7 +262,7 @@ void DummiesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = DummyNode;
     std::vector<std::string> keywords_1{ "Dummy" };
-    search_nodes_vector.push_back(SearchNodeObj("Dummy Node", keywords_1, func_1));
+    search_nodes_vector.push_back(SearchNodeObj("Dummy Node", keywords_1, func_1, false));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = DummySendFloat;
     std::vector<std::string> keywords_2{ "Dummy", "Send", "Float" };
@@ -270,7 +270,7 @@ void DummiesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = DummyRecvSendFloat;
     std::vector<std::string> keywords_3{ "Dummy", "Send", "Receive", "Float" };
-    search_nodes_vector.push_back(SearchNodeObj("Dummy Receive Send Float", keywords_3, func_3));
+    search_nodes_vector.push_back(SearchNodeObj("Dummy Receive Send Float", keywords_3, func_3, false));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = DummySendInt;
     std::vector<std::string> keywords_4{ "Dummy", "Send", "Int" };
@@ -278,5 +278,5 @@ void DummiesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = DummyRecvSendInt;
     std::vector<std::string> keywords_5{ "Dummy", "Send", "Receive", "Int" };
-    search_nodes_vector.push_back(SearchNodeObj("Dummy Receive Send Int", keywords_5, func_5));
+    search_nodes_vector.push_back(SearchNodeObj("Dummy Receive Send Int", keywords_5, func_5, false));
 }
