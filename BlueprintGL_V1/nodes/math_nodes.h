@@ -1,4 +1,7 @@
 #pragma once
+#ifndef MATH_NODES_H
+#define MATH_NODES_H
+
 #include "node_function_interface.h"
 #include "../nodes_builder.h"
 #include "../utils.h"
@@ -56,3 +59,5 @@ std::shared_ptr<Node> MathSubtractNode(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 void MathNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+
+#endif

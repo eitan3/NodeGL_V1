@@ -323,7 +323,7 @@ void ShowTextureViewer(bool* show = nullptr)
             }
             ImGui::EndCombo();
         }
-        ImGui::Image((void*)(intptr_t)config->GetTexture(preview_texture), ImVec2(256, 256));
+        ImGui::Image((void*)(intptr_t)config->GetTexture(preview_texture)->object_id, ImVec2(256, 256));
     }
 
     ImGui::End();

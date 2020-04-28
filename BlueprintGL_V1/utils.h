@@ -1,4 +1,7 @@
 #pragma once
+#ifndef UTILS_H
+#define UTILS_H
+
 #include "bp_structs.h"
 #include <memory>
 
@@ -17,3 +20,5 @@ std::shared_ptr<PinValue<T>> GetLinkedInputPin(std::shared_ptr<Node>& parent_nod
 
 template<typename T>
 T GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
+
+#endif

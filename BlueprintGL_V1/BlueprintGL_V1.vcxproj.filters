@@ -19,6 +19,12 @@
     <Filter Include="Source Files\nodes">
       <UniqueIdentifier>{04cfe7d3-3c8c-4683-ba16-2aa61ff441fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\objects">
+      <UniqueIdentifier>{f454394a-4a13-4367-adc9-11d1a646d1ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects">
+      <UniqueIdentifier>{f78086cd-f8f4-4406-8241-4c17aa406678}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -50,6 +56,15 @@
     </ClCompile>
     <ClCompile Include="nodes\gl_nodes_1.cpp">
       <Filter>Source Files\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\texture_object.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\renderbuffer_object.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\framebuffer_object.cpp">
+      <Filter>Source Files\objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +106,15 @@
     </ClInclude>
     <ClInclude Include="InstanceConfig.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\texture_object.h">
+      <Filter>Header Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\renderbuffer_object.h">
+      <Filter>Header Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\framebuffer_object.h">
+      <Filter>Header Files\objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

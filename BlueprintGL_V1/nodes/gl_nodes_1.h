@@ -1,4 +1,7 @@
 #pragma once
+#ifndef GL_NODES_1_H
+#define GL_NODES_1_H
+
 #include "node_function_interface.h"
 #include "../nodes_builder.h"
 #include "../utils.h"
@@ -20,6 +23,7 @@ private:
     void DeleteFrameBuffer();
 
 private:
+    std::string object_prefix;
     int output_width;
     int output_height;
 };
@@ -54,6 +58,7 @@ private:
     void DeleteFrameBuffer();
 
 private:
+    std::string object_prefix;
     int output_width;
     int output_height;
 };
@@ -64,3 +69,5 @@ std::shared_ptr<Node> GlRenderToTexture(std::vector<std::shared_ptr<Node>>& s_No
 
 
 void GlNodes1_SearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+
+#endif

@@ -2,6 +2,7 @@
 
 void GlMainLoop_Func::Initialize()
 {
+    object_prefix = "glMainLoop_" + std::to_string(parent_node->id.Get());
     output_width = GetInputPinValue<int>(parent_node, 0);
     output_height = GetInputPinValue<int>(parent_node, 1);
     SetupFrameBuffer();
@@ -26,8 +27,8 @@ void GlMainLoop_Func::Run()
     glViewport(0, 0, output_width, output_height);
 
     // Bind framebuffer
-    config->current_framebuffer = "glMainLoop_" + std::to_string(parent_node->id.Get());
-    GLuint new_framebuffer_id = config->GetFrameBuffer(config->current_framebuffer);
+    config->current_framebuffer = object_prefix;
+    GLuint new_framebuffer_id = config->GetFrameBuffer(config->current_framebuffer)->object_id;
     glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer_id);
 
     // Run next node
@@ -57,12 +58,12 @@ void GlMainLoop_Func::ChangePinType(PinKind kind, int index, PinType type)
 void GlMainLoop_Func::SetupFrameBuffer()
 {
     auto config = InstanceConfig::instance();
-    GLuint FramebufferName;
+    GLuint framebuffer_id;
     GLuint renderedTexture;
     GLuint depthrenderbuffer;
 
-    glGenFramebuffers(1, &FramebufferName);
-    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+    glGenFramebuffers(1, &framebuffer_id);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
     glGenTextures(1, &renderedTexture);
     glBindTexture(GL_TEXTURE_2D, renderedTexture);
@@ -70,14 +71,14 @@ void GlMainLoop_Func::SetupFrameBuffer()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+    // Set "renderedTexture" as our colour attachement #0
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+
     // The depth buffer
     glGenRenderbuffers(1, &depthrenderbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, output_width, output_height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
-
-    // Set "renderedTexture" as our colour attachement #0
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
 
     // Set the list of draw buffers.
     GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
@@ -90,18 +91,18 @@ void GlMainLoop_Func::SetupFrameBuffer()
         return;
     }
 
-    config->InsertTexture("glMainLoop_" + std::to_string(parent_node->id.Get()), renderedTexture);
-    config->InsertRenderBuffer("glMainLoop_" + std::to_string(parent_node->id.Get()), depthrenderbuffer);
-    config->InsertFrameBuffer("glMainLoop_" + std::to_string(parent_node->id.Get()), FramebufferName);
+    config->InsertTexture(object_prefix, std::make_shared<TextureObject>(object_prefix, renderedTexture, output_width, output_height));
+    config->InsertRenderBuffer(object_prefix, std::make_shared<RenderBufferObject>(object_prefix, depthrenderbuffer, output_width, output_height));
+    config->InsertFrameBuffer(object_prefix, std::make_shared<FrameBufferObject>(object_prefix, framebuffer_id));
     parent_node->info = "Texture name: 'glMainLoop_" + std::to_string(parent_node->id.Get())+"'";
 }
 
 void GlMainLoop_Func::DeleteFrameBuffer()
 {
     auto config = InstanceConfig::instance();
-    config->DeleteTexture("glMainLoop_" + std::to_string(parent_node->id.Get()));
-    config->DeleteRenderBuffer("glMainLoop_" + std::to_string(parent_node->id.Get()));
-    config->DeleteFrameBuffer("glMainLoop_" + std::to_string(parent_node->id.Get()));
+    config->DeleteTexture(object_prefix);
+    config->DeleteRenderBuffer(object_prefix);
+    config->DeleteFrameBuffer(object_prefix);
 }
 
 std::shared_ptr<Node> GlMainLoop(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -197,6 +198,7 @@ std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 void GlRenderToTexture_Func::Initialize()
 {
+    object_prefix = "glRenderToTexture_" + std::to_string(parent_node->id.Get());
     output_width = GetInputPinValue<int>(parent_node, 1);
     output_height = GetInputPinValue<int>(parent_node, 2);
     SetupFrameBuffer();
@@ -222,8 +224,8 @@ void GlRenderToTexture_Func::Run()
 
     // Bind framebuffer
     config->framebuffer_stack.push(config->current_framebuffer);
-    config->current_framebuffer = "glRenderToTexture_" + std::to_string(parent_node->id.Get());
-    GLuint new_framebuffer_id = config->GetFrameBuffer(config->current_framebuffer);
+    config->current_framebuffer = object_prefix;
+    GLuint new_framebuffer_id = config->GetFrameBuffer(config->current_framebuffer)->object_id;
     glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer_id);
 
     // Run next node
@@ -231,8 +233,9 @@ void GlRenderToTexture_Func::Run()
 
     // Return to previous viewport and framebuffer
     std::string prev_framebuffer = config->framebuffer_stack.top();
+    config->current_framebuffer = prev_framebuffer;
     config->framebuffer_stack.pop();
-    GLuint prev_framebuffer_id = config->GetFrameBuffer(prev_framebuffer);
+    GLuint prev_framebuffer_id = config->GetFrameBuffer(prev_framebuffer)->object_id;
     glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer_id);
     glViewport(0, 0, prev_viewport[2], prev_viewport[3]);
 
@@ -259,12 +262,12 @@ void GlRenderToTexture_Func::ChangePinType(PinKind kind, int index, PinType type
 void GlRenderToTexture_Func::SetupFrameBuffer()
 {
     auto config = InstanceConfig::instance();
-    GLuint FramebufferName;
+    GLuint framebuffer_id;
     GLuint renderedTexture;
     GLuint depthrenderbuffer;
 
-    glGenFramebuffers(1, &FramebufferName);
-    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+    glGenFramebuffers(1, &framebuffer_id);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
     glGenTextures(1, &renderedTexture);
     glBindTexture(GL_TEXTURE_2D, renderedTexture);
@@ -272,14 +275,14 @@ void GlRenderToTexture_Func::SetupFrameBuffer()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+    // Set "renderedTexture" as our colour attachement #0
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+
     // The depth buffer
     glGenRenderbuffers(1, &depthrenderbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, output_width, output_height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
-
-    // Set "renderedTexture" as our colour attachement #0
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
 
     // Set the list of draw buffers.
     GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
@@ -292,18 +295,18 @@ void GlRenderToTexture_Func::SetupFrameBuffer()
         return;
     }
 
-    config->InsertTexture("glRenderToTexture_" + std::to_string(parent_node->id.Get()), renderedTexture);
-    config->InsertRenderBuffer("glRenderToTexture_" + std::to_string(parent_node->id.Get()), depthrenderbuffer);
-    config->InsertFrameBuffer("glRenderToTexture_" + std::to_string(parent_node->id.Get()), FramebufferName);
+    config->InsertTexture(object_prefix, std::make_shared<TextureObject>(object_prefix, renderedTexture, output_width, output_height));
+    config->InsertRenderBuffer(object_prefix, std::make_shared<RenderBufferObject>(object_prefix, depthrenderbuffer, output_width, output_height));
+    config->InsertFrameBuffer(object_prefix, std::make_shared<FrameBufferObject>(object_prefix, framebuffer_id));
     parent_node->info = "Texture name: 'glRenderToTexture_" + std::to_string(parent_node->id.Get())+"'";
 }
 
 void GlRenderToTexture_Func::DeleteFrameBuffer()
 {
     auto config = InstanceConfig::instance();
-    config->DeleteTexture("glRenderToTexture_" + std::to_string(parent_node->id.Get()));
-    config->DeleteRenderBuffer("glRenderToTexture_" + std::to_string(parent_node->id.Get()));
-    config->DeleteFrameBuffer("glRenderToTexture_" + std::to_string(parent_node->id.Get()));
+    config->DeleteTexture(object_prefix);
+    config->DeleteRenderBuffer(object_prefix);
+    config->DeleteFrameBuffer(object_prefix);
 }
 
 std::shared_ptr<Node> GlRenderToTexture(std::vector<std::shared_ptr<Node>>& s_Nodes)

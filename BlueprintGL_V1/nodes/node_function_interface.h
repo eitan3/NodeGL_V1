@@ -1,4 +1,7 @@
 #pragma once
+#ifndef NODE_FUNCTION_INTERFACE_H
+#define NODE_FUNCTION_INTERFACE_H
+
 #include <memory>
 #include "../bp_enums.h"
 
@@ -14,3 +17,5 @@ public:
 
     std::shared_ptr<Node> parent_node;
 };
+
+#endif

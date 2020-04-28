@@ -1,4 +1,7 @@
 #pragma once
+#ifndef DUMMY_NODES_H
+#define DUMMY_NODES_H
+
 #include "node_function_interface.h"
 #include "../nodes_builder.h"
 #include "../utils.h"
@@ -68,3 +71,5 @@ std::shared_ptr<Node> DummyRecvSendInt(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 void DummiesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+
+#endif

@@ -1,4 +1,6 @@
 #pragma once
+#ifndef BP_CLASSES_H
+#define BP_CLASSES_H
 
 #include <iostream>
 #include <string>
@@ -152,3 +154,5 @@ public:
 
     ImColor color;
 };
+
+#endif

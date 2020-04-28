@@ -1,4 +1,7 @@
 #pragma once
+#ifndef NODES_BUILDER_H
+#define NODES_BUILDER_H
+
 #include "bp_structs.h"
 #include "utils.h"
 #include "id_generator.h"
@@ -20,3 +23,5 @@ Node* SpawnComment(std::vector<Node>& s_Nodes);
 */
 
 void BuildNodes(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+#endif

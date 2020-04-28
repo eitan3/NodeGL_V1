@@ -1,4 +1,6 @@
 #pragma once
+#ifndef BP_ENUMS_H
+#define BP_ENUMS_H
 
 
 enum class PinType
@@ -25,3 +27,5 @@ enum class NodeType
     Tree,
     Comment
 };
+
+#endif

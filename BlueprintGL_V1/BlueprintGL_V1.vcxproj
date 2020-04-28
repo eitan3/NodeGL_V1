@@ -154,6 +154,9 @@
     <ClCompile Include="nodes\math_nodes.cpp" />
     <ClCompile Include="nodes\utils_nodes.cpp" />
     <ClCompile Include="nodes_builder.cpp" />
+    <ClCompile Include="objects\framebuffer_object.cpp" />
+    <ClCompile Include="objects\renderbuffer_object.cpp" />
+    <ClCompile Include="objects\texture_object.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +172,9 @@
     <ClInclude Include="nodes\node_function_interface.h" />
     <ClInclude Include="nodes\utils_nodes.h" />
     <ClInclude Include="nodes_builder.h" />
+    <ClInclude Include="objects\framebuffer_object.h" />
+    <ClInclude Include="objects\renderbuffer_object.h" />
+    <ClInclude Include="objects\texture_object.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>

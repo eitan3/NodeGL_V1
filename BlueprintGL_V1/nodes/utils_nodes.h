@@ -1,4 +1,7 @@
 #pragma once
+#ifndef UTILS_NODES_H
+#define UTILS_NODES_H
+
 #include "node_function_interface.h"
 #include "../nodes_builder.h"
 #include "../utils.h"
@@ -30,3 +33,5 @@ std::shared_ptr<Node> ConvertTo(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+
+#endif
