@@ -189,6 +189,7 @@ ImColor GetIconColor(PinType type)
     case PinType::Int:      return ImColor(68, 201, 156);
     case PinType::Float:    return ImColor(147, 226, 74);
     case PinType::String:   return ImColor(124, 21, 153);
+    case PinType::TextureObject:   return ImColor(75, 116, 117);
     }
 };
 
@@ -206,6 +207,7 @@ void DrawPinIcon(std::shared_ptr<BasePin> pin, bool connected, int alpha)
         case PinType::Int:      iconType = IconType::Circle; break;
         case PinType::Float:    iconType = IconType::Circle; break;
         case PinType::String:   iconType = IconType::Circle; break;
+        case PinType::TextureObject:   iconType = IconType::Circle; break;
         default:
             return;
         }
@@ -1001,7 +1003,7 @@ void Application_Frame()
         if (node)
         {
             ImGui::Text("ID: %p", node->id.AsPointer());
-            ImGui::Text("Type: %s", node->type == NodeType::Blueprint ? "Blueprint" : (node->type == NodeType::Tree ? "Tree" : "Comment"));
+            ImGui::Text("Type: %s", node->type == NodeType::Blueprint ? "Blueprint" : "Comment");
             ImGui::Text("Inputs: %d", (int)node->inputs.size());
             ImGui::Text("Outputs: %d", (int)node->outputs.size());
         }

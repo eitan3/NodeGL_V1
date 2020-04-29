@@ -11,6 +11,7 @@ enum class PinType
     Int,
     Float,
     String,
+    TextureObject,
 };
 
 enum class PinKind
@@ -23,7 +24,6 @@ enum class NodeType
 {
     Blueprint,
     Simple,
-    Tree,
     Comment
 };
 
