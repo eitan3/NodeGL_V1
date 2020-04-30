@@ -204,6 +204,180 @@ std::shared_ptr<Node> ConvertTo(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
+void SetPlaceholder_Func::Initialize()
+{
+    placeholder = nullptr;
+}
+
+void SetPlaceholder_Func::Run()
+{
+    if (placeholder)
+    {
+        if (parent_node->inputs.at(1)->type == PinType::String)
+        {
+            std::string placeholder_value = GetInputPinValue<std::string>(parent_node, 1);
+            std::shared_ptr<PlaceholderValue<std::string>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::string>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at(1)->type == PinType::Int)
+        {
+            int placeholder_value = GetInputPinValue<int>(parent_node, 1);
+            std::shared_ptr<PlaceholderValue<int>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<int>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at(1)->type == PinType::Float)
+        {
+            float placeholder_value = GetInputPinValue<float>(parent_node, 1);
+            std::shared_ptr<PlaceholderValue<float>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<float>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at(1)->type == PinType::Bool)
+        {
+            bool placeholder_value = GetInputPinValue<bool>(parent_node, 1);
+            std::shared_ptr<PlaceholderValue<bool>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<bool>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at(1)->type == PinType::TextureObject)
+        {
+            std::shared_ptr<TextureObject> placeholder_value = GetInputPinValue<std::shared_ptr<TextureObject>>(parent_node, 1);
+            std::shared_ptr<PlaceholderValue<std::shared_ptr<TextureObject>>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<TextureObject>>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+    }
+    RunNextNodeFunc(parent_node, 0);
+}
+
+void SetPlaceholder_Func::Delete()
+{
+    if (placeholder)
+    {
+        placeholder->nodesID_vec.erase(std::remove(placeholder->nodesID_vec.begin(), placeholder->nodesID_vec.end(), parent_node->id), placeholder->nodesID_vec.end());
+    }
+    placeholder = nullptr;
+    parent_node = nullptr;
+}
+
+void SetPlaceholder_Func::NoFlowUpdatePinsValues()
+{
+}
+
+void SetPlaceholder_Func::ChangePinType(PinKind kind, int index, PinType type)
+{
+    UtilsChangePinType(parent_node, kind, index, type);
+    BuildNode(parent_node);
+}
+
+std::shared_ptr<Node> SetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), "Set Placeholder"));
+    s_Nodes.back()->inputs.emplace_back(new BasePin(s_Nodes.back()->inputs.size(), GetNextId(), "Enter", PinType::Flow));
+    s_Nodes.back()->inputs.emplace_back(new PinValue<std::string>(s_Nodes.back()->inputs.size(), GetNextId(), "Value", PinType::String, ""));
+    s_Nodes.back()->outputs.emplace_back(new BasePin(s_Nodes.back()->outputs.size(), GetNextId(), "Next", PinType::Flow));
+
+    s_Nodes.back()->is_set_placeholder = true;
+    s_Nodes.back()->node_funcs = std::make_shared<SetPlaceholder_Func>();
+    std::dynamic_pointer_cast<SetPlaceholder_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+void GetPlaceholder_Func::Initialize()
+{
+    placeholder = nullptr;
+}
+
+void GetPlaceholder_Func::Run()
+{
+}
+
+void GetPlaceholder_Func::Delete()
+{
+    if (placeholder)
+    {
+        placeholder->nodesID_vec.erase(std::remove(placeholder->nodesID_vec.begin(), placeholder->nodesID_vec.end(), parent_node->id), placeholder->nodesID_vec.end());
+    }
+    placeholder = nullptr;
+    parent_node = nullptr;
+}
+
+void GetPlaceholder_Func::NoFlowUpdatePinsValues()
+{
+    if (placeholder_type == PinType::String)
+    {
+        std::string ph_value = "";
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::string>>(placeholder)->value;
+        std::shared_ptr<PinValue<std::string>> output_pin = std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->outputs.at(0));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::Bool)
+    {
+        bool ph_value = false;
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<bool>>(placeholder)->value;
+        std::shared_ptr<PinValue<bool>> output_pin = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->outputs.at(0));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::Float)
+    {
+        float ph_value = 0;
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<float>>(placeholder)->value;
+        std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::Int)
+    {
+        int ph_value = 0;
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<int>>(placeholder)->value;
+        std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::TextureObject)
+    {
+        std::shared_ptr<TextureObject> ph_value = nullptr;
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<TextureObject>>>(placeholder)->value;
+        std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<TextureObject>>>(parent_node->outputs.at(0));
+        output_pin->value = ph_value;
+    }
+}
+
+void GetPlaceholder_Func::ChangePinType(PinKind kind, int index, PinType type)
+{
+    UtilsChangePinType(parent_node, kind, index, type);
+    BuildNode(parent_node);
+}
+
+std::shared_ptr<Node> GetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), "Get Placeholder", true));
+    s_Nodes.back()->outputs.emplace_back(new PinValue<std::string>(s_Nodes.back()->outputs.size(), GetNextId(), "Value", PinType::String, ""));
+
+    s_Nodes.back()->is_get_placeholder = true;
+    s_Nodes.back()->node_funcs = std::make_shared<GetPlaceholder_Func>();
+    std::dynamic_pointer_cast<GetPlaceholder_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
 void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = ConvertTo;
@@ -213,4 +387,12 @@ void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = PrintString;
     std::vector<std::string> keywords_2{ "Print", "String" };
     search_nodes_vector.push_back(SearchNodeObj("Print String", keywords_2, func_2));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = SetPlaceholder;
+    std::vector<std::string> keywords_3{ "Set", "Placeholder" };
+    search_nodes_vector.push_back(SearchNodeObj("Set Placeholder", keywords_3, func_3));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = GetPlaceholder;
+    std::vector<std::string> keywords_4{ "Get", "Placeholder" };
+    search_nodes_vector.push_back(SearchNodeObj("Get Placeholder", keywords_4, func_4));
 }

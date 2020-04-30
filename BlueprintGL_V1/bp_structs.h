@@ -75,12 +75,14 @@ class Node
 {
 public:
     Node(int id, const char* name, ImColor color = ImColor(128, 128, 128)) :
-        id(id), name(name), no_flow_node(false), color(color), type(NodeType::Blueprint), size(0, 0)
+        id(id), name(name), no_flow_node(false), color(color), type(NodeType::Blueprint), size(0, 0),
+        is_set_placeholder(false), is_get_placeholder(false)
     {
     }
 
-    Node(int id, const char* name, bool no_flow_node, ImColor color = ImColor(255, 255, 255)) :
-        id(id), name(name), no_flow_node(no_flow_node), color(color), type(NodeType::Blueprint), size(0, 0)
+    Node(int id, const char* name, bool no_flow_node, ImColor color = ImColor(128, 128, 128)) :
+        id(id), name(name), no_flow_node(no_flow_node), color(color), type(NodeType::Blueprint), size(0, 0),
+        is_set_placeholder(false), is_get_placeholder(false)
     {
     }
 
@@ -94,6 +96,8 @@ public:
     ed::NodeId id;
     std::string name;
     bool no_flow_node;
+    bool is_set_placeholder;
+    bool is_get_placeholder;
     std::vector<std::shared_ptr<BasePin>> inputs;
     std::vector<std::shared_ptr<BasePin>> outputs;
     ImColor color;
@@ -153,6 +157,40 @@ public:
     std::shared_ptr<BasePin> endPin;
 
     ImColor color;
+};
+
+
+class BasePlaceholder
+{
+public:
+    BasePlaceholder(std::string name, PinType type) :
+        name(name), type(type)
+    {
+
+    }
+
+    virtual ~BasePlaceholder()
+    {
+        nodesID_vec.clear();
+    }
+
+    std::string name;
+    PinType type;
+    std::vector<ed::NodeId> nodesID_vec;
+};
+
+
+template<class T>
+class PlaceholderValue : public BasePlaceholder
+{
+public:
+    PlaceholderValue(std::string name, PinType type, T value) :
+        BasePlaceholder(name, type)
+    {
+        this->value = value;
+    }
+
+    T value;
 };
 
 #endif

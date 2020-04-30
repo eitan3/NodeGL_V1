@@ -26,30 +26,60 @@
 #include "nodes_builder.h"
 #include "nodes/collect_search_nodes.h"
 
+// To add GL Main Loop
 #include "nodes/gl_nodes_1.h"
 
+using namespace ax;
 namespace ed = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;
-
-using namespace ax;
-
 using ax::Widgets::IconType;
-
 
 
 // Set main variables
 ed::EditorContext* m_Editor = nullptr;
 
+// Varialbes for editor
 const int            s_PinIconSize = 24;
 ImTextureID          s_HeaderBackground = nullptr;
 ImTextureID          s_SaveIcon = nullptr;
 ImTextureID          s_RestoreIcon = nullptr;
 
+ed::NodeId contextNodeId = 0;
+ed::LinkId contextLinkId = 0;
+ed::PinId  contextPinId = 0;
+bool createNewNode = false;
+std::shared_ptr<BasePin> newNodeLinkPin = nullptr;
+std::shared_ptr<BasePin> newLinkPin = nullptr;
+
+// Boolean variables to indicate which window to open
+bool showStyleEditor = false;
+bool showTextureViewer = false;
+bool showCreatePlaceholderWindow = false;
+bool showSelectPlaceholderWindow = false;
+bool showRenamePlaceholderWindow = false;
+bool showDeletePlaceholderWindow = false;
+
+// Variables for 'Create Placeholder' Window
+std::string create_placeholder_name;
+std::string create_placeholder_type_combo;
+
+// Variable for 'Select Placeholder' Window
+std::string select_placeholder_combo;
+
+// Variables for 'Rename Placeholder' Window
+std::string rename_placeholder_name;
+std::string rename_placeholder_original_combo;
+
+// Variable for 'Delete Placeholder' Window
+std::string delete_placeholder_combo;
+
+// Variables for seraching nodes on right click
 std::vector<SearchNodeObj> search_nodes_vector;
 std::string search_node_str = "";
 bool reset_search_node = false;
 
-std::string pin_type_selected_item;
+// String variable to indicate which pin type we selected with templates pin
+std::string template_pin_type_selected_item;
 
 std::string preview_texture;
 
@@ -329,6 +359,292 @@ void ShowTextureViewer(bool* show = nullptr)
     ImGui::End();
 }
 
+void ShowCreatePlaceholderWindow(bool* show = nullptr)
+{
+    if (!ImGui::Begin("Create Placeholder", show))
+    {
+        ImGui::End();
+        ImGui::PopItemWidth();
+        return;
+    }
+    ImGui::SetWindowSize(ImVec2(256, 0));
+    auto config = InstanceConfig::instance();
+    auto paneWidth = ImGui::GetContentRegionAvailWidth();
+
+    ImGui::BeginHorizontal("##placeholder_name", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Placeholder Name");
+    ImGui::InputText("##placeholder_name_input", (char*)create_placeholder_name.data(), create_placeholder_name.capacity() + 1.0);
+    create_placeholder_name = std::string(create_placeholder_name.data());
+    create_placeholder_name.reserve(create_placeholder_name.capacity() + 1.0);
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##placeholder_type", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Placeholder Type");
+    std::string items[] = { PinTypeToString(PinType::String), PinTypeToString(PinType::Bool),
+    PinTypeToString(PinType::Float), PinTypeToString(PinType::Int),PinTypeToString(PinType::TextureObject) };
+    if (create_placeholder_type_combo == "")
+        create_placeholder_type_combo = items[0];
+    if (ImGui::BeginCombo("##placeholder_type_combo", create_placeholder_type_combo.data())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < ARRAYSIZE(items); n++)
+        {
+            bool is_selected = (create_placeholder_type_combo == items[n]);
+            if (ImGui::Selectable(items[n].c_str(), is_selected))
+            {
+                create_placeholder_type_combo = items[n];
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##placeholder_buttons", ImVec2(paneWidth, 0), 1.0f);
+    if (ImGui::Button("Create"))
+    {
+        if (config->IsPlaceholderNameUsed(create_placeholder_name) == false)
+        {
+            PinType pinType = StringToPinType(create_placeholder_type_combo);
+            if (pinType == PinType::String)
+            {
+                std::shared_ptr<PlaceholderValue<std::string>> ph = std::make_shared< PlaceholderValue<std::string>>(create_placeholder_name, pinType, "");;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                showCreatePlaceholderWindow = false;
+            }
+            else if (pinType == PinType::Bool)
+            {
+                std::shared_ptr<PlaceholderValue<bool>> ph = std::make_shared< PlaceholderValue<bool>>(create_placeholder_name, pinType, false);;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                showCreatePlaceholderWindow = false;
+            }
+            else if (pinType == PinType::Float)
+            {
+                std::shared_ptr<PlaceholderValue<float>> ph = std::make_shared< PlaceholderValue<float>>(create_placeholder_name, pinType, 0);;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                showCreatePlaceholderWindow = false;
+            }
+            else if (pinType == PinType::Int)
+            {
+                std::shared_ptr<PlaceholderValue<int>> ph = std::make_shared< PlaceholderValue<int>>(create_placeholder_name, pinType, 0);;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                showCreatePlaceholderWindow = false;
+            }
+            else if (pinType == PinType::TextureObject)
+            {
+                std::shared_ptr<PlaceholderValue<std::shared_ptr<TextureObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<TextureObject>>>(create_placeholder_name, pinType, nullptr);;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                showCreatePlaceholderWindow = false;
+            }
+        }
+    }
+    if (ImGui::Button("Cancel"))
+    {
+        showCreatePlaceholderWindow = false;
+    }
+
+    ImGui::EndHorizontal();
+    ImGui::End();
+}
+
+void ShowSelectPlaceholderWindow(bool* show = nullptr)
+{
+    if (!ImGui::Begin("Select Placeholder", show))
+    {
+        ImGui::End();
+        ImGui::PopItemWidth();
+        return;
+    }
+    ImGui::SetWindowSize(ImVec2(256, 0));
+    auto config = InstanceConfig::instance();
+    auto paneWidth = ImGui::GetContentRegionAvailWidth();
+
+    ImGui::BeginHorizontal("##placeholder_original", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Select Placeholder");
+    std::vector<std::string> all_placeholders = config->GetPlaceholdersMapKeys();
+    if (select_placeholder_combo == "")
+        select_placeholder_combo = all_placeholders[0];
+    if (ImGui::BeginCombo("##placeholder_type_combo", select_placeholder_combo.data())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < all_placeholders.size(); n++)
+        {
+            bool is_selected = (select_placeholder_combo == all_placeholders[n]);
+            if (ImGui::Selectable(all_placeholders[n].c_str(), is_selected))
+            {
+                select_placeholder_combo = all_placeholders[n];
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##placeholder_buttons", ImVec2(paneWidth, 0), 1.0f);
+    if (ImGui::Button("Select"))
+    {
+        auto node = FindNode(contextNodeId, config->s_Nodes);
+        std::shared_ptr<BasePlaceholder> ph = config->GetPlaceholder(select_placeholder_combo);
+        if (node->is_set_placeholder)
+        {
+            if (std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder)
+            {
+                std::shared_ptr<BasePlaceholder> prev_ph = std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder;
+                prev_ph->nodesID_vec.erase(std::remove(prev_ph->nodesID_vec.begin(), prev_ph->nodesID_vec.end(), node->id), prev_ph->nodesID_vec.end());
+                prev_ph = nullptr;
+            }
+            std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder = ph;
+            for (int link_i = 0; link_i < node->inputs.at(1)->links.size(); link_i++)
+            {
+                ed::DeleteLink(node->inputs.at(1)->links.at(link_i)->id);
+            }
+            node->inputs.at(1)->links.clear();
+            std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->ChangePinType(PinKind::Input, 1, ph->type);
+        }
+        else if (node->is_get_placeholder)
+        {
+            if (std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder)
+            {
+                std::shared_ptr<BasePlaceholder> prev_ph = std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder;
+                prev_ph->nodesID_vec.erase(std::remove(prev_ph->nodesID_vec.begin(), prev_ph->nodesID_vec.end(), node->id), prev_ph->nodesID_vec.end());
+                prev_ph = nullptr;
+            }
+            std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder = ph;
+            std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder_type = ph->type;
+            
+            for (int link_i = 0; link_i < node->outputs.at(0)->links.size(); link_i++)
+            {
+                ed::DeleteLink(node->outputs.at(0)->links.at(link_i)->id);
+            }
+            node->outputs.at(0)->links.clear();
+            std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->ChangePinType(PinKind::Output, 0, ph->type);
+        }
+        ph->nodesID_vec.push_back(contextNodeId);
+        showSelectPlaceholderWindow = false;
+    }
+    if (ImGui::Button("Cancel"))
+    {
+        showSelectPlaceholderWindow = false;
+    }
+
+    ImGui::EndHorizontal();
+    ImGui::End();
+}
+
+void ShowRenamePlaceholderWindow(bool* show = nullptr)
+{
+    if (!ImGui::Begin("Rename Placeholder", show))
+    {
+        ImGui::End();
+        ImGui::PopItemWidth();
+        return;
+    }
+    ImGui::SetWindowSize(ImVec2(256, 0));
+    auto config = InstanceConfig::instance();
+    auto paneWidth = ImGui::GetContentRegionAvailWidth();
+
+    ImGui::BeginHorizontal("##placeholder_original", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Placeholder To Rename");
+    std::vector<std::string> all_placeholders = config->GetPlaceholdersMapKeys();
+    if (rename_placeholder_original_combo == "")
+        rename_placeholder_original_combo = all_placeholders[0];
+    if (ImGui::BeginCombo("##placeholder_type_combo", rename_placeholder_original_combo.data())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < all_placeholders.size(); n++)
+        {
+            bool is_selected = (rename_placeholder_original_combo == all_placeholders[n]);
+            if (ImGui::Selectable(all_placeholders[n].c_str(), is_selected))
+            {
+                rename_placeholder_original_combo = all_placeholders[n];
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##placeholder_name", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Placeholder Name");
+    ImGui::InputText("##placeholder_name_input", (char*)rename_placeholder_name.data(), rename_placeholder_name.capacity() + 1.0);
+    rename_placeholder_name = std::string(rename_placeholder_name.data());
+    rename_placeholder_name.reserve(rename_placeholder_name.capacity() + 1.0);
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##placeholder_buttons", ImVec2(paneWidth, 0), 1.0f);
+    if (ImGui::Button("Rename"))
+    {
+        if (config->IsPlaceholderNameUsed(rename_placeholder_name) == false)
+        {
+            std::shared_ptr<BasePlaceholder> ph = config->GetPlaceholder(rename_placeholder_original_combo);
+            ph->name = rename_placeholder_name;
+            config->DeletePlaceholder(rename_placeholder_original_combo);
+            config->InsertNewPlaceholder(rename_placeholder_name, ph);
+            showRenamePlaceholderWindow = false;
+        }
+    }
+    if (ImGui::Button("Cancel"))
+    {
+        showRenamePlaceholderWindow = false;
+    }
+
+    ImGui::EndHorizontal();
+    ImGui::End();
+}
+
+void ShowDeletePlaceholderWindow(bool* show = nullptr)
+{
+    if (!ImGui::Begin("Delete Placeholder", show))
+    {
+        ImGui::End();
+        ImGui::PopItemWidth();
+        return;
+    }
+    ImGui::SetWindowSize(ImVec2(256, 0));
+    auto config = InstanceConfig::instance();
+    auto paneWidth = ImGui::GetContentRegionAvailWidth();
+
+    ImGui::BeginHorizontal("##placeholder_original", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Select Placeholder");
+    std::vector<std::string> all_placeholders = config->GetPlaceholdersMapKeys();
+    if (delete_placeholder_combo == "")
+        delete_placeholder_combo = all_placeholders[0];
+    if (ImGui::BeginCombo("##placeholder_type_combo", delete_placeholder_combo.data())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < all_placeholders.size(); n++)
+        {
+            bool is_selected = (delete_placeholder_combo == all_placeholders[n]);
+            if (ImGui::Selectable(all_placeholders[n].c_str(), is_selected))
+            {
+                delete_placeholder_combo = all_placeholders[n];
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##placeholder_buttons", ImVec2(paneWidth, 0), 1.0f);
+    if (ImGui::Button("Delete"))
+    {
+        std::shared_ptr<BasePlaceholder> ph = config->GetPlaceholder(delete_placeholder_combo);
+        for (int ph_node_i = 0; ph_node_i < ph->nodesID_vec.size(); ph_node_i++)
+        {
+            ed::DeleteNode(ph->nodesID_vec.at(ph_node_i));
+        }
+        config->DeletePlaceholder(delete_placeholder_combo);
+        showDeletePlaceholderWindow = false;
+    }
+    if (ImGui::Button("Cancel"))
+    {
+        showDeletePlaceholderWindow = false;
+    }
+
+    ImGui::EndHorizontal();
+    ImGui::End();
+}
+
 void ShowLeftPane(float paneWidth)
 {
     auto config = InstanceConfig::instance();
@@ -338,8 +654,6 @@ void ShowLeftPane(float paneWidth)
 
     paneWidth = ImGui::GetContentRegionAvailWidth();
 
-    static bool showStyleEditor = false;
-    static bool showTextureViewer = false;
     ImGui::BeginHorizontal("Style Editor", ImVec2(paneWidth, 0));
     ImGui::Spring(0.0f, 0.0f);
     if (ImGui::Button("Zoom to Content"))
@@ -357,8 +671,49 @@ void ShowLeftPane(float paneWidth)
         showTextureViewer = true;
     ImGui::EndHorizontal();
 
+    if (showStyleEditor)
+        ShowStyleEditor(&showStyleEditor);
+
     if (showTextureViewer)
         ShowTextureViewer(&showTextureViewer);
+
+    if (showCreatePlaceholderWindow)
+    {
+        ShowCreatePlaceholderWindow(&showCreatePlaceholderWindow);
+    }
+    else
+    {
+        create_placeholder_name = "";
+        create_placeholder_type_combo = "";
+    }
+
+    if (showSelectPlaceholderWindow)
+    {
+        ShowSelectPlaceholderWindow(&showSelectPlaceholderWindow);
+    }
+    else
+    {
+        select_placeholder_combo = "";
+    }
+
+    if (showRenamePlaceholderWindow)
+    {
+        ShowRenamePlaceholderWindow(&showRenamePlaceholderWindow);
+    }
+    else
+    {
+        rename_placeholder_name = "";
+        rename_placeholder_original_combo = "";
+    }
+
+    if (showDeletePlaceholderWindow)
+    {
+        ShowDeletePlaceholderWindow(&showDeletePlaceholderWindow);
+    }
+    else
+    {
+        delete_placeholder_combo = "";
+    }
 
     std::vector<ed::NodeId> selectedNodes;
     std::vector<ed::LinkId> selectedLinks;
@@ -543,13 +898,6 @@ void Application_Frame()
 
     ed::SetCurrentEditor(m_Editor);
 
-    static ed::NodeId contextNodeId = 0;
-    static ed::LinkId contextLinkId = 0;
-    static ed::PinId  contextPinId = 0;
-    static bool createNewNode = false;
-    static std::shared_ptr<BasePin> newNodeLinkPin = nullptr;
-    static std::shared_ptr<BasePin> newLinkPin = nullptr;
-
     static float leftPaneWidth = 400.0f;
     static float rightPaneWidth = 800.0f;
     Splitter(true, 4.0f, &leftPaneWidth, &rightPaneWidth, 50.0f, 50.0f);
@@ -708,6 +1056,20 @@ void Application_Frame()
                 ImGui::Spring(1, 0);
             }
 
+            if (!isSimple && (node->is_set_placeholder || node->is_get_placeholder))
+            {
+                builder.Middle();
+
+                ImGui::Spring(1, 0);
+                if (node->is_set_placeholder)
+                    if (std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder)
+                        ImGui::TextUnformatted(std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder->name.c_str());
+                if (node->is_get_placeholder)
+                    if (std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder)
+                        ImGui::TextUnformatted(std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder->name.c_str());
+                ImGui::Spring(1, 0);
+            }
+
             for (auto& output : node->outputs)
             {
                 auto alpha = ImGui::GetStyle().Alpha;
@@ -759,13 +1121,9 @@ void Application_Frame()
 
             if (ed::BeginGroupHint(node->id))
             {
-                //auto alpha   = static_cast<int>(commentAlpha * ImGui::GetStyle().Alpha * 255);
                 auto bgAlpha = static_cast<int>(ImGui::GetStyle().Alpha * 255);
 
-                //ImGui::PushStyleVar(ImGuiStyleVar_Alpha, commentAlpha * ImGui::GetStyle().Alpha);
-
                 auto min = ed::GetGroupMin();
-                //auto max = ed::GetGroupMax();
 
                 ImGui::SetCursorScreenPos(min - ImVec2(-8, ImGui::GetTextLineHeightWithSpacing() + 4));
                 ImGui::BeginGroup();
@@ -786,8 +1144,6 @@ void Application_Frame()
                     hintFrameBounds.GetTL(),
                     hintFrameBounds.GetBR(),
                     IM_COL32(255, 255, 255, 128 * bgAlpha / 255), 4.0f);
-
-                //ImGui::PopStyleVar();
             }
             ed::EndGroupHint();
         }
@@ -861,7 +1217,6 @@ void Application_Frame()
                                 {
                                     if (config->s_Links.at(link_i)->startPinID == startPinId && startPin->type == PinType::Flow)
                                     {
-                                        // s_Links.at(link_i)->endPin->link = nullptr;
                                         config->s_Links.at(link_i)->endPin->links.erase(std::remove(config->s_Links.at(link_i)->endPin->links.begin(), config->s_Links.at(link_i)->endPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->endPin->links.end());
                                         config->s_Links.at(link_i)->startPin->links.erase(std::remove(config->s_Links.at(link_i)->startPin->links.begin(), config->s_Links.at(link_i)->startPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->startPin->links.end());
                                         config->s_Links.at(link_i)->startPin = nullptr;
@@ -871,7 +1226,6 @@ void Application_Frame()
                                     }
                                     else if (config->s_Links.at(link_i)->endPinID == endPinId && endPin->type != PinType::Flow && endPin->kind == PinKind::Input)
                                     {
-                                        //s_Links.at(link_i)->startPin->link = nullptr;
                                         config->s_Links.at(link_i)->endPin->links.erase(std::remove(config->s_Links.at(link_i)->endPin->links.begin(), config->s_Links.at(link_i)->endPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->endPin->links.end());
                                         config->s_Links.at(link_i)->startPin->links.erase(std::remove(config->s_Links.at(link_i)->startPin->links.begin(), config->s_Links.at(link_i)->startPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->startPin->links.end());
                                         config->s_Links.at(link_i)->startPin = nullptr;
@@ -1009,12 +1363,30 @@ void Application_Frame()
         }
         else
             ImGui::Text("Unknown node: %p", contextNodeId.AsPointer());
-        ImGui::Separator();
+        
         if (node->name != "GL Main Loop")
         {
+            ImGui::Separator();
             if (ImGui::MenuItem("Delete"))
                 ed::DeleteNode(contextNodeId);
         }
+
+        if (node->is_set_placeholder || node->is_get_placeholder)
+        {
+            ImGui::Separator();
+            if (ImGui::MenuItem("Create Placeholder"))
+                showCreatePlaceholderWindow = true;
+            if (config->GetPlaceholdersMapKeys().size() > 0)
+            {
+                if (ImGui::MenuItem("Select Placeholder"))
+                    showSelectPlaceholderWindow = true;
+                if (ImGui::MenuItem("Rename Placeholder"))
+                    showRenamePlaceholderWindow = true;
+                if (ImGui::MenuItem("Delete Placeholder"))
+                    showDeletePlaceholderWindow = true;
+            }
+        }
+
         ImGui::EndPopup();
     }
 
@@ -1037,21 +1409,21 @@ void Application_Frame()
                 ImGui::Separator();
                 ImGui::Text("Select Type:");
 
-                pin_type_selected_item = PinTypeToString(pin->type);
-                if (ImGui::BeginCombo("##combo", pin_type_selected_item.data())) // The second parameter is the label previewed before opening the combo.
+                template_pin_type_selected_item = PinTypeToString(pin->type);
+                if (ImGui::BeginCombo("##combo", template_pin_type_selected_item.data())) // The second parameter is the label previewed before opening the combo.
                 {
                     for (int n = 0; n < pin->template_allowed_types.size(); n++)
                     {
-                        bool is_selected = (pin_type_selected_item == PinTypeToString(pin->template_allowed_types[n]));
+                        bool is_selected = (template_pin_type_selected_item == PinTypeToString(pin->template_allowed_types[n]));
                         if (ImGui::Selectable(PinTypeToString(pin->template_allowed_types[n]).c_str(), is_selected))
                         {
-                            pin_type_selected_item = PinTypeToString(pin->template_allowed_types[n]);
+                            template_pin_type_selected_item = PinTypeToString(pin->template_allowed_types[n]);
                             for (int link_i = 0; link_i < pin->links.size(); link_i++)
                             {
                                 ed::DeleteLink(pin->links.at(link_i)->id);
                             }
                             pin->links.clear();
-                            pin->node->node_funcs->ChangePinType(pin->kind, pin->index, StringToPinType(pin_type_selected_item));
+                            pin->node->node_funcs->ChangePinType(pin->kind, pin->index, StringToPinType(template_pin_type_selected_item));
                         }
                         if (is_selected)
                             ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)

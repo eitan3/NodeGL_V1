@@ -32,6 +32,37 @@ std::shared_ptr<Node> ConvertTo(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
+class SetPlaceholder_Func : public NodeFunctions {
+public:
+    void Initialize();
+    void Run();
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void ChangePinType(PinKind kind, int index, PinType type);
+
+    std::shared_ptr<BasePlaceholder> placeholder;
+};
+
+std::shared_ptr<Node> SetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class GetPlaceholder_Func : public NodeFunctions {
+public:
+    void Initialize();
+    void Run();
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void ChangePinType(PinKind kind, int index, PinType type);
+
+    std::shared_ptr<BasePlaceholder> placeholder;
+    PinType placeholder_type;
+};
+
+std::shared_ptr<Node> GetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
 void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
 
 #endif
