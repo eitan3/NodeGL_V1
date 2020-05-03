@@ -4,6 +4,8 @@
 
 #include "bp_structs.h"
 #include "objects/texture_object.h"
+#include "objects/program_object.h"
+#include "objects/shader_object.h"
 #include <memory>
 
 std::shared_ptr<Node> FindNode(ed::NodeId id, std::vector<std::shared_ptr<Node>>& s_Nodes);
