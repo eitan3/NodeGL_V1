@@ -1,2 +1,7 @@
+Create a menu bar instead left panel buttons
+remove the left panel and make it as floating window
+Change the UI, replace the right click for pins selection and placeholders with a panel that show all the node and pins settings
+Make functions for objects (like meshes)
+
 Need to remake placeholders ui and freeze the editor
 Need to freeze the editor on shader edit window

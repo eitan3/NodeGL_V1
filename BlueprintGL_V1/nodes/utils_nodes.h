@@ -5,6 +5,8 @@
 #include "node_function_interface.h"
 #include "../nodes_builder.h"
 #include "../utils.h"
+#include "../objects/shader_object.h"
+#include "../objects/program_object.h"
 
 class PrintString_Func : public NodeFunctions {
 public:
