@@ -114,7 +114,7 @@ std::shared_ptr<Node> GlMainLoop(std::vector<std::shared_ptr<Node>>& s_Nodes)
     s_Nodes.back()->inputs.emplace_back(new PinValue<int>(s_Nodes.back()->inputs.size(), GetNextId(), "Width", PinType::Int, 1920));
     s_Nodes.back()->inputs.emplace_back(new PinValue<int>(s_Nodes.back()->inputs.size(), GetNextId(), "Height", PinType::Int, 1080));
     s_Nodes.back()->outputs.emplace_back(new BasePin(s_Nodes.back()->outputs.size(), GetNextId(), "Next", PinType::Flow));
-    s_Nodes.back()->outputs.emplace_back(new PinValue<std::shared_ptr<TextureObject>>(s_Nodes.back()->inputs.size(), GetNextId(), "Texture Object", PinType::TextureObject, nullptr));
+    s_Nodes.back()->outputs.emplace_back(new PinValue<std::shared_ptr<TextureObject>>(s_Nodes.back()->outputs.size(), GetNextId(), "Texture Object", PinType::TextureObject, nullptr));
 
     s_Nodes.back()->node_funcs = std::make_shared<GlMainLoop_Func>();
     std::dynamic_pointer_cast<GlMainLoop_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
@@ -324,7 +324,7 @@ std::shared_ptr<Node> GlRenderToTexture(std::vector<std::shared_ptr<Node>>& s_No
     s_Nodes.back()->inputs.emplace_back(new PinValue<int>(s_Nodes.back()->inputs.size(), GetNextId(), "Height", PinType::Int, 1080));
     s_Nodes.back()->outputs.emplace_back(new BasePin(s_Nodes.back()->outputs.size(), GetNextId(), "Render Body", PinType::Flow));
     s_Nodes.back()->outputs.emplace_back(new BasePin(s_Nodes.back()->outputs.size(), GetNextId(), "After Rendering", PinType::Flow));
-    s_Nodes.back()->outputs.emplace_back(new PinValue<std::shared_ptr<TextureObject>>(s_Nodes.back()->inputs.size(), GetNextId(), "Texture Object", PinType::TextureObject, nullptr));
+    s_Nodes.back()->outputs.emplace_back(new PinValue<std::shared_ptr<TextureObject>>(s_Nodes.back()->outputs.size(), GetNextId(), "Texture Object", PinType::TextureObject, nullptr));
 
     s_Nodes.back()->node_funcs = std::make_shared<GlRenderToTexture_Func>();
     std::dynamic_pointer_cast<GlRenderToTexture_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();

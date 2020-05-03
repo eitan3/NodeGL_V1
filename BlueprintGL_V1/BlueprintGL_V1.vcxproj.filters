@@ -66,6 +66,15 @@
     <ClCompile Include="objects\framebuffer_object.cpp">
       <Filter>Source Files\objects</Filter>
     </ClCompile>
+    <ClCompile Include="nodes\shaders_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\shader_object.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\program_object.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_utils.h">
@@ -114,6 +123,15 @@
       <Filter>Header Files\objects</Filter>
     </ClInclude>
     <ClInclude Include="objects\framebuffer_object.h">
+      <Filter>Header Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\shaders_nodes.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\shader_object.h">
+      <Filter>Header Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\program_object.h">
       <Filter>Header Files\objects</Filter>
     </ClInclude>
   </ItemGroup>

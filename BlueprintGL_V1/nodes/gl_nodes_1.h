@@ -17,6 +17,8 @@ public:
     void Delete();
     void NoFlowUpdatePinsValues();
     void ChangePinType(PinKind kind, int index, PinType type);
+    void PressButton(PinKind, int index) {};
+    void UpdateUI() {};
 
 private:
     void SetupFrameBuffer();
@@ -39,6 +41,8 @@ public:
     void Delete();
     void NoFlowUpdatePinsValues();
     void ChangePinType(PinKind kind, int index, PinType type);
+    void PressButton(PinKind, int index) {};
+    void UpdateUI() {};
 };
 
 std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -52,6 +56,8 @@ public:
     void Delete();
     void NoFlowUpdatePinsValues();
     void ChangePinType(PinKind kind, int index, PinType type);
+    void PressButton(PinKind, int index) {};
+    void UpdateUI() {};
 
 private:
     void SetupFrameBuffer();

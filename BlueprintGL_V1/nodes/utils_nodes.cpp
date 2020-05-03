@@ -243,6 +243,24 @@ void SetPlaceholder_Func::Run()
             std::shared_ptr<PlaceholderValue<std::shared_ptr<TextureObject>>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<TextureObject>>>(placeholder);
             ph_value->value = placeholder_value;
         }
+        else if (parent_node->inputs.at(1)->type == PinType::ProgramObject)
+        {
+            std::shared_ptr<ProgramObject> placeholder_value = GetInputPinValue<std::shared_ptr<ProgramObject>>(parent_node, 1);
+            std::shared_ptr<PlaceholderValue<std::shared_ptr<ProgramObject>>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<ProgramObject>>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at(1)->type == PinType::VertexShaderObject)
+        {
+            std::shared_ptr<ShaderObject> placeholder_value = GetInputPinValue<std::shared_ptr<ShaderObject>>(parent_node, 1);
+            std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<ShaderObject>>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at(1)->type == PinType::FragmentShaderObject)
+        {
+            std::shared_ptr<ShaderObject> placeholder_value = GetInputPinValue<std::shared_ptr<ShaderObject>>(parent_node, 1);
+            std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<ShaderObject>>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
     }
     RunNextNodeFunc(parent_node, 0);
 }
@@ -348,6 +366,30 @@ void GetPlaceholder_Func::NoFlowUpdatePinsValues()
         if (placeholder)
             ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<TextureObject>>>(placeholder)->value;
         std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<TextureObject>>>(parent_node->outputs.at(0));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::ProgramObject)
+    {
+        std::shared_ptr<ProgramObject> ph_value = nullptr;
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<ProgramObject>>>(placeholder)->value;
+        std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<ProgramObject>>>(parent_node->outputs.at(0));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::VertexShaderObject)
+    {
+        std::shared_ptr<ShaderObject> ph_value = nullptr;
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<ShaderObject>>>(placeholder)->value;
+        std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<ShaderObject>>>(parent_node->outputs.at(0));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::FragmentShaderObject)
+    {
+        std::shared_ptr<ShaderObject> ph_value = nullptr;
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<ShaderObject>>>(placeholder)->value;
+        std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<ShaderObject>>>(parent_node->outputs.at(0));
         output_pin->value = ph_value;
     }
 }

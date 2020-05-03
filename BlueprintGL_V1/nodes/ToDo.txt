@@ -1,0 +1,2 @@
+Need to remake placeholders ui and freeze the editor
+Need to freeze the editor on shader edit window
