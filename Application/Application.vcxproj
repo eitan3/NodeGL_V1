@@ -87,10 +87,10 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>E:\Eitan\C++\BlueprintGL_V1\imgui;E:\Eitan\C++\BlueprintGL_V1\Dependencies\stb_image;E:\Eitan\C++\BlueprintGL_V1\Dependencies\ScopeGuard;E:\Eitan\C++\BlueprintGL_V1\Dependencies\DXSDK\include;E:\Eitan\C++\BlueprintGL_V1\Dependencies\gl3w\Include;E:\Eitan\C++\BlueprintGL_V1\Dependencies\glfw-3.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Eitan\C++\BlueprintGL_V1\imgui;E:\Eitan\C++\BlueprintGL_V1\Dependencies\stb_image;E:\Eitan\C++\BlueprintGL_V1\Dependencies\ScopeGuard;E:\Eitan\C++\BlueprintGL_V1\Dependencies\DXSDK\include;E:\Eitan\C++\BlueprintGL_V1\Dependencies\gl3w\Include;E:\Eitan\C++\BlueprintGL_V1\Dependencies\glfw-3.3.2\include;E:\Eitan\C++\BlueprintGL_V1\Dependencies\Dirent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -143,11 +143,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>E:\Eitan\C++\BlueprintGL_V1\imgui;E:\Eitan\C++\BlueprintGL_V1\Dependencies\stb_image;E:\Eitan\C++\BlueprintGL_V1\Dependencies\ScopeGuard;E:\Eitan\C++\BlueprintGL_V1\Dependencies\DXSDK\include;E:\Eitan\C++\BlueprintGL_V1\Dependencies\gl3w\Include;E:\Eitan\C++\BlueprintGL_V1\Dependencies\glfw-3.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Eitan\C++\BlueprintGL_V1\imgui;E:\Eitan\C++\BlueprintGL_V1\Dependencies\stb_image;E:\Eitan\C++\BlueprintGL_V1\Dependencies\ScopeGuard;E:\Eitan\C++\BlueprintGL_V1\Dependencies\DXSDK\include;E:\Eitan\C++\BlueprintGL_V1\Dependencies\gl3w\Include;E:\Eitan\C++\BlueprintGL_V1\Dependencies\glfw-3.3.2\include;E:\Eitan\C++\BlueprintGL_V1\Dependencies\Dirent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,12 +162,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="ImGuiFileBrowser.h" />
     <ClInclude Include="imgui_impl_glfw_gl3.h" />
+    <ClInclude Include="TextEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entry.cpp" />
     <ClCompile Include="gl3w.c" />
+    <ClCompile Include="ImGuiFileBrowser.cpp" />
     <ClCompile Include="imgui_impl_glfw_gl3.cpp" />
+    <ClCompile Include="TextEditor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

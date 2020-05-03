@@ -13,6 +13,8 @@ public:
     void Delete();
     void NoFlowUpdatePinsValues();
     void ChangePinType(PinKind kind, int index, PinType type);
+    void PressButton(PinKind, int index) {};
+    void UpdateUI() {};
 };
 
 std::shared_ptr<Node> MathPlusNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -26,6 +28,8 @@ public:
     void Delete();
     void NoFlowUpdatePinsValues();
     void ChangePinType(PinKind kind, int index, PinType type);
+    void PressButton(PinKind, int index) {};
+    void UpdateUI() {};
 };
 
 std::shared_ptr<Node> MathMinusNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -39,6 +43,8 @@ public:
     void Delete();
     void NoFlowUpdatePinsValues();
     void ChangePinType(PinKind kind, int index, PinType type);
+    void PressButton(PinKind, int index) {};
+    void UpdateUI() {};
 };
 
 std::shared_ptr<Node> MathMultiplyNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -52,6 +58,8 @@ public:
     void Delete();
     void NoFlowUpdatePinsValues();
     void ChangePinType(PinKind kind, int index, PinType type);
+    void PressButton(PinKind, int index) {};
+    void UpdateUI() {};
 };
 
 std::shared_ptr<Node> MathSubtractNode(std::vector<std::shared_ptr<Node>>& s_Nodes);

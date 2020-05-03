@@ -219,6 +219,9 @@ ImColor GetIconColor(PinType type)
     case PinType::Int:      return ImColor(68, 201, 156);
     case PinType::Float:    return ImColor(147, 226, 74);
     case PinType::String:   return ImColor(124, 21, 153);
+    case PinType::ProgramObject:   return ImColor(89, 48, 156);
+    case PinType::VertexShaderObject:   return ImColor(100, 149, 106);
+    case PinType::FragmentShaderObject:   return ImColor(239, 194, 154);
     case PinType::TextureObject:   return ImColor(75, 116, 117);
     }
 };
@@ -237,6 +240,9 @@ void DrawPinIcon(std::shared_ptr<BasePin> pin, bool connected, int alpha)
         case PinType::Int:      iconType = IconType::Circle; break;
         case PinType::Float:    iconType = IconType::Circle; break;
         case PinType::String:   iconType = IconType::Circle; break;
+        case PinType::ProgramObject:   iconType = IconType::Circle; break;
+        case PinType::VertexShaderObject:   iconType = IconType::Circle; break;
+        case PinType::FragmentShaderObject:   iconType = IconType::Circle; break;
         case PinType::TextureObject:   iconType = IconType::Circle; break;
         default:
             return;
@@ -364,7 +370,6 @@ void ShowCreatePlaceholderWindow(bool* show = nullptr)
     if (!ImGui::Begin("Create Placeholder", show))
     {
         ImGui::End();
-        ImGui::PopItemWidth();
         return;
     }
     ImGui::SetWindowSize(ImVec2(256, 0));
@@ -381,7 +386,8 @@ void ShowCreatePlaceholderWindow(bool* show = nullptr)
     ImGui::BeginHorizontal("##placeholder_type", ImVec2(paneWidth, 0), 1.0f);
     ImGui::TextUnformatted("Placeholder Type");
     std::string items[] = { PinTypeToString(PinType::String), PinTypeToString(PinType::Bool),
-    PinTypeToString(PinType::Float), PinTypeToString(PinType::Int),PinTypeToString(PinType::TextureObject) };
+    PinTypeToString(PinType::Float), PinTypeToString(PinType::Int),PinTypeToString(PinType::TextureObject),
+    PinTypeToString(PinType::ProgramObject), PinTypeToString(PinType::VertexShaderObject), PinTypeToString(PinType::FragmentShaderObject) };
     if (create_placeholder_type_combo == "")
         create_placeholder_type_combo = items[0];
     if (ImGui::BeginCombo("##placeholder_type_combo", create_placeholder_type_combo.data())) // The second parameter is the label previewed before opening the combo.
@@ -436,6 +442,24 @@ void ShowCreatePlaceholderWindow(bool* show = nullptr)
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
                 showCreatePlaceholderWindow = false;
             }
+            else if (pinType == PinType::ProgramObject)
+            {
+                std::shared_ptr<PlaceholderValue<std::shared_ptr<ProgramObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ProgramObject>>>(create_placeholder_name, pinType, nullptr);;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                showCreatePlaceholderWindow = false;
+            }
+            else if (pinType == PinType::VertexShaderObject)
+            {
+                std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ShaderObject>>>(create_placeholder_name, pinType, nullptr);;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                showCreatePlaceholderWindow = false;
+            }
+            else if (pinType == PinType::FragmentShaderObject)
+            {
+                std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ShaderObject>>>(create_placeholder_name, pinType, nullptr);;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                showCreatePlaceholderWindow = false;
+            }
         }
     }
     if (ImGui::Button("Cancel"))
@@ -452,7 +476,6 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
     if (!ImGui::Begin("Select Placeholder", show))
     {
         ImGui::End();
-        ImGui::PopItemWidth();
         return;
     }
     ImGui::SetWindowSize(ImVec2(256, 0));
@@ -536,7 +559,6 @@ void ShowRenamePlaceholderWindow(bool* show = nullptr)
     if (!ImGui::Begin("Rename Placeholder", show))
     {
         ImGui::End();
-        ImGui::PopItemWidth();
         return;
     }
     ImGui::SetWindowSize(ImVec2(256, 0));
@@ -597,7 +619,6 @@ void ShowDeletePlaceholderWindow(bool* show = nullptr)
     if (!ImGui::Begin("Delete Placeholder", show))
     {
         ImGui::End();
-        ImGui::PopItemWidth();
         return;
     }
     ImGui::SetWindowSize(ImVec2(256, 0));
@@ -906,6 +927,11 @@ void Application_Frame()
 
     ImGui::SameLine(0.0f, 12.0f);
 
+    for (auto& node : config->s_Nodes)
+    {
+        node->node_funcs->UpdateUI();
+    }
+
     ed::Begin("Node editor");
     {
         auto cursorTopLeft = ImGui::GetCursorScreenPos();
@@ -1040,7 +1066,17 @@ void Application_Frame()
                 }
                 if (!input->name.empty())
                 {
-                    ImGui::TextUnformatted(input->name.c_str());
+                    if (input->type == PinType::Button)
+                    {
+                        if (ImGui::Button(input->name.c_str()))
+                        {
+                            input->node->node_funcs->PressButton(PinKind::Input, input->index);
+                        }
+                    }
+                    else
+                    {
+                        ImGui::TextUnformatted(input->name.c_str());
+                    }
                     ImGui::Spring(0);
                 }
                 ImGui::PopStyleVar();
@@ -1193,6 +1229,10 @@ void Application_Frame()
                         {
                             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
                         }
+                        if (endPin->type == PinType::Button || startPin->type == PinType::Button)
+                        {
+                            ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+                        }
                         else if (endPin->kind == startPin->kind)
                         {
                             showLabel("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
@@ -1248,17 +1288,26 @@ void Application_Frame()
                 {
                     newLinkPin = FindPin(pinId, config->s_Nodes);
                     if (newLinkPin)
-                        showLabel("+ Create Node", ImColor(32, 45, 32, 180));
-
-                    if (ed::AcceptNewItem())
                     {
-                        createNewNode = true;
-                        newNodeLinkPin = FindPin(pinId, config->s_Nodes);
-                        newLinkPin = nullptr;
-                        ed::Suspend();
-                        ImGui::OpenPopup("Create New Node");
-                        reset_search_node = true;
-                        ed::Resume();
+                        if (newLinkPin->type != PinType::Button)
+                        {
+                            showLabel("+ Create Node", ImColor(32, 45, 32, 180));
+                            if (ed::AcceptNewItem())
+                            {
+                                createNewNode = true;
+                                newNodeLinkPin = FindPin(pinId, config->s_Nodes);
+                                newLinkPin = nullptr;
+                                ed::Suspend();
+                                ImGui::OpenPopup("Create New Node");
+                                reset_search_node = true;
+                                ed::Resume();
+                            }
+                        }
+                        else
+                        {
+                            newLinkPin = nullptr;
+                            ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+                        }
                     }
                 }
             }

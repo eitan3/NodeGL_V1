@@ -14,6 +14,8 @@ public:
     virtual void Delete() = 0;
     virtual void NoFlowUpdatePinsValues() = 0;
     virtual void ChangePinType(PinKind kind, int index, PinType type) = 0;
+    virtual void PressButton(PinKind, int index) = 0;
+    virtual void UpdateUI() = 0;
 
     std::shared_ptr<Node> parent_node;
 };

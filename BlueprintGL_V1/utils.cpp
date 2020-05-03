@@ -78,6 +78,12 @@ std::string PinTypeToString(PinType type)
         return "Int";
     else if (type == PinType::String)
         return "String";
+    else if (type == PinType::ProgramObject)
+        return "Program Object";
+    else if (type == PinType::VertexShaderObject)
+        return "Vertex Shader Object";
+    else if (type == PinType::FragmentShaderObject)
+        return "Fragment Shader Object";
     else if (type == PinType::TextureObject)
         return "Texture Object";
     std::cout << "Error!!! Cant find pin type" << std::endl;
@@ -94,6 +100,12 @@ PinType StringToPinType(std::string str)
         return PinType::Int;
     else if (str == "String")
         return PinType::String;
+    else if (str == "Program Object")
+        return PinType::ProgramObject;
+    else if (str == "Vertex Shader Object")
+        return PinType::VertexShaderObject;
+    else if (str == "Fragment Shader Object")
+        return PinType::FragmentShaderObject;
     else if (str == "Texture Object")
         return PinType::TextureObject;
     std::cout << "Error!!! Cant find pin type" << std::endl;
@@ -144,6 +156,30 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, int ind
             new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
             parent_node->inputs.at(index) = new_node;
         }
+        else if (type == PinType::ProgramObject)
+        {
+            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::ProgramObject, nullptr);
+            new_node->node = parent_node->inputs.at(index)->node;
+            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
+            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            parent_node->inputs.at(index) = new_node;
+        }
+        else if (type == PinType::VertexShaderObject)
+        {
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::VertexShaderObject, nullptr);
+            new_node->node = parent_node->inputs.at(index)->node;
+            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
+            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            parent_node->inputs.at(index) = new_node;
+        }
+        else if (type == PinType::FragmentShaderObject)
+        {
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::FragmentShaderObject, nullptr);
+            new_node->node = parent_node->inputs.at(index)->node;
+            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
+            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            parent_node->inputs.at(index) = new_node;
+        }
     }
     else if (kind == PinKind::Output)
     {
@@ -187,6 +223,30 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, int ind
             new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
             parent_node->outputs.at(index) = new_node;
         }
+        else if (type == PinType::ProgramObject)
+        {
+            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::ProgramObject, nullptr);
+            new_node->node = parent_node->outputs.at(index)->node;
+            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
+            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            parent_node->outputs.at(index) = new_node;
+        }
+        else if (type == PinType::VertexShaderObject)
+        {
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::VertexShaderObject, nullptr);
+            new_node->node = parent_node->outputs.at(index)->node;
+            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
+            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            parent_node->outputs.at(index) = new_node;
+        }
+        else if (type == PinType::FragmentShaderObject)
+        {
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::FragmentShaderObject, nullptr);
+            new_node->node = parent_node->outputs.at(index)->node;
+            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
+            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            parent_node->outputs.at(index) = new_node;
+        }
     }
 }
 
@@ -217,9 +277,12 @@ T GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index)
             if (parent_node->inputs.at(pin_index)->links.at(0)->startPin)
             {
                 std::shared_ptr<PinValue<T>> input_pin = std::dynamic_pointer_cast<PinValue<T>>(parent_node->inputs.at(pin_index)->links.at(0)->startPin);
-                input_pin->node->node_funcs->NoFlowUpdatePinsValues();
-                std::dynamic_pointer_cast<PinValue<T>>(parent_node->inputs.at(pin_index))->value = input_pin->GetValue();
-                return input_pin->GetValue();
+                if (input_pin->node)
+                {
+                    input_pin->node->node_funcs->NoFlowUpdatePinsValues();
+                    std::dynamic_pointer_cast<PinValue<T>>(parent_node->inputs.at(pin_index))->value = input_pin->GetValue();
+                    return input_pin->GetValue();
+                }
             }
         }
     }
@@ -245,9 +308,13 @@ template std::shared_ptr<PinValue<int>> GetLinkedInputPin(std::shared_ptr<Node>&
 template std::shared_ptr<PinValue<float>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
 template std::shared_ptr<PinValue<std::string>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
 template std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
+template std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
+template std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
 
 template bool GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
 template int GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
 template float GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
 template std::string GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
 template std::shared_ptr<TextureObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
+template std::shared_ptr<ProgramObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
+template std::shared_ptr<ShaderObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
