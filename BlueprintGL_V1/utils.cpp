@@ -116,155 +116,102 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, int ind
 {
     if (kind == PinKind::Input)
     {
+        std::shared_ptr<Node> node = parent_node->inputs.at(index)->node;;
+        bool isTemplate = parent_node->inputs.at(index)->isTemplate;
+        std::vector<PinType> template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
         if (type == PinType::Bool)
         {
-            std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::Bool, false);
-            new_node->node = parent_node->inputs.at(index)->node;
-            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, false);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::Float, 0);
-            new_node->node = parent_node->inputs.at(index)->node;
-            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, 0);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::Int, 0);
-            new_node->node = parent_node->inputs.at(index)->node;
-            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, 0);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::String)
         {
-            std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::String, "");
-            new_node->node = parent_node->inputs.at(index)->node;
-            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, "");
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::TextureObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::TextureObject, nullptr);
-            new_node->node = parent_node->inputs.at(index)->node;
-            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::ProgramObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::ProgramObject, nullptr);
-            new_node->node = parent_node->inputs.at(index)->node;
-            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::VertexShaderObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::VertexShaderObject, nullptr);
-            new_node->node = parent_node->inputs.at(index)->node;
-            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::FragmentShaderObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), PinType::FragmentShaderObject, nullptr);
-            new_node->node = parent_node->inputs.at(index)->node;
-            new_node->isTemplate = parent_node->inputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
             parent_node->inputs.at(index) = new_node;
         }
+        parent_node->inputs.at(index)->node = node;
+        parent_node->inputs.at(index)->isTemplate = isTemplate;
+        parent_node->inputs.at(index)->template_allowed_types = template_allowed_types;
     }
     else if (kind == PinKind::Output)
     {
+        std::shared_ptr<Node> node = parent_node->outputs.at(index)->node;;
+        bool isTemplate = parent_node->outputs.at(index)->isTemplate;
+        std::vector<PinType> template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
         if (type == PinType::Bool)
         {
-            std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::Bool, false);
-            new_node->node = parent_node->outputs.at(index)->node;
-            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, false);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::Float, 0);
-            new_node->node = parent_node->outputs.at(index)->node;
-            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, 0);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::Int, 0);
-            new_node->node = parent_node->outputs.at(index)->node;
-            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, 0);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::String)
         {
-            std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::String, "");
-            new_node->node = parent_node->outputs.at(index)->node;
-            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, "");
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::TextureObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::TextureObject, nullptr);
-            new_node->node = parent_node->outputs.at(index)->node;
-            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::ProgramObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::ProgramObject, nullptr);
-            new_node->node = parent_node->outputs.at(index)->node;
-            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::VertexShaderObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::VertexShaderObject, nullptr);
-            new_node->node = parent_node->outputs.at(index)->node;
-            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::FragmentShaderObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), PinType::FragmentShaderObject, nullptr);
-            new_node->node = parent_node->outputs.at(index)->node;
-            new_node->isTemplate = parent_node->outputs.at(index)->isTemplate;
-            new_node->template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
             parent_node->outputs.at(index) = new_node;
         }
+        parent_node->outputs.at(index)->node = node;
+        parent_node->outputs.at(index)->isTemplate = isTemplate;
+        parent_node->outputs.at(index)->template_allowed_types = template_allowed_types;
     }
-}
-
-template<typename T>
-std::shared_ptr<PinValue<T>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index)
-{
-    if (parent_node->inputs.at(pin_index)->links.size() > 0)
-    {
-        if (parent_node->inputs.at(pin_index)->links.at(0))
-        {
-            if (parent_node->inputs.at(pin_index)->links.at(0)->startPin)
-            {
-                std::shared_ptr<PinValue<T>> input_pin = std::dynamic_pointer_cast<PinValue<T>>(parent_node->inputs.at(pin_index)->links.at(0)->startPin);
-                return input_pin;
-            }
-        }
-    }
-    return nullptr;
 }
 
 template<typename T>
@@ -303,13 +250,6 @@ T GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index)
 
 
 
-template std::shared_ptr<PinValue<bool>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
-template std::shared_ptr<PinValue<int>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
-template std::shared_ptr<PinValue<float>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
-template std::shared_ptr<PinValue<std::string>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
-template std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
-template std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
-template std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
 
 template bool GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
 template int GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);

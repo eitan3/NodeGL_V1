@@ -19,8 +19,8 @@ void BuildNode(std::shared_ptr<Node>& node)
 Node* SpawnBranchNode(std::vector<Node>& s_Nodes)
 {
     s_Nodes.emplace_back(GetNextId(), "Branch");
-    s_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
-    s_Nodes.back().Inputs.emplace_back(GetNextId(), "Condition", PinType::Bool);
+    s_Nodes.back().In puts.emplace_back(GetNextId(), "", PinType::Flow);
+    s_Nodes.back().In puts.emplace_back(GetNextId(), "Condition", PinType::Bool);
     s_Nodes.back().Outputs.emplace_back(GetNextId(), "True", PinType::Flow);
     s_Nodes.back().Outputs.emplace_back(GetNextId(), "False", PinType::Flow);
 

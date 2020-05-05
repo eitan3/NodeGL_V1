@@ -19,9 +19,6 @@ PinType StringToPinType(std::string str);
 void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, int index, PinType type);
 
 template<typename T>
-std::shared_ptr<PinValue<T>> GetLinkedInputPin(std::shared_ptr<Node>& parent_node, int pin_index);
-
-template<typename T>
 T GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
 
 #endif

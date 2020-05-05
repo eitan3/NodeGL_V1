@@ -1,4 +1,4 @@
-#include "Application.h"
+﻿#include "Application.h"
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -53,7 +53,9 @@ std::shared_ptr<BasePin> newLinkPin = nullptr;
 
 // Boolean variables to indicate which window to open
 bool showStyleEditor = false;
+bool showNodeHierarchyWindow = false;
 bool showTextureViewer = false;
+bool showNodeInspector = false;
 bool showCreatePlaceholderWindow = false;
 bool showSelectPlaceholderWindow = false;
 bool showRenamePlaceholderWindow = false;
@@ -167,7 +169,6 @@ void Application_Initialize()
 
     std::shared_ptr<Node> node;
     node = GlMainLoop(config->s_Nodes);      ed::SetNodePosition(node->id, ImVec2(0, 0));
-    //s_Links.push_back(Link(GetNextLinkId(), s_Nodes[5].Outputs[0].id, s_Nodes[6].Inputs[0].id));
 
     BuildNodes(config->s_Nodes);
     ed::NavigateToContent();
@@ -195,18 +196,6 @@ void Application_Finalize()
         ed::DestroyEditor(m_Editor);
         m_Editor = nullptr;
     }
-}
-
-static bool Splitter(bool split_vertically, float thickness, float* size1, float* size2, float min_size1, float min_size2, float splitter_long_axis_size = -1.0f)
-{
-    using namespace ImGui;
-    ImGuiContext& g = *GImGui;
-    ImGuiWindow* window = g.CurrentWindow;
-    ImGuiID id = window->GetID("##Splitter");
-    ImRect bb;
-    bb.Min = window->DC.CursorPos + (split_vertically ? ImVec2(*size1, 0.0f) : ImVec2(0.0f, *size1));
-    bb.Max = bb.Min + CalcItemSize(split_vertically ? ImVec2(thickness, splitter_long_axis_size) : ImVec2(splitter_long_axis_size, thickness), 0.0f, 0.0f);
-    return SplitterBehavior(bb, id, split_vertically ? ImGuiAxis_X : ImGuiAxis_Y, size1, size2, min_size1, min_size2, 0.0f);
 }
 
 ImColor GetIconColor(PinType type)
@@ -330,6 +319,163 @@ void ShowStyleEditor(bool* show = nullptr)
     ImGui::End();
 }
 
+void ShowNodeHierarchyWindow(bool* show = nullptr)
+{
+    if (!ImGui::Begin("Node Hierarchy Window", show, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoResize))
+    {
+        ImGui::End();
+        return;
+    }
+
+    auto config = InstanceConfig::instance();
+    auto& io = ImGui::GetIO();
+    ImGui::SetWindowSize(ImVec2(350, 512));
+
+    auto paneWidth = ImGui::GetContentRegionAvailWidth();
+    paneWidth = ImGui::GetContentRegionAvailWidth();
+
+    std::vector<ed::NodeId> selectedNodes;
+    std::vector<ed::LinkId> selectedLinks;
+    selectedNodes.resize(ed::GetSelectedObjectCount());
+    selectedLinks.resize(ed::GetSelectedObjectCount());
+
+    int nodeCount = ed::GetSelectedNodes(selectedNodes.data(), static_cast<int>(selectedNodes.size()));
+    int linkCount = ed::GetSelectedLinks(selectedLinks.data(), static_cast<int>(selectedLinks.size()));
+
+    selectedNodes.resize(nodeCount);
+    selectedLinks.resize(linkCount);
+
+    int saveIconWidth = Application_GetTextureWidth(s_SaveIcon);
+    int saveIconHeight = Application_GetTextureWidth(s_SaveIcon);
+    int restoreIconWidth = Application_GetTextureWidth(s_RestoreIcon);
+    int restoreIconHeight = Application_GetTextureWidth(s_RestoreIcon);
+
+    ImGui::GetWindowDrawList()->AddRectFilled(
+        ImGui::GetCursorScreenPos(),
+        ImGui::GetCursorScreenPos() + ImVec2(paneWidth, ImGui::GetTextLineHeight()),
+        ImColor(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]), ImGui::GetTextLineHeight() * 0.25f);
+    ImGui::Spacing(); ImGui::SameLine();
+    ImGui::TextUnformatted("Nodes");
+    ImGui::Indent();
+    for (auto& node : config->s_Nodes)
+    {
+        ImGui::PushID(node->id.AsPointer());
+        auto start = ImGui::GetCursorScreenPos();
+
+        if (const auto progress = GetTouchProgress(node->id))
+        {
+            ImGui::GetWindowDrawList()->AddLine(
+                start + ImVec2(-8, 0),
+                start + ImVec2(-8, ImGui::GetTextLineHeight()),
+                IM_COL32(255, 0, 0, 255 - (int)(255 * progress)), 4.0f);
+        }
+
+        bool isSelected = std::find(selectedNodes.begin(), selectedNodes.end(), node->id) != selectedNodes.end();
+        if (ImGui::Selectable((node->name + "##" + std::to_string(reinterpret_cast<uintptr_t>(node->id.AsPointer()))).c_str(), &isSelected))
+        {
+            if (io.KeyCtrl)
+            {
+                if (isSelected)
+                    ed::SelectNode(node->id, true);
+                else
+                    ed::DeselectNode(node->id);
+            }
+            else
+                ed::SelectNode(node->id, false);
+
+            ed::NavigateToSelection();
+        }
+        if (ImGui::IsItemHovered() && !node->state.empty())
+            ImGui::SetTooltip("State: %s", node->state.c_str());
+
+        auto id = std::string("(") + std::to_string(reinterpret_cast<uintptr_t>(node->id.AsPointer())) + ")";
+        auto textSize = ImGui::CalcTextSize(id.c_str(), nullptr);
+        auto iconPanelPos = start + ImVec2(
+            paneWidth - ImGui::GetStyle().FramePadding.x - ImGui::GetStyle().IndentSpacing - saveIconWidth - restoreIconWidth - ImGui::GetStyle().ItemInnerSpacing.x * 1,
+            (ImGui::GetTextLineHeight() - saveIconHeight) / 2);
+        ImGui::GetWindowDrawList()->AddText(
+            ImVec2(iconPanelPos.x - textSize.x - ImGui::GetStyle().ItemInnerSpacing.x, start.y),
+            IM_COL32(255, 255, 255, 255), id.c_str(), nullptr);
+
+        auto drawList = ImGui::GetWindowDrawList();
+        ImGui::SetCursorScreenPos(iconPanelPos);
+        ImGui::SetItemAllowOverlap();
+        if (node->savedState.empty())
+        {
+            if (ImGui::InvisibleButton("save", ImVec2((float)saveIconWidth, (float)saveIconHeight)))
+                node->savedState = node->state;
+
+            if (ImGui::IsItemActive())
+                drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 96));
+            else if (ImGui::IsItemHovered())
+                drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 255));
+            else
+                drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 160));
+        }
+        else
+        {
+            ImGui::Dummy(ImVec2((float)saveIconWidth, (float)saveIconHeight));
+            drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 32));
+        }
+
+        ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
+        ImGui::SetItemAllowOverlap();
+        if (!node->savedState.empty())
+        {
+            if (ImGui::InvisibleButton("restore", ImVec2((float)restoreIconWidth, (float)restoreIconHeight)))
+            {
+                node->state = node->savedState;
+                ed::RestoreNodeState(node->id);
+                node->savedState.clear();
+            }
+
+            if (ImGui::IsItemActive())
+                drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 96));
+            else if (ImGui::IsItemHovered())
+                drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 255));
+            else
+                drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 160));
+        }
+        else
+        {
+            ImGui::Dummy(ImVec2((float)restoreIconWidth, (float)restoreIconHeight));
+            drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 32));
+        }
+
+        ImGui::SameLine(0, 0);
+        ImGui::SetItemAllowOverlap();
+        ImGui::Dummy(ImVec2(0, (float)restoreIconHeight));
+
+        ImGui::PopID();
+    }
+    ImGui::Unindent();
+
+    static int changeCount = 0;
+
+    ImGui::GetWindowDrawList()->AddRectFilled(
+        ImGui::GetCursorScreenPos(),
+        ImGui::GetCursorScreenPos() + ImVec2(paneWidth, ImGui::GetTextLineHeight()),
+        ImColor(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]), ImGui::GetTextLineHeight() * 0.25f);
+    ImGui::Spacing(); ImGui::SameLine();
+    ImGui::TextUnformatted("Selection");
+
+    ImGui::BeginHorizontal("Selection Stats", ImVec2(paneWidth, 0));
+    ImGui::Text("Changed %d time%s", changeCount, changeCount > 1 ? "s" : "");
+    ImGui::Spring();
+    if (ImGui::Button("Deselect All"))
+        ed::ClearSelection();
+    ImGui::EndHorizontal();
+    ImGui::Indent();
+    for (int i = 0; i < nodeCount; ++i) ImGui::Text("Node (%p)", selectedNodes[i].AsPointer());
+    for (int i = 0; i < linkCount; ++i) ImGui::Text("Link (%p)", selectedLinks[i].AsPointer());
+    ImGui::Unindent();
+
+    if (ed::HasSelectionChanged())
+        ++changeCount;
+
+    ImGui::End();
+}
+
 void ShowTextureViewer(bool* show = nullptr)
 {
     if (!ImGui::Begin("Texture Viewer", show))
@@ -360,6 +506,47 @@ void ShowTextureViewer(bool* show = nullptr)
             ImGui::EndCombo();
         }
         ImGui::Image((void*)(intptr_t)config->GetTexture(preview_texture)->object_id, ImVec2(256, 256));
+    }
+
+    ImGui::End();
+}
+
+void ShowNodeInspector(bool* show = nullptr, std::shared_ptr<Node> node = nullptr)
+{
+    ImVec2 win_size = ImGui::GetWindowSize();
+    if (!ImGui::Begin("Node Inspector", show, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_HorizontalScrollbar))
+    {
+        ImGui::End();
+        return;
+    }
+
+    auto config = InstanceConfig::instance();
+    auto& io = ImGui::GetIO();
+    ImGui::GetCurrentWindow()->BeginOrderWithinParent = 1;
+    ImGui::SetWindowPos(ImVec2(10, win_size.y - 512 - 25));
+    ImGui::SetWindowSize(ImVec2(256, 512));
+
+    //ImGui::Text(((std::string)("Node: " + node->name)).c_str());
+    if (ImGui::BeginTabBar("TabBar 0", 0))
+    {
+        if (ImGui::BeginTabItem("TabItem 0"))
+        {
+            ImGui::Text(((std::string)("Node: " + node->name)).c_str());
+
+            ImGui::Text("TabBar 0 pointer in g.CurrentTabar is invalid");
+            ImGui::EndTabItem();
+        }
+        
+        if (ImGui::BeginTabItem("TabItem 1"))
+        {
+            ImGui::Text(((std::string)("Node: " + node->name)).c_str());
+
+            ImGui::Text("TabBar 1 pointer in g.CurrentTabar is invalid");
+            ImGui::EndTabItem();
+        }
+
+        ImGui::EndTabBar();
     }
 
     ImGui::End();
@@ -666,37 +853,16 @@ void ShowDeletePlaceholderWindow(bool* show = nullptr)
     ImGui::End();
 }
 
-void ShowLeftPane(float paneWidth)
+void ShowWindows()
 {
-    auto config = InstanceConfig::instance();
-    auto& io = ImGui::GetIO();
-
-    ImGui::BeginChild("Selection", ImVec2(paneWidth, 0));
-
-    paneWidth = ImGui::GetContentRegionAvailWidth();
-
-    ImGui::BeginHorizontal("Style Editor", ImVec2(paneWidth, 0));
-    ImGui::Spring(0.0f, 0.0f);
-    if (ImGui::Button("Zoom to Content"))
-        ed::NavigateToContent();
-    ImGui::Spring(0.0f);
-    if (ImGui::Button("Show Flow"))
-    {
-        for (auto& link : config->s_Links)
-            ed::Flow(link->id);
-    }
-    ImGui::Spring();
-    if (ImGui::Button("Edit Style"))
-        showStyleEditor = true;
-    if (ImGui::Button("Texture Viewer"))
-        showTextureViewer = true;
-    ImGui::EndHorizontal();
-
     if (showStyleEditor)
         ShowStyleEditor(&showStyleEditor);
 
     if (showTextureViewer)
         ShowTextureViewer(&showTextureViewer);
+
+    if (showNodeHierarchyWindow)
+        ShowNodeHierarchyWindow(&showNodeHierarchyWindow);
 
     if (showCreatePlaceholderWindow)
     {
@@ -735,152 +901,52 @@ void ShowLeftPane(float paneWidth)
     {
         delete_placeholder_combo = "";
     }
+}
 
-    std::vector<ed::NodeId> selectedNodes;
-    std::vector<ed::LinkId> selectedLinks;
-    selectedNodes.resize(ed::GetSelectedObjectCount());
-    selectedLinks.resize(ed::GetSelectedObjectCount());
-
-    int nodeCount = ed::GetSelectedNodes(selectedNodes.data(), static_cast<int>(selectedNodes.size()));
-    int linkCount = ed::GetSelectedLinks(selectedLinks.data(), static_cast<int>(selectedLinks.size()));
-
-    selectedNodes.resize(nodeCount);
-    selectedLinks.resize(linkCount);
-
-    int saveIconWidth = Application_GetTextureWidth(s_SaveIcon);
-    int saveIconHeight = Application_GetTextureWidth(s_SaveIcon);
-    int restoreIconWidth = Application_GetTextureWidth(s_RestoreIcon);
-    int restoreIconHeight = Application_GetTextureWidth(s_RestoreIcon);
-
-    ImGui::GetWindowDrawList()->AddRectFilled(
-        ImGui::GetCursorScreenPos(),
-        ImGui::GetCursorScreenPos() + ImVec2(paneWidth, ImGui::GetTextLineHeight()),
-        ImColor(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]), ImGui::GetTextLineHeight() * 0.25f);
-    ImGui::Spacing(); ImGui::SameLine();
-    ImGui::TextUnformatted("Nodes");
-    ImGui::Indent();
-    for (auto& node : config->s_Nodes)
+void CreateMenuBar()
+{
+    auto config = InstanceConfig::instance();
+    if (ImGui::BeginMainMenuBar())
     {
-        ImGui::PushID(node->id.AsPointer());
-        auto start = ImGui::GetCursorScreenPos();
-
-        if (const auto progress = GetTouchProgress(node->id))
+        if (ImGui::BeginMenu("File"))
         {
-            ImGui::GetWindowDrawList()->AddLine(
-                start + ImVec2(-8, 0),
-                start + ImVec2(-8, ImGui::GetTextLineHeight()),
-                IM_COL32(255, 0, 0, 255 - (int)(255 * progress)), 4.0f);
-        }
-
-        bool isSelected = std::find(selectedNodes.begin(), selectedNodes.end(), node->id) != selectedNodes.end();
-        if (ImGui::Selectable((node->name + "##" + std::to_string(reinterpret_cast<uintptr_t>(node->id.AsPointer()))).c_str(), &isSelected))
-        {
-            if (io.KeyCtrl)
+            if (ImGui::MenuItem("Exit"))
             {
-                if (isSelected)
-                    ed::SelectNode(node->id, true);
-                else
-                    ed::DeselectNode(node->id);
+                exit(0);
             }
-            else
-                ed::SelectNode(node->id, false);
-
-            ed::NavigateToSelection();
+            ImGui::EndMenu();
         }
-        if (ImGui::IsItemHovered() && !node->state.empty())
-            ImGui::SetTooltip("State: %s", node->state.c_str());
-
-        auto id = std::string("(") + std::to_string(reinterpret_cast<uintptr_t>(node->id.AsPointer())) + ")";
-        auto textSize = ImGui::CalcTextSize(id.c_str(), nullptr);
-        auto iconPanelPos = start + ImVec2(
-            paneWidth - ImGui::GetStyle().FramePadding.x - ImGui::GetStyle().IndentSpacing - saveIconWidth - restoreIconWidth - ImGui::GetStyle().ItemInnerSpacing.x * 1,
-            (ImGui::GetTextLineHeight() - saveIconHeight) / 2);
-        ImGui::GetWindowDrawList()->AddText(
-            ImVec2(iconPanelPos.x - textSize.x - ImGui::GetStyle().ItemInnerSpacing.x, start.y),
-            IM_COL32(255, 255, 255, 255), id.c_str(), nullptr);
-
-        auto drawList = ImGui::GetWindowDrawList();
-        ImGui::SetCursorScreenPos(iconPanelPos);
-        ImGui::SetItemAllowOverlap();
-        if (node->savedState.empty())
+        if (ImGui::BeginMenu("Editor"))
         {
-            if (ImGui::InvisibleButton("save", ImVec2((float)saveIconWidth, (float)saveIconHeight)))
-                node->savedState = node->state;
-
-            if (ImGui::IsItemActive())
-                drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 96));
-            else if (ImGui::IsItemHovered())
-                drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 255));
-            else
-                drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 160));
-        }
-        else
-        {
-            ImGui::Dummy(ImVec2((float)saveIconWidth, (float)saveIconHeight));
-            drawList->AddImage(s_SaveIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 32));
-        }
-
-        ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
-        ImGui::SetItemAllowOverlap();
-        if (!node->savedState.empty())
-        {
-            if (ImGui::InvisibleButton("restore", ImVec2((float)restoreIconWidth, (float)restoreIconHeight)))
+            if (ImGui::MenuItem("Zoom to Content"))
             {
-                node->state = node->savedState;
-                ed::RestoreNodeState(node->id);
-                node->savedState.clear();
+                ed::NavigateToContent();
             }
-
-            if (ImGui::IsItemActive())
-                drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 96));
-            else if (ImGui::IsItemHovered())
-                drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 255));
-            else
-                drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 160));
+            if (ImGui::MenuItem("Show Flow"))
+            {
+                for (auto& link : config->s_Links)
+                    ed::Flow(link->id);
+            }
+            if (ImGui::MenuItem("Edit Style"))
+            {
+                showStyleEditor = true;
+            }
+            ImGui::EndMenu();
         }
-        else
+        if (ImGui::BeginMenu("Windows"))
         {
-            ImGui::Dummy(ImVec2((float)restoreIconWidth, (float)restoreIconHeight));
-            drawList->AddImage(s_RestoreIcon, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 32));
+            if (ImGui::MenuItem("Nodes Hierarchy Window"))
+            {
+                showNodeHierarchyWindow = true;
+            }
+            if (ImGui::MenuItem("Textures Viewer"))
+            {
+                showTextureViewer = true;
+            }
+            ImGui::EndMenu();
         }
-
-        ImGui::SameLine(0, 0);
-        ImGui::SetItemAllowOverlap();
-        ImGui::Dummy(ImVec2(0, (float)restoreIconHeight));
-
-        ImGui::PopID();
+        ImGui::EndMainMenuBar();
     }
-    ImGui::Unindent();
-
-    static int changeCount = 0;
-
-    ImGui::GetWindowDrawList()->AddRectFilled(
-        ImGui::GetCursorScreenPos(),
-        ImGui::GetCursorScreenPos() + ImVec2(paneWidth, ImGui::GetTextLineHeight()),
-        ImColor(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]), ImGui::GetTextLineHeight() * 0.25f);
-    ImGui::Spacing(); ImGui::SameLine();
-    ImGui::TextUnformatted("Selection");
-
-    ImGui::BeginHorizontal("Selection Stats", ImVec2(paneWidth, 0));
-    ImGui::Text("Changed %d time%s", changeCount, changeCount > 1 ? "s" : "");
-    ImGui::Spring();
-    if (ImGui::Button("Deselect All"))
-        ed::ClearSelection();
-    ImGui::EndHorizontal();
-    ImGui::Indent();
-    for (int i = 0; i < nodeCount; ++i) ImGui::Text("Node (%p)", selectedNodes[i].AsPointer());
-    for (int i = 0; i < linkCount; ++i) ImGui::Text("Link (%p)", selectedLinks[i].AsPointer());
-    ImGui::Unindent();
-
-    // Press Z to show the flow
-    //if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Z)))
-    //    for (auto& link : s Links)
-    //        ed::Flow(link.id);
-
-    if (ed::HasSelectionChanged())
-        ++changeCount;
-
-    ImGui::EndChild();
 }
 
 std::vector<std::string> split_string(std::string s_tmp, char splitter)
@@ -901,6 +967,24 @@ std::vector<std::string> split_string(std::string s_tmp, char splitter)
     return tokens;
 }
 
+auto showLabelOnMouse = [](const char* label, ImColor color)
+{
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
+    auto size = ImGui::CalcTextSize(label);
+
+    auto padding = ImGui::GetStyle().FramePadding;
+    auto spacing = ImGui::GetStyle().ItemSpacing;
+
+    ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
+
+    auto rectMin = ImGui::GetCursorScreenPos() - padding;
+    auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
+
+    auto drawList = ImGui::GetWindowDrawList();
+    drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
+    ImGui::TextUnformatted(label);
+};
+
 void Application_GL_Frame()
 {
     auto config = InstanceConfig::instance();
@@ -911,6 +995,8 @@ void Application_GL_Frame()
 void Application_Frame()
 {
     UpdateTouch();
+    CreateMenuBar();
+    ShowWindows();
 
     auto& io = ImGui::GetIO();
     auto config = InstanceConfig::instance();
@@ -918,14 +1004,6 @@ void Application_Frame()
     ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 
     ed::SetCurrentEditor(m_Editor);
-
-    static float leftPaneWidth = 400.0f;
-    static float rightPaneWidth = 800.0f;
-    Splitter(true, 4.0f, &leftPaneWidth, &rightPaneWidth, 50.0f, 50.0f);
-
-    ShowLeftPane(leftPaneWidth - 4.0f);
-
-    ImGui::SameLine(0.0f, 12.0f);
 
     for (auto& node : config->s_Nodes)
     {
@@ -1191,24 +1269,6 @@ void Application_Frame()
         {
             if (ed::BeginCreate(ImColor(255, 255, 255), 2.0f))
             {
-                auto showLabel = [](const char* label, ImColor color)
-                {
-                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
-                    auto size = ImGui::CalcTextSize(label);
-
-                    auto padding = ImGui::GetStyle().FramePadding;
-                    auto spacing = ImGui::GetStyle().ItemSpacing;
-
-                    ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
-
-                    auto rectMin = ImGui::GetCursorScreenPos() - padding;
-                    auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
-
-                    auto drawList = ImGui::GetWindowDrawList();
-                    drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
-                    ImGui::TextUnformatted(label);
-                };
-
                 ed::PinId startPinId = 0, endPinId = 0;
                 if (ed::QueryNewLink(&startPinId, &endPinId))
                 {
@@ -1235,22 +1295,22 @@ void Application_Frame()
                         }
                         else if (endPin->kind == startPin->kind)
                         {
-                            showLabel("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
+                            showLabelOnMouse("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
                             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
                         }
                         else if (endPin->node->id == startPin->node->id)
                         {
-                            showLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
+                            showLabelOnMouse("x Cannot connect to self", ImColor(45, 32, 32, 180));
                             ed::RejectNewItem(ImColor(255, 0, 0), 1.0f);
                         }
                         else if (endPin->type != startPin->type)
                         {
-                            showLabel("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
+                            showLabelOnMouse("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
                             ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
                         }
                         else
                         {
-                            showLabel("+ Create Link", ImColor(32, 45, 32, 180));
+                            showLabelOnMouse("+ Create Link", ImColor(32, 45, 32, 180));
                             if (ed::AcceptNewItem(ImColor(128, 255, 128), 4.0f))
                             {
                                 for (int link_i = 0; link_i < config->s_Links.size(); link_i++)
@@ -1291,7 +1351,7 @@ void Application_Frame()
                     {
                         if (newLinkPin->type != PinType::Button)
                         {
-                            showLabel("+ Create Node", ImColor(32, 45, 32, 180));
+                            showLabelOnMouse("+ Create Node", ImColor(32, 45, 32, 180));
                             if (ed::AcceptNewItem())
                             {
                                 createNewNode = true;
@@ -1602,6 +1662,24 @@ void Application_Frame()
         createNewNode = false;
     ImGui::PopStyleVar();
     ed::Resume();
+
+
+    std::vector<ed::NodeId> selectedNodes;
+    selectedNodes.resize(ed::GetSelectedObjectCount());
+    int nodeCount = ed::GetSelectedNodes(selectedNodes.data(), static_cast<int>(selectedNodes.size()));
+    selectedNodes.resize(nodeCount);
+
+    if (nodeCount == 1)
+    {
+        ed::Suspend();
+        auto node = FindNode(selectedNodes.at(0), config->s_Nodes);
+        ShowNodeInspector(&showNodeInspector, node);
+        ed::Resume();
+    }
+    else
+    {
+        showNodeInspector = false;
+    }
 
     ed::End();
 }

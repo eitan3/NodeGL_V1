@@ -12,6 +12,7 @@
 #include <vector>
 #include <algorithm>
 #include <cstdint>
+#include <imgui_internal.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 extern "C" {
@@ -109,9 +110,10 @@ int main(int, char**)
     glfwSetErrorCallback(error_callback);
     if (!glfwInit())
         return 1;
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
 #if __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #ifdef GLFW_COCOA_RETINA_FRAMEBUFFER
@@ -168,7 +170,7 @@ int main(int, char**)
         ImGui::Begin("Content", nullptr,
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
             ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoSavedSettings |
-            ImGuiWindowFlags_NoBringToFrontOnFocus);
+            ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_MenuBar);
 
         Application_Frame();
 
@@ -184,6 +186,14 @@ int main(int, char**)
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        ImGuiContext* ctx = ImGui::GetCurrentContext();
+        std::stable_sort(ctx->Windows.begin(), ctx->Windows.end(),
+            [](const ImGuiWindow* a, const ImGuiWindow* b) {
+            return a->BeginOrderWithinContext < b->BeginOrderWithinContext;
+        }
+        );
+
         ImGui::Render();
         glfwSwapBuffers(window);
     }
