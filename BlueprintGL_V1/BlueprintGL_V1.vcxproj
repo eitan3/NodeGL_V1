@@ -160,6 +160,17 @@
     <ClCompile Include="objects\renderbuffer_object.cpp" />
     <ClCompile Include="objects\shader_object.cpp" />
     <ClCompile Include="objects\texture_object.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutCopy.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutDirectX.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutGLDXinterop.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutGLextensions.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutMemoryShare.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutReceiver.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutSDK.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutSender.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutSenderMemory.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutSenderNames.cpp" />
+    <ClCompile Include="SpoutSDK\SpoutSharedMemory.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +192,19 @@
     <ClInclude Include="objects\renderbuffer_object.h" />
     <ClInclude Include="objects\shader_object.h" />
     <ClInclude Include="objects\texture_object.h" />
+    <ClInclude Include="SpoutSDK\Spout.h" />
+    <ClInclude Include="SpoutSDK\SpoutCommon.h" />
+    <ClInclude Include="SpoutSDK\SpoutCopy.h" />
+    <ClInclude Include="SpoutSDK\SpoutDirectX.h" />
+    <ClInclude Include="SpoutSDK\SpoutGLDXinterop.h" />
+    <ClInclude Include="SpoutSDK\SpoutGLextensions.h" />
+    <ClInclude Include="SpoutSDK\SpoutMemoryShare.h" />
+    <ClInclude Include="SpoutSDK\SpoutReceiver.h" />
+    <ClInclude Include="SpoutSDK\SpoutSDK.h" />
+    <ClInclude Include="SpoutSDK\SpoutSender.h" />
+    <ClInclude Include="SpoutSDK\SpoutSenderMemory.h" />
+    <ClInclude Include="SpoutSDK\SpoutSenderNames.h" />
+    <ClInclude Include="SpoutSDK\SpoutSharedMemory.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>

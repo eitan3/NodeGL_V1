@@ -3,15 +3,15 @@
 void GlMainLoop_Func::Initialize()
 {
     object_prefix = "glMainLoop_" + std::to_string(parent_node->id.Get());
-    output_width = GetInputPinValue<int>(parent_node, 0);
-    output_height = GetInputPinValue<int>(parent_node, 1);
+    output_width = GetInputPinValue<int>(parent_node, "width");
+    output_height = GetInputPinValue<int>(parent_node, "height");
     SetupFrameBuffer();
 }
 
 void GlMainLoop_Func::Run()
 {
-    int new_width = GetInputPinValue<int>(parent_node, 0);
-    int new_height = GetInputPinValue<int>(parent_node, 1);
+    int new_width = GetInputPinValue<int>(parent_node, "width");
+    int new_height = GetInputPinValue<int>(parent_node, "height");
     if (new_width != output_width || new_height != output_height)
     {
         output_width = new_width;
@@ -31,11 +31,11 @@ void GlMainLoop_Func::Run()
     GLuint new_framebuffer_id = config->GetFrameBuffer(config->current_framebuffer)->object_id;
     glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer_id);
 
-    std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<TextureObject>>>(parent_node->outputs.at(1));
+    std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<TextureObject>>>(parent_node->outputs.at("texture_out"));
     output_pin->value = config->GetTexture(object_prefix);
 
     // Run next node
-    RunNextNodeFunc(parent_node, 0);
+    RunNextNodeFunc(parent_node, "next");
 
     // Unbind frambebuffer and return to previous viewport
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -53,7 +53,7 @@ void GlMainLoop_Func::NoFlowUpdatePinsValues()
 
 }
 
-void GlMainLoop_Func::ChangePinType(PinKind kind, int index, PinType type)
+void GlMainLoop_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
 {
 
 }
@@ -111,10 +111,11 @@ void GlMainLoop_Func::DeleteFrameBuffer()
 std::shared_ptr<Node> GlMainLoop(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "GL Main Loop", ImColor(255, 128, 128)));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<int>(s_Nodes.back()->inputs.size(), GetNextId(), "Width", PinType::Int, 1920));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<int>(s_Nodes.back()->inputs.size(), GetNextId(), "Height", PinType::Int, 1080));
-    s_Nodes.back()->outputs.emplace_back(new BasePin(s_Nodes.back()->outputs.size(), GetNextId(), "Next", PinType::Flow));
-    s_Nodes.back()->outputs.emplace_back(new PinValue<std::shared_ptr<TextureObject>>(s_Nodes.back()->outputs.size(), GetNextId(), "Texture Object", PinType::TextureObject, nullptr));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("width", new PinValue<int>("width", 0, GetNextId(), "Width", PinType::Int, 1920)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("height", new PinValue<int>("height", 1, GetNextId(), "Height", PinType::Int, 1080)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("next", new BasePin("next", 0, GetNextId(), "Next", PinType::Flow)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>>>("texture_out", new PinValue<std::shared_ptr<TextureObject>>("texture_out", 1, GetNextId(), "Texture Object", PinType::TextureObject, nullptr)));
 
     s_Nodes.back()->node_funcs = std::make_shared<GlMainLoop_Func>();
     std::dynamic_pointer_cast<GlMainLoop_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
@@ -136,10 +137,10 @@ void GlClear_Func::Initialize()
 
 void GlClear_Func::Run()
 {
-    float r = GetInputPinValue<float>(parent_node, 1);
-    float g = GetInputPinValue<float>(parent_node, 2);
-    float b = GetInputPinValue<float>(parent_node, 3);
-    float a = GetInputPinValue<float>(parent_node, 4);
+    float r = GetInputPinValue<float>(parent_node, "r");
+    float g = GetInputPinValue<float>(parent_node, "g");
+    float b = GetInputPinValue<float>(parent_node, "b");
+    float a = GetInputPinValue<float>(parent_node, "a");
     if (r < 0)
         r = 0;
     if (r > 1)
@@ -158,7 +159,7 @@ void GlClear_Func::Run()
         a = r;
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT);
-    RunNextNodeFunc(parent_node, 0);
+    RunNextNodeFunc(parent_node, "next");
 }
 
 void GlClear_Func::Delete()
@@ -171,7 +172,7 @@ void GlClear_Func::NoFlowUpdatePinsValues()
 
 }
 
-void GlClear_Func::ChangePinType(PinKind kind, int index, PinType type)
+void GlClear_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
 {
 
 }
@@ -179,12 +180,18 @@ void GlClear_Func::ChangePinType(PinKind kind, int index, PinType type)
 std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "glClrear"));
-    s_Nodes.back()->inputs.emplace_back(new BasePin(s_Nodes.back()->inputs.size(), GetNextId(), "Enter", PinType::Flow));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "R", PinType::Float, 0));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "G", PinType::Float, 0));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "B", PinType::Float, 0));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "A", PinType::Float, 0));
-    s_Nodes.back()->outputs.emplace_back(new BasePin(s_Nodes.back()->outputs.size(), GetNextId(), "Next", PinType::Flow));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("r", new PinValue<float>("r", 1, GetNextId(), "R", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("g", new PinValue<float>("g", 2, GetNextId(), "G", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("b", new PinValue<float>("b", 3, GetNextId(), "B", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("a", new PinValue<float>("a", 4, GetNextId(), "A", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("next", new BasePin("next", 0, GetNextId(), "Next", PinType::Flow)));
+
+    s_Nodes.back()->inputs.at("r")->always_expose = false;
+    s_Nodes.back()->inputs.at("g")->always_expose = false;
+    s_Nodes.back()->inputs.at("b")->always_expose = false;
+    s_Nodes.back()->inputs.at("a")->always_expose = false;
 
     s_Nodes.back()->node_funcs = std::make_shared<GlClear_Func>();
     std::dynamic_pointer_cast<GlClear_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
@@ -203,15 +210,15 @@ std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 void GlRenderToTexture_Func::Initialize()
 {
     object_prefix = "glRenderToTexture_" + std::to_string(parent_node->id.Get());
-    output_width = GetInputPinValue<int>(parent_node, 1);
-    output_height = GetInputPinValue<int>(parent_node, 2);
+    output_width = GetInputPinValue<int>(parent_node, "width");
+    output_height = GetInputPinValue<int>(parent_node, "height");
     SetupFrameBuffer();
 }
 
 void GlRenderToTexture_Func::Run()
 {
-    int new_width = GetInputPinValue<int>(parent_node, 1);
-    int new_height = GetInputPinValue<int>(parent_node, 2);
+    int new_width = GetInputPinValue<int>(parent_node, "width");
+    int new_height = GetInputPinValue<int>(parent_node, "height");
     if (new_width != output_width || new_height != output_height)
     {
         output_width = new_width;
@@ -233,7 +240,7 @@ void GlRenderToTexture_Func::Run()
     glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer_id);
 
     // Run next node
-    RunNextNodeFunc(parent_node, 0);
+    RunNextNodeFunc(parent_node, "render_body");
 
     // Return to previous viewport and framebuffer
     std::string prev_framebuffer = config->framebuffer_stack.top();
@@ -243,11 +250,11 @@ void GlRenderToTexture_Func::Run()
     glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer_id);
     glViewport(0, 0, prev_viewport[2], prev_viewport[3]);
 
-    std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<TextureObject>>>(parent_node->outputs.at(2));
+    std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<TextureObject>>>(parent_node->outputs.at("texture_out"));
     output_pin->value = config->GetTexture(object_prefix);
 
     // Run next node
-    RunNextNodeFunc(parent_node, 1);
+    RunNextNodeFunc(parent_node, "next");
 }
 
 void GlRenderToTexture_Func::Delete()
@@ -261,7 +268,7 @@ void GlRenderToTexture_Func::NoFlowUpdatePinsValues()
 
 }
 
-void GlRenderToTexture_Func::ChangePinType(PinKind kind, int index, PinType type)
+void GlRenderToTexture_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
 {
 
 }
@@ -319,12 +326,14 @@ void GlRenderToTexture_Func::DeleteFrameBuffer()
 std::shared_ptr<Node> GlRenderToTexture(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "GL Render To Texture"));
-    s_Nodes.back()->inputs.emplace_back(new BasePin(s_Nodes.back()->inputs.size(), GetNextId(), "Enter", PinType::Flow));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<int>(s_Nodes.back()->inputs.size(), GetNextId(), "Width", PinType::Int, 1920));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<int>(s_Nodes.back()->inputs.size(), GetNextId(), "Height", PinType::Int, 1080));
-    s_Nodes.back()->outputs.emplace_back(new BasePin(s_Nodes.back()->outputs.size(), GetNextId(), "Render Body", PinType::Flow));
-    s_Nodes.back()->outputs.emplace_back(new BasePin(s_Nodes.back()->outputs.size(), GetNextId(), "After Rendering", PinType::Flow));
-    s_Nodes.back()->outputs.emplace_back(new PinValue<std::shared_ptr<TextureObject>>(s_Nodes.back()->outputs.size(), GetNextId(), "Texture Object", PinType::TextureObject, nullptr));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("width", new PinValue<int>("width", 1, GetNextId(), "Width", PinType::Int, 1920)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("height", new PinValue<int>("height", 2, GetNextId(), "Height", PinType::Int, 1080)));
+
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("render_body", new BasePin("render_body", 0, GetNextId(), "Render Body", PinType::Flow)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("next", new BasePin("next", 1, GetNextId(), "After Rendering", PinType::Flow)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>>>("texture_out", new PinValue<std::shared_ptr<TextureObject>>("texture_out", 2, GetNextId(), "Texture Object", PinType::TextureObject, nullptr)));
 
     s_Nodes.back()->node_funcs = std::make_shared<GlRenderToTexture_Func>();
     std::dynamic_pointer_cast<GlRenderToTexture_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();

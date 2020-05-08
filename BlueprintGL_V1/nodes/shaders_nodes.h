@@ -18,8 +18,8 @@ public:
     void Delete();
     void DeleteShader();
     void NoFlowUpdatePinsValues() {};
-    void ChangePinType(PinKind kind, int index, PinType type) {};
-    void PressButton(PinKind, int index);
+    void ChangePinType(PinKind kind, std::string pin_key, PinType type) {};
+    void PressButton(PinKind, std::string pin_key);
     void UpdateUI();
 
     void ShowShaderEditorWindow(bool* show = nullptr);
@@ -46,8 +46,8 @@ public:
     void Delete();
     void DeleteProgram();
     void NoFlowUpdatePinsValues();
-    void ChangePinType(PinKind kind, int index, PinType type) {};
-    void PressButton(PinKind, int index) {};
+    void ChangePinType(PinKind kind, std::string pin_key, PinType type) {};
+    void PressButton(PinKind, std::string pin_key) {};
     void UpdateUI();
 
     void CreateProgram(GLuint vertex_shader, GLuint fragment_shader);

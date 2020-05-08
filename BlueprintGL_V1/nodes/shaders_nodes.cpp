@@ -21,14 +21,14 @@ void CreateSahder_Func::DeleteShader()
     {
         if (parent_node->outputs.size() > 0)
         {
-            for (int i = 0; i < parent_node->outputs.size(); i++)
+            for (auto& output : parent_node->outputs)
             {
-                for (int j = 0; j < parent_node->outputs.at(i)->links.size(); j++)
+                for (int j = 0; j < output.second->links.size(); j++)
                 {
-                    ed::DeleteLink(parent_node->outputs.at(i)->links.at(j)->id);
+                    ed::DeleteLink(output.second->links.at(j)->id);
                 }
-                parent_node->outputs.at(i)->node = nullptr;
-                parent_node->outputs.at(i)->links.clear();
+                output.second->node = nullptr;
+                output.second->links.clear();
             }
         }
         parent_node->outputs.clear();
@@ -37,7 +37,7 @@ void CreateSahder_Func::DeleteShader()
     }
 }
 
-void CreateSahder_Func::PressButton(PinKind, int index)
+void CreateSahder_Func::PressButton(PinKind, std::string pin_key)
 {
     showShaderEditorWindow = true;
 }
@@ -127,13 +127,13 @@ void CreateSahder_Func::ShowShaderEditorWindow(bool* show)
             if (current_shader_type == shaders_types[0])
             {
                 std::shared_ptr<ShaderObject> new_obj = std::make_shared<ShaderObject>(object_prefix, shader_id, editor.GetText(), PinType::VertexShaderObject);
-                parent_node->outputs.emplace_back(new PinValue<std::shared_ptr<ShaderObject>>(parent_node->outputs.size(), GetNextId(), "Vertex Shader Object", PinType::VertexShaderObject, new_obj));
+                parent_node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("shader_out", new PinValue<std::shared_ptr<ShaderObject>>("shader_out", 0, GetNextId(), "Vertex Shader Object", PinType::VertexShaderObject, new_obj)));
                 shader_obj = new_obj;
             }
             else if (current_shader_type == shaders_types[1])
             {
                 std::shared_ptr<ShaderObject> new_obj = std::make_shared<ShaderObject>(object_prefix, shader_id, editor.GetText(), PinType::FragmentShaderObject);
-                parent_node->outputs.emplace_back(new PinValue<std::shared_ptr<ShaderObject>>(parent_node->outputs.size(), GetNextId(), "Fragment Shader Object", PinType::FragmentShaderObject, new_obj));
+                parent_node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("shader_out", new PinValue<std::shared_ptr<ShaderObject>>("shader_out", 0, GetNextId(), "Fragment Shader Object", PinType::FragmentShaderObject, new_obj)));
                 shader_obj = new_obj;
             }
             BuildNode(parent_node);
@@ -191,7 +191,7 @@ void CreateSahder_Func::UpdateUI()
 std::shared_ptr<Node> CreateSahder(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Create Shader", true));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<std::string>(s_Nodes.back()->inputs.size(), GetNextId(), "Edit Shader", PinType::Button, ""));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("edit_btn", new PinValue<std::string>("edit_btn", 0, GetNextId(), "Edit Shader", PinType::Button, "")));
 
     s_Nodes.back()->node_funcs = std::make_shared<CreateSahder_Func>();
     std::dynamic_pointer_cast<CreateSahder_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
@@ -225,14 +225,14 @@ void CreateProgram_Func::DeleteProgram()
     {
         if (parent_node->outputs.size() > 0)
         {
-            for (int i = 0; i < parent_node->outputs.size(); i++)
+            for (auto& output : parent_node->outputs)
             {
-                for (int j = 0; j < parent_node->outputs.at(i)->links.size(); j++)
+                for (int j = 0; j < output.second->links.size(); j++)
                 {
-                    ed::DeleteLink(parent_node->outputs.at(i)->links.at(j)->id);
+                    ed::DeleteLink(output.second->links.at(j)->id);
                 }
-                parent_node->outputs.at(i)->node = nullptr;
-                parent_node->outputs.at(i)->links.clear();
+                output.second->node = nullptr;
+                output.second->links.clear();
             }
         }
         parent_node->outputs.clear();
@@ -247,8 +247,8 @@ void CreateProgram_Func::NoFlowUpdatePinsValues()
 
 void CreateProgram_Func::UpdateUI()
 {
-    std::shared_ptr<ShaderObject> vertex_shader = GetInputPinValue<std::shared_ptr<ShaderObject>>(parent_node, 0);
-    std::shared_ptr<ShaderObject> fragment_shader = GetInputPinValue<std::shared_ptr<ShaderObject>>(parent_node, 1);
+    std::shared_ptr<ShaderObject> vertex_shader = GetInputPinValue<std::shared_ptr<ShaderObject>>(parent_node, "vs");
+    std::shared_ptr<ShaderObject> fragment_shader = GetInputPinValue<std::shared_ptr<ShaderObject>>(parent_node, "fs");
 
     if (vertex_shader && fragment_shader)
     {
@@ -292,7 +292,7 @@ void CreateProgram_Func::CreateProgram(GLuint vertex_shader, GLuint fragment_sha
     else
     {
         std::shared_ptr<ProgramObject> new_obj = std::make_shared<ProgramObject>(object_prefix, program, vertex_shader, fragment_shader);
-        parent_node->outputs.emplace_back(new PinValue<std::shared_ptr<ProgramObject>>(parent_node->outputs.size(), GetNextId(), "Program Object", PinType::ProgramObject, new_obj));
+        parent_node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>>>("prog_out", new PinValue<std::shared_ptr<ProgramObject>>("prog_out", 0, GetNextId(), "Program Object", PinType::ProgramObject, new_obj)));
         program_obj = new_obj;
         BuildNode(parent_node);
         parent_node->error = "";
@@ -302,8 +302,8 @@ void CreateProgram_Func::CreateProgram(GLuint vertex_shader, GLuint fragment_sha
 std::shared_ptr<Node> CreateProgram(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Create Program", true));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<std::shared_ptr<ShaderObject>>(s_Nodes.back()->inputs.size(), GetNextId(), "Vertex Shader", PinType::VertexShaderObject, nullptr));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<std::shared_ptr<ShaderObject>>(s_Nodes.back()->inputs.size(), GetNextId(), "Fragment Shader", PinType::FragmentShaderObject, nullptr));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("vs", new PinValue<std::shared_ptr<ShaderObject>>("vs", 0, GetNextId(), "Vertex Shader", PinType::VertexShaderObject, nullptr)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("fs", new PinValue<std::shared_ptr<ShaderObject>>("fs", 1, GetNextId(), "Fragment Shader", PinType::FragmentShaderObject, nullptr)));
 
     s_Nodes.back()->node_funcs = std::make_shared<CreateProgram_Func>();
     std::dynamic_pointer_cast<CreateProgram_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();

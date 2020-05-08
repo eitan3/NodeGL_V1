@@ -12,8 +12,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void ChangePinType(PinKind kind, int index, PinType type);
-    void PressButton(PinKind, int index) {};
+    void ChangePinType(PinKind kind, std::string pin_key, PinType type);
+    void PressButton(PinKind, std::string pin_key) {};
     void UpdateUI() {};
 };
 
@@ -27,8 +27,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void ChangePinType(PinKind kind, int index, PinType type);
-    void PressButton(PinKind, int index) {};
+    void ChangePinType(PinKind kind, std::string pin_key, PinType type);
+    void PressButton(PinKind, std::string pin_key) {};
     void UpdateUI() {};
 };
 
@@ -42,8 +42,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void ChangePinType(PinKind kind, int index, PinType type);
-    void PressButton(PinKind, int index) {};
+    void ChangePinType(PinKind kind, std::string pin_key, PinType type);
+    void PressButton(PinKind, std::string pin_key) {};
     void UpdateUI() {};
 };
 
@@ -51,18 +51,18 @@ std::shared_ptr<Node> MathMultiplyNode(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 
-class MathSubtractNode_Func : public NodeFunctions {
+class MathDivideNode_Func : public NodeFunctions {
 public:
     void Initialize();
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void ChangePinType(PinKind kind, int index, PinType type);
-    void PressButton(PinKind, int index) {};
+    void ChangePinType(PinKind kind, std::string pin_key, PinType type);
+    void PressButton(PinKind, std::string pin_key) {};
     void UpdateUI() {};
 };
 
-std::shared_ptr<Node> MathSubtractNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> MathDivideNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 

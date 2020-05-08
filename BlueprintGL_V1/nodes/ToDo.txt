@@ -1,5 +1,5 @@
-Change the UI, replace the right click for pins selection and placeholders with a panel that show all the node and pins settings
+Siquencer
+PBR Rendering & Simple
 Make functions for objects (like meshes)
-
-Need to remake placeholders ui and freeze the editor
-Need to freeze the editor on shader edit window
+Need to freeze the editor when other window open up
+Change buttons pin(?)

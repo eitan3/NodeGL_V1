@@ -26,12 +26,12 @@ std::shared_ptr<BasePin> FindPin(ed::PinId id, std::vector<std::shared_ptr<Node>
     for (auto& node : s_Nodes)
     {
         for (auto& pin : node->inputs)
-            if (pin->id == id)
-                return pin;
+            if (pin.second->id == id)
+                return pin.second;
 
         for (auto& pin : node->outputs)
-            if (pin->id == id)
-                return pin;
+            if (pin.second->id == id)
+                return pin.second;
     }
 
     return nullptr;
@@ -57,15 +57,15 @@ bool CanCreateLink(std::shared_ptr<BasePin>& a, std::shared_ptr<BasePin>& b)
     return true;
 }
 
-void RunNextNodeFunc(std::shared_ptr<Node>& parent_node, int pin_index)
+void RunNextNodeFunc(std::shared_ptr<Node>& parent_node, std::string pin_key)
 {
-    if (parent_node->outputs.at(pin_index)->type == PinType::Flow)
-        if (parent_node->outputs.at(pin_index)->links.size() > 0)
-            if (parent_node->outputs.at(pin_index)->links.at(0))
-                if (parent_node->outputs.at(pin_index)->links.at(0)->endPin)
-                    if (parent_node->outputs.at(pin_index)->links.at(0)->endPin->node)
-                        if (parent_node->outputs.at(pin_index)->links.at(0)->endPin->node->node_funcs)
-                            parent_node->outputs.at(pin_index)->links.at(0)->endPin->node->node_funcs->Run();
+    if (parent_node->outputs.at(pin_key)->type == PinType::Flow)
+        if (parent_node->outputs.at(pin_key)->links.size() > 0)
+            if (parent_node->outputs.at(pin_key)->links.at(0))
+                if (parent_node->outputs.at(pin_key)->links.at(0)->endPin)
+                    if (parent_node->outputs.at(pin_key)->links.at(0)->endPin->node)
+                        if (parent_node->outputs.at(pin_key)->links.at(0)->endPin->node->node_funcs)
+                            parent_node->outputs.at(pin_key)->links.at(0)->endPin->node->node_funcs->Run();
 }
 
 std::string PinTypeToString(PinType type)
@@ -112,7 +112,232 @@ PinType StringToPinType(std::string str)
     return PinType::Unknown;
 }
 
-void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, int index, PinType type)
+std::vector<std::string> SortPins(std::map<std::string, std::shared_ptr<BasePin>> pins)
+{
+    auto cmp = [](const std::pair<std::string, std::shared_ptr<BasePin>>& p1, const std::pair<std::string, std::shared_ptr<BasePin>>& p2)
+    {
+        return p1.second->order < p2.second->order;
+    };
+
+    std::set<std::pair<std::string, std::shared_ptr<BasePin>>, decltype(cmp)> s(pins.begin(), pins.end(), cmp);
+    std::vector<std::string> ret;
+    for (const auto& p : s)
+        ret.push_back(p.first);
+    return ret;
+}
+
+bool CanAddToInputsTab(std::shared_ptr<BasePin> pin)
+{
+    if (pin->type == PinType::Bool || pin->type == PinType::Float || pin->type == PinType::Int || pin->type == PinType::String)
+        return true;
+    return false;
+}
+
+bool isEditDefaultActive = false;
+void AddInputPinsTab(std::shared_ptr<Node> node)
+{
+    bool g_hasValuePins = false;
+    bool g_hasTemplate = false;
+    for (auto& input : node->inputs)
+    {
+        if (CanAddToInputsTab(input.second))
+            g_hasValuePins = true;
+        if (input.second->isTemplate)
+            g_hasTemplate = true;
+    }
+    for (auto& output : node->outputs)
+    {
+        if (output.second->isTemplate)
+            g_hasTemplate = true;
+    }
+
+    if (g_hasValuePins || g_hasTemplate)
+    {
+        auto paneWidth = ImGui::GetContentRegionAvailWidth();
+        if (ImGui::BeginTabItem("Inputs"))
+        {
+            if (g_hasValuePins)
+            {
+                if (ImGui::CollapsingHeader("Inputs Default Values", ImGuiTreeNodeFlags_AllowItemOverlap))
+                {
+                    std::vector<std::string> sort_pins = SortPins(node->inputs);
+                    for (int pi = 0; pi < sort_pins.size(); pi++)
+                    {
+                        std::shared_ptr<BasePin> input = node->inputs.at(sort_pins.at(pi));
+                        if (CanAddToInputsTab(input))
+                        {
+                            ImGui::BeginHorizontal(("##horizontal_panel" + input->name).c_str(), ImVec2(paneWidth, 0), 1.0f);
+                            if (input->always_expose)
+                            {
+                                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+                                input->exposed = true;
+                                ImGui::Checkbox(("##checkbox_" + input->name).c_str(), &input->exposed);
+                                ImGui::PopItemFlag();
+                                ImGui::PopStyleVar();
+                            }
+                            else
+                            {
+                                ImGui::Checkbox(("##checkbox_" + input->name).c_str(), &input->exposed);
+                            }
+                            ImGui::TextUnformatted(input->name.c_str());
+
+                            if (input->type == PinType::String)
+                            {
+                                ImGui::PushItemWidth(100.0f);
+                                std::shared_ptr<PinValue<std::string>> input_pin_value = std::dynamic_pointer_cast<PinValue<std::string>>(input);
+
+                                ImGui::InputText("##edit", (char*)input_pin_value->default_value.data(), input_pin_value->default_value.capacity() + 1.0);
+                                input_pin_value->default_value = std::string(input_pin_value->default_value.data());
+
+                                ImGui::PopItemWidth();
+                                if (ImGui::IsItemActive() && !isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(false);
+                                    isEditDefaultActive = true;
+                                }
+                                else if (!ImGui::IsItemActive() && isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(true);
+                                    isEditDefaultActive = false;
+                                }
+                            }
+                            else if (input->type == PinType::Bool)
+                            {
+                                std::shared_ptr<PinValue<bool>> input_pin_value = std::dynamic_pointer_cast<PinValue<bool>>(input);
+                                ImGui::PushItemWidth(100.0f);
+                                
+                                ImGui::Checkbox("##edit", &input_pin_value->default_value);
+
+                                ImGui::PopItemWidth();
+                                if (ImGui::IsItemActive() && !isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(false);
+                                    isEditDefaultActive = true;
+                                }
+                                else if (!ImGui::IsItemActive() && isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(true);
+                                    isEditDefaultActive = false;
+                                }
+                            }
+                            else if (input->type == PinType::Float)
+                            {
+                                std::shared_ptr<PinValue<float>> input_pin_value = std::dynamic_pointer_cast<PinValue<float>>(input);
+                                ImGui::PushItemWidth(100.0f);
+
+                                ImGui::InputFloat("##edit", &input_pin_value->default_value, 0.0, 0.0, "%.6f", 0);
+
+                                ImGui::PopItemWidth();
+                                if (ImGui::IsItemActive() && !isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(false);
+                                    isEditDefaultActive = true;
+                                }
+                                else if (!ImGui::IsItemActive() && isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(true);
+                                    isEditDefaultActive = false;
+                                }
+                            }
+                            else if (input->type == PinType::Int)
+                            {
+                                std::shared_ptr<PinValue<int>> input_pin_value = std::dynamic_pointer_cast<PinValue<int>>(input);
+                                ImGui::PushItemWidth(100.0f);
+
+                                ImGui::InputInt("##edit", &input_pin_value->default_value, 0, 0, 0);
+
+                                ImGui::PopItemWidth();
+                                if (ImGui::IsItemActive() && !isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(false);
+                                    isEditDefaultActive = true;
+                                }
+                                else if (!ImGui::IsItemActive() && isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(true);
+                                    isEditDefaultActive = false;
+                                }
+                            }
+
+                            ImGui::EndHorizontal();
+                        }
+                    }
+                }
+            }
+
+            if (g_hasTemplate)
+            {
+                if (ImGui::CollapsingHeader("Inputs Type", ImGuiTreeNodeFlags_AllowItemOverlap))
+                {
+                    std::vector<std::string> sort_pins = SortPins(node->inputs);
+                    for (int pi = 0; pi < sort_pins.size(); pi++)
+                    {
+                        std::shared_ptr<BasePin> input = node->inputs.at(sort_pins.at(pi));
+                        if (input->isTemplate)
+                        {
+                            std::string template_pin_type_selected_item = PinTypeToString(input->type);
+                            if (ImGui::BeginCombo(input->name.c_str(), template_pin_type_selected_item.data()))
+                            {
+                                for (int n = 0; n < input->template_allowed_types.size(); n++)
+                                {
+                                    bool is_selected = (template_pin_type_selected_item == PinTypeToString(input->template_allowed_types[n]));
+                                    if (ImGui::Selectable(PinTypeToString(input->template_allowed_types[n]).c_str(), is_selected))
+                                    {
+                                        template_pin_type_selected_item = PinTypeToString(input->template_allowed_types[n]);
+                                        for (int link_i = 0; link_i < input->links.size(); link_i++)
+                                        {
+                                            ed::DeleteLink(input->links.at(link_i)->id);
+                                        }
+                                        input->links.clear();
+                                        input->node->node_funcs->ChangePinType(input->kind, input->pin_key, input->template_allowed_types[n]);
+                                    }
+                                    if (is_selected)
+                                        ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                                }
+                                ImGui::EndCombo();
+                            }
+                        }
+                    }
+                    
+                    sort_pins = SortPins(node->outputs);
+                    for (int pi = 0; pi < sort_pins.size(); pi++)
+                    {
+                        std::shared_ptr<BasePin> output = node->outputs.at(sort_pins.at(pi));
+                        if (output->isTemplate)
+                        {
+                            std::string template_pin_type_selected_item = PinTypeToString(output->type);
+                            if (ImGui::BeginCombo(output->name.c_str(), template_pin_type_selected_item.data()))
+                            {
+                                for (int n = 0; n < output->template_allowed_types.size(); n++)
+                                {
+                                    bool is_selected = (template_pin_type_selected_item == PinTypeToString(output->template_allowed_types[n]));
+                                    if (ImGui::Selectable(PinTypeToString(output->template_allowed_types[n]).c_str(), is_selected))
+                                    {
+                                        template_pin_type_selected_item = PinTypeToString(output->template_allowed_types[n]);
+                                        for (int link_i = 0; link_i < output->links.size(); link_i++)
+                                        {
+                                            ed::DeleteLink(output->links.at(link_i)->id);
+                                        }
+                                        output->links.clear();
+                                        output->node->node_funcs->ChangePinType(output->kind, output->pin_key, output->template_allowed_types[n]);
+                                    }
+                                    if (is_selected)
+                                        ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                                }
+                                ImGui::EndCombo();
+                            }
+                        }
+                    }
+                }
+            }
+
+            ImGui::EndTabItem();
+        }
+    }
+}
+
+void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::string index, PinType type)
 {
     if (kind == PinKind::Input)
     {
@@ -121,42 +346,42 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, int ind
         std::vector<PinType> template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
         if (type == PinType::Bool)
         {
-            std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, false);
+            std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, false);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, 0);
+            std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, 0);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, 0);
+            std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, 0);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::String)
         {
-            std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, "");
+            std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, "");
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::TextureObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
+            std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::ProgramObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
+            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::VertexShaderObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
             parent_node->inputs.at(index) = new_node;
         }
         else if (type == PinType::FragmentShaderObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
             parent_node->inputs.at(index) = new_node;
         }
         parent_node->inputs.at(index)->node = node;
@@ -170,42 +395,42 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, int ind
         std::vector<PinType> template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
         if (type == PinType::Bool)
         {
-            std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, false);
+            std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, false);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, 0);
+            std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, 0);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, 0);
+            std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, 0);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::String)
         {
-            std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, "");
+            std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, "");
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::TextureObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
+            std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::ProgramObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
+            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::VertexShaderObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
             parent_node->outputs.at(index) = new_node;
         }
         else if (type == PinType::FragmentShaderObject)
         {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
+            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
             parent_node->outputs.at(index) = new_node;
         }
         parent_node->outputs.at(index)->node = node;
@@ -215,25 +440,25 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, int ind
 }
 
 template<typename T>
-T GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index)
+T GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key)
 {
-    if (parent_node->inputs.at(pin_index)->links.size() > 0)
+    if (parent_node->inputs.at(pin_key)->links.size() > 0)
     {
-        if (parent_node->inputs.at(pin_index)->links.at(0))
+        if (parent_node->inputs.at(pin_key)->links.at(0))
         {
-            if (parent_node->inputs.at(pin_index)->links.at(0)->startPin)
+            if (parent_node->inputs.at(pin_key)->links.at(0)->startPin)
             {
-                std::shared_ptr<PinValue<T>> input_pin = std::dynamic_pointer_cast<PinValue<T>>(parent_node->inputs.at(pin_index)->links.at(0)->startPin);
+                std::shared_ptr<PinValue<T>> input_pin = std::dynamic_pointer_cast<PinValue<T>>(parent_node->inputs.at(pin_key)->links.at(0)->startPin);
                 if (input_pin->node)
                 {
                     input_pin->node->node_funcs->NoFlowUpdatePinsValues();
-                    std::dynamic_pointer_cast<PinValue<T>>(parent_node->inputs.at(pin_index))->value = input_pin->GetValue();
+                    std::dynamic_pointer_cast<PinValue<T>>(parent_node->inputs.at(pin_key))->value = input_pin->GetValue();
                     return input_pin->GetValue();
                 }
             }
         }
     }
-    std::shared_ptr<PinValue<T>> input_pin = std::dynamic_pointer_cast<PinValue<T>>(parent_node->inputs.at(pin_index));
+    std::shared_ptr<PinValue<T>> input_pin = std::dynamic_pointer_cast<PinValue<T>>(parent_node->inputs.at(pin_key));
     input_pin->value = input_pin->default_value;
     return input_pin->GetValue();
 }
@@ -251,10 +476,10 @@ T GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index)
 
 
 
-template bool GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
-template int GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
-template float GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
-template std::string GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
-template std::shared_ptr<TextureObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
-template std::shared_ptr<ProgramObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
-template std::shared_ptr<ShaderObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, int pin_index);
+template bool GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template int GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template float GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::string GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<TextureObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<ProgramObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<ShaderObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);

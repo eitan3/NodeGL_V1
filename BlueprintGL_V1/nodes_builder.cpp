@@ -4,14 +4,14 @@ void BuildNode(std::shared_ptr<Node>& node)
 {
     for (auto& input : node->inputs)
     {
-        input->node = node;
-        input->kind = PinKind::Input;
+        input.second->node = node;
+        input.second->kind = PinKind::Input;
     }
 
     for (auto& output : node->outputs)
     {
-        output->node = node;
-        output->kind = PinKind::Output;
+        output.second->node = node;
+        output.second->kind = PinKind::Output;
     }
 }
 

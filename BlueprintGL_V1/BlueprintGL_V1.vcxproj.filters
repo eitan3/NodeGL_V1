@@ -25,6 +25,12 @@
     <Filter Include="Source Files\objects">
       <UniqueIdentifier>{f78086cd-f8f4-4406-8241-4c17aa406678}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\SpoutSDK">
+      <UniqueIdentifier>{13d76ad1-de30-4cad-960d-6313be11cdc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SpoutSDK">
+      <UniqueIdentifier>{022cd1e9-7fb7-4071-b88a-ddc54e36cef5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -74,6 +80,39 @@
     </ClCompile>
     <ClCompile Include="objects\program_object.cpp">
       <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutSDK.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutSender.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutSenderMemory.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutSenderNames.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutSharedMemory.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutCopy.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutDirectX.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutGLDXinterop.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutGLextensions.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutMemoryShare.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SpoutSDK\SpoutReceiver.cpp">
+      <Filter>Source Files\SpoutSDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +172,45 @@
     </ClInclude>
     <ClInclude Include="objects\program_object.h">
       <Filter>Header Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutSenderNames.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutSharedMemory.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\Spout.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutCommon.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutCopy.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutDirectX.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutGLDXinterop.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutGLextensions.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutMemoryShare.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutReceiver.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutSDK.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutSender.h">
+      <Filter>Header Files\SpoutSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SpoutSDK\SpoutSenderMemory.h">
+      <Filter>Header Files\SpoutSDK</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

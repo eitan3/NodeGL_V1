@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include <imgui_node_editor.h>
 #include <ax/Builders.h>
 #include <memory>
@@ -22,8 +23,8 @@ struct Link;
 class BasePin
 {
 public:
-    BasePin(int index, int id, const char* name, PinType type) :
-        index(index), id(id), node(), name(name), type(type), kind(PinKind::Input), isTemplate(false)
+    BasePin(std::string pin_key, int order, int id, const char* name, PinType type) :
+        pin_key(pin_key), order(order), id(id), node(), name(name), type(type), kind(PinKind::Input), isTemplate(false), exposed(true), always_expose(true)
     {
     }
 
@@ -34,7 +35,8 @@ public:
         template_allowed_types.clear();
     }
 
-    int index;
+    std::string pin_key;
+    int order;
     ed::PinId   id;
     std::shared_ptr<::Node> node;
     std::vector<std::shared_ptr<::Link>> links;
@@ -44,13 +46,16 @@ public:
 
     bool isTemplate;
     std::vector<PinType> template_allowed_types;
+
+    bool exposed;
+    bool always_expose;
 };
 
 
 template<class T>
 class PinValue : public BasePin {
 public:
-    PinValue(int index, int id, const char* name, PinType type, T default_val) : BasePin(index, id, name, type)
+    PinValue(std::string pin_key, int order, int id, const char* name, PinType type, T default_val) : BasePin(pin_key, order, id, name, type)
     {
         value = default_val;
         default_value = default_val;
@@ -98,8 +103,8 @@ public:
     bool no_flow_node;
     bool is_set_placeholder;
     bool is_get_placeholder;
-    std::vector<std::shared_ptr<BasePin>> inputs;
-    std::vector<std::shared_ptr<BasePin>> outputs;
+    std::map<std::string, std::shared_ptr<BasePin>> inputs;
+    std::map<std::string, std::shared_ptr<BasePin>> outputs;
     ImColor color;
     NodeType type;
     ImVec2 size;

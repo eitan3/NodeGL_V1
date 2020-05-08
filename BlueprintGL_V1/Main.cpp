@@ -44,6 +44,7 @@ ImTextureID          s_HeaderBackground = nullptr;
 ImTextureID          s_SaveIcon = nullptr;
 ImTextureID          s_RestoreIcon = nullptr;
 
+ed::NodeId selectedNode;
 ed::NodeId contextNodeId = 0;
 ed::LinkId contextLinkId = 0;
 ed::PinId  contextPinId = 0;
@@ -524,28 +525,42 @@ void ShowNodeInspector(bool* show = nullptr, std::shared_ptr<Node> node = nullpt
     auto config = InstanceConfig::instance();
     auto& io = ImGui::GetIO();
     ImGui::GetCurrentWindow()->BeginOrderWithinParent = 1;
-    ImGui::SetWindowPos(ImVec2(10, win_size.y - 512 - 25));
-    ImGui::SetWindowSize(ImVec2(256, 512));
+    ImGui::SetWindowPos(ImVec2(10, win_size.y - 350 - 25));
+    ImGui::SetWindowSize(ImVec2(256, 350));
 
-    //ImGui::Text(((std::string)("Node: " + node->name)).c_str());
+    ImGui::Text(((std::string)("Node: " + node->name)).c_str());
     if (ImGui::BeginTabBar("TabBar 0", 0))
     {
-        if (ImGui::BeginTabItem("TabItem 0"))
+        if (node->is_set_placeholder || node->is_get_placeholder)
         {
-            ImGui::Text(((std::string)("Node: " + node->name)).c_str());
-
-            ImGui::Text("TabBar 0 pointer in g.CurrentTabar is invalid");
-            ImGui::EndTabItem();
+            std::string ph_name = "";
+            if (node->is_set_placeholder)
+                if (std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder)
+                    ph_name = std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder->name;
+            if (node->is_get_placeholder)
+                if (std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder)
+                    ph_name = std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder->name;
+            if (ph_name != "")
+                ImGui::Text(((std::string)("Placeholder Name: " + ph_name)).c_str());
+            if (ImGui::BeginTabItem("Placeholder"))
+            {
+                if (ImGui::Button("Create Placeholder"))
+                    showCreatePlaceholderWindow = true;
+                if (config->GetPlaceholdersMapKeys().size() > 0)
+                {
+                    if (ImGui::Button("Select Placeholder"))
+                        showSelectPlaceholderWindow = true;
+                }
+            }
         }
-        
-        if (ImGui::BeginTabItem("TabItem 1"))
+        else
         {
-            ImGui::Text(((std::string)("Node: " + node->name)).c_str());
-
-            ImGui::Text("TabBar 1 pointer in g.CurrentTabar is invalid");
-            ImGui::EndTabItem();
+            /*if (ImGui::BeginTabItem("General"))
+            {
+                ImGui::EndTabItem();
+            }*/
+            AddInputPinsTab(node);
         }
-
         ImGui::EndTabBar();
     }
 
@@ -693,7 +708,7 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
     ImGui::BeginHorizontal("##placeholder_buttons", ImVec2(paneWidth, 0), 1.0f);
     if (ImGui::Button("Select"))
     {
-        auto node = FindNode(contextNodeId, config->s_Nodes);
+        auto node = FindNode(selectedNode, config->s_Nodes);
         std::shared_ptr<BasePlaceholder> ph = config->GetPlaceholder(select_placeholder_combo);
         if (node->is_set_placeholder)
         {
@@ -704,12 +719,12 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
                 prev_ph = nullptr;
             }
             std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder = ph;
-            for (int link_i = 0; link_i < node->inputs.at(1)->links.size(); link_i++)
+            for (int link_i = 0; link_i < node->inputs.at("placeholder_pin")->links.size(); link_i++)
             {
-                ed::DeleteLink(node->inputs.at(1)->links.at(link_i)->id);
+                ed::DeleteLink(node->inputs.at("placeholder_pin")->links.at(link_i)->id);
             }
-            node->inputs.at(1)->links.clear();
-            std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->ChangePinType(PinKind::Input, 1, ph->type);
+            node->inputs.at("placeholder_pin")->links.clear();
+            std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->ChangePinType(PinKind::Input, "placeholder_pin", ph->type);
         }
         else if (node->is_get_placeholder)
         {
@@ -722,14 +737,14 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
             std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder = ph;
             std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder_type = ph->type;
             
-            for (int link_i = 0; link_i < node->outputs.at(0)->links.size(); link_i++)
+            for (int link_i = 0; link_i < node->outputs.at("placeholder_pin")->links.size(); link_i++)
             {
-                ed::DeleteLink(node->outputs.at(0)->links.at(link_i)->id);
+                ed::DeleteLink(node->outputs.at("placeholder_pin")->links.at(link_i)->id);
             }
-            node->outputs.at(0)->links.clear();
-            std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->ChangePinType(PinKind::Output, 0, ph->type);
+            node->outputs.at("placeholder_pin")->links.clear();
+            std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->ChangePinType(PinKind::Output, "placeholder_pin", ph->type);
         }
-        ph->nodesID_vec.push_back(contextNodeId);
+        ph->nodesID_vec.push_back(selectedNode);
         showSelectPlaceholderWindow = false;
     }
     if (ImGui::Button("Cancel"))
@@ -945,6 +960,19 @@ void CreateMenuBar()
             }
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Placeholders"))
+        {
+            if (ImGui::MenuItem("Create Placeholder"))
+                showCreatePlaceholderWindow = true;
+            if (config->GetPlaceholdersMapKeys().size() > 0)
+            {
+                if (ImGui::MenuItem("Rename Placeholder"))
+                    showRenamePlaceholderWindow = true;
+                if (ImGui::MenuItem("Delete Placeholder"))
+                    showDeletePlaceholderWindow = true;
+            }
+            ImGui::EndMenu();
+        }
         ImGui::EndMainMenuBar();
     }
 }
@@ -1041,8 +1069,16 @@ void Application_Frame()
                 builder.EndHeader();
             }
 
-            for (auto& input : node->inputs)
+            std::vector<std::string> sort_pins = SortPins(node->inputs);
+            for (int pi = 0; pi < sort_pins.size(); pi++)
             {
+                std::shared_ptr<BasePin> input = node->inputs.at(sort_pins.at(pi));
+                if (input->exposed == false)
+                {
+                    for (int li = 0; li < input->links.size(); li++)
+                        ed::DeleteLink(input->links.at(li)->id);
+                    continue;
+                }
                 auto alpha = ImGui::GetStyle().Alpha;
                 if (newLinkPin && !CanCreateLink(newLinkPin, input) && input != newLinkPin)
                     alpha = alpha * (48.0f / 255.0f);
@@ -1142,13 +1178,14 @@ void Application_Frame()
                     }
                     ImGui::Spring(0);
                 }
+                // Buttons
                 if (!input->name.empty())
                 {
                     if (input->type == PinType::Button)
                     {
                         if (ImGui::Button(input->name.c_str()))
                         {
-                            input->node->node_funcs->PressButton(PinKind::Input, input->index);
+                            input->node->node_funcs->PressButton(PinKind::Input, input->pin_key);
                         }
                     }
                     else
@@ -1184,8 +1221,10 @@ void Application_Frame()
                 ImGui::Spring(1, 0);
             }
 
-            for (auto& output : node->outputs)
+            sort_pins = SortPins(node->outputs);
+            for (int pi = 0; pi < sort_pins.size(); pi++)
             {
+                std::shared_ptr<BasePin> output = node->outputs.at(sort_pins.at(pi));
                 auto alpha = ImGui::GetStyle().Alpha;
                 if (newLinkPin && !CanCreateLink(newLinkPin, output) && output != newLinkPin)
                     alpha = alpha * (48.0f / 255.0f);
@@ -1480,22 +1519,6 @@ void Application_Frame()
                 ed::DeleteNode(contextNodeId);
         }
 
-        if (node->is_set_placeholder || node->is_get_placeholder)
-        {
-            ImGui::Separator();
-            if (ImGui::MenuItem("Create Placeholder"))
-                showCreatePlaceholderWindow = true;
-            if (config->GetPlaceholdersMapKeys().size() > 0)
-            {
-                if (ImGui::MenuItem("Select Placeholder"))
-                    showSelectPlaceholderWindow = true;
-                if (ImGui::MenuItem("Rename Placeholder"))
-                    showRenamePlaceholderWindow = true;
-                if (ImGui::MenuItem("Delete Placeholder"))
-                    showDeletePlaceholderWindow = true;
-            }
-        }
-
         ImGui::EndPopup();
     }
 
@@ -1532,7 +1555,7 @@ void Application_Frame()
                                 ed::DeleteLink(pin->links.at(link_i)->id);
                             }
                             pin->links.clear();
-                            pin->node->node_funcs->ChangePinType(pin->kind, pin->index, StringToPinType(template_pin_type_selected_item));
+                            pin->node->node_funcs->ChangePinType(pin->kind, pin->pin_key, pin->template_allowed_types[n]);
                         }
                         if (is_selected)
                             ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
@@ -1672,12 +1695,14 @@ void Application_Frame()
     if (nodeCount == 1)
     {
         ed::Suspend();
-        auto node = FindNode(selectedNodes.at(0), config->s_Nodes);
+        selectedNode = selectedNodes.at(0);
+        auto node = FindNode(selectedNode, config->s_Nodes);
         ShowNodeInspector(&showNodeInspector, node);
         ed::Resume();
     }
     else
     {
+        selectedNode = ed::NodeId();
         showNodeInspector = false;
     }
 

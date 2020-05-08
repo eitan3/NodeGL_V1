@@ -15,89 +15,89 @@ void MathPlusNode_Func::Delete()
 
 void MathPlusNode_Func::NoFlowUpdatePinsValues()
 {
-    if (parent_node->inputs.at(0)->type == PinType::Int && parent_node->inputs.at(1)->type == PinType::Int)
+    if (parent_node->inputs.at("x_1")->type == PinType::Int && parent_node->inputs.at("x_2")->type == PinType::Int)
     {
-        int pin_0_value = GetInputPinValue<int>(parent_node, 0);
-        int pin_1_value = GetInputPinValue<int>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
+        int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value + pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value + pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Float && parent_node->inputs.at(1)->type == PinType::Int)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Float && parent_node->inputs.at("x_2")->type == PinType::Int)
     {
-        float pin_0_value = GetInputPinValue<float>(parent_node, 0);
-        int pin_1_value = GetInputPinValue<int>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
+        int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value + pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value + pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Int && parent_node->inputs.at(1)->type == PinType::Float)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int && parent_node->inputs.at("x_2")->type == PinType::Float)
     {
-        int pin_0_value = GetInputPinValue<int>(parent_node, 0);
-        float pin_1_value = GetInputPinValue<float>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
+        float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value + pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value + pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Float && parent_node->inputs.at(1)->type == PinType::Float)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Float && parent_node->inputs.at("x_2")->type == PinType::Float)
     {
-        float pin_0_value = GetInputPinValue<float>(parent_node, 0);
-        float pin_1_value = GetInputPinValue<float>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
+        float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value + pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value + pin_1_value;
         }
     }
 }
 
-void MathPlusNode_Func::ChangePinType(PinKind kind, int index, PinType type)
+void MathPlusNode_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
 {
-    UtilsChangePinType(parent_node, kind, index, type);
+    UtilsChangePinType(parent_node, kind, pin_key, type);
     BuildNode(parent_node);
 }
 
 std::shared_ptr<Node> MathPlusNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Plus", true));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "X_1", PinType::Float, 0));
-    s_Nodes.back()->inputs.back()->isTemplate = true;;
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Int);
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "X_2", PinType::Float, 0));
-    s_Nodes.back()->inputs.back()->isTemplate = true;;
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Int);
-    s_Nodes.back()->outputs.emplace_back(new PinValue<float>(s_Nodes.back()->outputs.size(), GetNextId(), "Out", PinType::Float, 0));
-    s_Nodes.back()->outputs.back()->isTemplate = true;
-    s_Nodes.back()->outputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->outputs.back()->template_allowed_types.push_back(PinType::Int);
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
+    s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
+    s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Int);
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_2", new PinValue<float>("x_2", 1, GetNextId(), "X 2", PinType::Float, 0)));
+    s_Nodes.back()->inputs.at("x_2")->isTemplate = true;;
+    s_Nodes.back()->inputs.at("x_2")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->inputs.at("x_2")->template_allowed_types.push_back(PinType::Int);
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("out", new PinValue<float>("out", 0, GetNextId(), "Out", PinType::Float, 0)));
+    s_Nodes.back()->outputs.at("out")->isTemplate = true;
+    s_Nodes.back()->outputs.at("out")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->outputs.at("out")->template_allowed_types.push_back(PinType::Int);
 
     s_Nodes.back()->node_funcs = std::make_shared<MathPlusNode_Func>();
     std::dynamic_pointer_cast<MathPlusNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
@@ -128,89 +128,90 @@ void MathMinusNode_Func::Delete()
 
 void MathMinusNode_Func::NoFlowUpdatePinsValues()
 {
-    if (parent_node->inputs.at(0)->type == PinType::Int && parent_node->inputs.at(1)->type == PinType::Int)
+    if (parent_node->inputs.at("x_1")->type == PinType::Int && parent_node->inputs.at("x_2")->type == PinType::Int)
     {
-        int pin_0_value = GetInputPinValue<int>(parent_node, 0);
-        int pin_1_value = GetInputPinValue<int>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
+        int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value - pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value - pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Float && parent_node->inputs.at(1)->type == PinType::Int)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Float && parent_node->inputs.at("x_2")->type == PinType::Int)
     {
-        float pin_0_value = GetInputPinValue<float>(parent_node, 0);
-        int pin_1_value = GetInputPinValue<int>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
+        int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value - pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value - pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Int && parent_node->inputs.at(1)->type == PinType::Float)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int && parent_node->inputs.at("x_2")->type == PinType::Float)
     {
-        int pin_0_value = GetInputPinValue<int>(parent_node, 0);
-        float pin_1_value = GetInputPinValue<float>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
+        float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value - pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value - pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Float && parent_node->inputs.at(1)->type == PinType::Float)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Float && parent_node->inputs.at("x_2")->type == PinType::Float)
     {
-        float pin_0_value = GetInputPinValue<float>(parent_node, 0);
-        float pin_1_value = GetInputPinValue<float>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
+        float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value - pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value - pin_1_value;
         }
     }
 }
 
-void MathMinusNode_Func::ChangePinType(PinKind kind, int index, PinType type)
+void MathMinusNode_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
 {
-    UtilsChangePinType(parent_node, kind, index, type);
+    UtilsChangePinType(parent_node, kind, pin_key, type);
     BuildNode(parent_node);
 }
 
 std::shared_ptr<Node> MathMinusNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Minus", true));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "X_1", PinType::Float, 0));
-    s_Nodes.back()->inputs.back()->isTemplate = true;;
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Int);
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "X_2", PinType::Float, 0));
-    s_Nodes.back()->inputs.back()->isTemplate = true;;
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Int);
-    s_Nodes.back()->outputs.emplace_back(new PinValue<float>(s_Nodes.back()->outputs.size(), GetNextId(), "Out", PinType::Float, 0));
-    s_Nodes.back()->outputs.back()->isTemplate = true;
-    s_Nodes.back()->outputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->outputs.back()->template_allowed_types.push_back(PinType::Int);
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
+    s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
+    s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Int);
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_2", new PinValue<float>("x_2", 1, GetNextId(), "X 2", PinType::Float, 0)));
+    s_Nodes.back()->inputs.at("x_2")->isTemplate = true;;
+    s_Nodes.back()->inputs.at("x_2")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->inputs.at("x_2")->template_allowed_types.push_back(PinType::Int);
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("out", new PinValue<float>("out", 0, GetNextId(), "Out", PinType::Float, 0)));
+    s_Nodes.back()->outputs.at("out")->isTemplate = true;
+    s_Nodes.back()->outputs.at("out")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->outputs.at("out")->template_allowed_types.push_back(PinType::Int);
 
     s_Nodes.back()->node_funcs = std::make_shared<MathMinusNode_Func>();
     std::dynamic_pointer_cast<MathMinusNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
@@ -241,89 +242,90 @@ void MathMultiplyNode_Func::Delete()
 
 void MathMultiplyNode_Func::NoFlowUpdatePinsValues()
 {
-    if (parent_node->inputs.at(0)->type == PinType::Int && parent_node->inputs.at(1)->type == PinType::Int)
+    if (parent_node->inputs.at("x_1")->type == PinType::Int && parent_node->inputs.at("x_2")->type == PinType::Int)
     {
-        int pin_0_value = GetInputPinValue<int>(parent_node, 0);
-        int pin_1_value = GetInputPinValue<int>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
+        int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value * pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value * pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Float && parent_node->inputs.at(1)->type == PinType::Int)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Float && parent_node->inputs.at("x_2")->type == PinType::Int)
     {
-        float pin_0_value = GetInputPinValue<float>(parent_node, 0);
-        int pin_1_value = GetInputPinValue<int>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
+        int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value * pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value * pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Int && parent_node->inputs.at(1)->type == PinType::Float)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int && parent_node->inputs.at("x_2")->type == PinType::Float)
     {
-        int pin_0_value = GetInputPinValue<int>(parent_node, 0);
-        float pin_1_value = GetInputPinValue<float>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
+        float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value * pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value * pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Float && parent_node->inputs.at(1)->type == PinType::Float)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Float && parent_node->inputs.at("x_2")->type == PinType::Float)
     {
-        float pin_0_value = GetInputPinValue<float>(parent_node, 0);
-        float pin_1_value = GetInputPinValue<float>(parent_node, 1);
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
+        float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value * pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value * pin_1_value;
         }
     }
 }
 
-void MathMultiplyNode_Func::ChangePinType(PinKind kind, int index, PinType type)
+void MathMultiplyNode_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
 {
-    UtilsChangePinType(parent_node, kind, index, type);
+    UtilsChangePinType(parent_node, kind, pin_key, type);
     BuildNode(parent_node);
 }
 
 std::shared_ptr<Node> MathMultiplyNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Multiply", true));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "X_1", PinType::Float, 0));
-    s_Nodes.back()->inputs.back()->isTemplate = true;;
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Int);
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "X_2", PinType::Float, 0));
-    s_Nodes.back()->inputs.back()->isTemplate = true;;
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Int);
-    s_Nodes.back()->outputs.emplace_back(new PinValue<float>(s_Nodes.back()->outputs.size(), GetNextId(), "Out", PinType::Float, 0));
-    s_Nodes.back()->outputs.back()->isTemplate = true;
-    s_Nodes.back()->outputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->outputs.back()->template_allowed_types.push_back(PinType::Int);
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
+    s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
+    s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Int);
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_2", new PinValue<float>("x_2", 1, GetNextId(), "X 2", PinType::Float, 0)));
+    s_Nodes.back()->inputs.at("x_2")->isTemplate = true;;
+    s_Nodes.back()->inputs.at("x_2")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->inputs.at("x_2")->template_allowed_types.push_back(PinType::Int);
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("out", new PinValue<float>("out", 0, GetNextId(), "Out", PinType::Float, 0)));
+    s_Nodes.back()->outputs.at("out")->isTemplate = true;
+    s_Nodes.back()->outputs.at("out")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->outputs.at("out")->template_allowed_types.push_back(PinType::Int);
 
     s_Nodes.back()->node_funcs = std::make_shared<MathMultiplyNode_Func>();
     std::dynamic_pointer_cast<MathMultiplyNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
@@ -339,115 +341,116 @@ std::shared_ptr<Node> MathMultiplyNode(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 
-void MathSubtractNode_Func::Initialize()
+void MathDivideNode_Func::Initialize()
 {
 }
 
-void MathSubtractNode_Func::Run()
+void MathDivideNode_Func::Run()
 {
 }
 
-void MathSubtractNode_Func::Delete()
+void MathDivideNode_Func::Delete()
 {
     parent_node = nullptr;
 }
 
-void MathSubtractNode_Func::NoFlowUpdatePinsValues()
+void MathDivideNode_Func::NoFlowUpdatePinsValues()
 {
-    if (parent_node->inputs.at(0)->type == PinType::Int && parent_node->inputs.at(1)->type == PinType::Int)
+    if (parent_node->inputs.at("x_1")->type == PinType::Int && parent_node->inputs.at("x_2")->type == PinType::Int)
     {
-        int pin_0_value = GetInputPinValue<int>(parent_node, 0);
-        int pin_1_value = GetInputPinValue<int>(parent_node, 1);
+        int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
+        int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
         if (pin_1_value == 0)
             pin_1_value = 1;
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value / pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value / pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Float && parent_node->inputs.at(1)->type == PinType::Int)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Float && parent_node->inputs.at("x_2")->type == PinType::Int)
     {
-        float pin_0_value = GetInputPinValue<float>(parent_node, 0);
-        int pin_1_value = GetInputPinValue<int>(parent_node, 1);
+        float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
+        int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
         if (pin_1_value == 0)
             pin_1_value = 1;
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value / pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value / pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Int && parent_node->inputs.at(1)->type == PinType::Float)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int && parent_node->inputs.at("x_2")->type == PinType::Float)
     {
-        int pin_0_value = GetInputPinValue<int>(parent_node, 0);
-        float pin_1_value = GetInputPinValue<float>(parent_node, 1);
+        int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
+        float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
         if (pin_1_value == 0)
             pin_1_value = 1;
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value / pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value / pin_1_value;
         }
     }
-    else if (parent_node->inputs.at(0)->type == PinType::Float && parent_node->inputs.at(1)->type == PinType::Float)
+    else if (parent_node->inputs.at("x_1")->type == PinType::Float && parent_node->inputs.at("x_2")->type == PinType::Float)
     {
-        float pin_0_value = GetInputPinValue<float>(parent_node, 0);
-        float pin_1_value = GetInputPinValue<float>(parent_node, 1);
+        float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
+        float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
         if (pin_1_value == 0)
             pin_1_value = 1;
-        if (parent_node->outputs.at(0)->type == PinType::Int)
+        if (parent_node->outputs.at("x_1")->type == PinType::Int)
         {
-            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value / pin_1_value);
         }
-        else if (parent_node->outputs.at(0)->type == PinType::Float)
+        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
         {
-            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at(0));
+            std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value / pin_1_value;
         }
     }
 }
 
-void MathSubtractNode_Func::ChangePinType(PinKind kind, int index, PinType type)
+void MathDivideNode_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
 {
-    UtilsChangePinType(parent_node, kind, index, type);
+    UtilsChangePinType(parent_node, kind, pin_key, type);
     BuildNode(parent_node);
 }
 
-std::shared_ptr<Node> MathSubtractNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+std::shared_ptr<Node> MathDivideNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Subtract", true));
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "X_1", PinType::Float, 0));
-    s_Nodes.back()->inputs.back()->isTemplate = true;;
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Int);
-    s_Nodes.back()->inputs.emplace_back(new PinValue<float>(s_Nodes.back()->inputs.size(), GetNextId(), "X_2", PinType::Float, 0));
-    s_Nodes.back()->inputs.back()->isTemplate = true;;
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->inputs.back()->template_allowed_types.push_back(PinType::Int);
-    s_Nodes.back()->outputs.emplace_back(new PinValue<float>(s_Nodes.back()->outputs.size(), GetNextId(), "Out", PinType::Float, 0));
-    s_Nodes.back()->outputs.back()->isTemplate = true;
-    s_Nodes.back()->outputs.back()->template_allowed_types.push_back(PinType::Float);
-    s_Nodes.back()->outputs.back()->template_allowed_types.push_back(PinType::Int);
+    s_Nodes.emplace_back(new Node(GetNextId(), "Divide", true));
 
-    s_Nodes.back()->node_funcs = std::make_shared<MathSubtractNode_Func>();
-    std::dynamic_pointer_cast<MathSubtractNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
+    s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
+    s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Int);
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_2", new PinValue<float>("x_2", 1, GetNextId(), "X 2", PinType::Float, 0)));
+    s_Nodes.back()->inputs.at("x_2")->isTemplate = true;;
+    s_Nodes.back()->inputs.at("x_2")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->inputs.at("x_2")->template_allowed_types.push_back(PinType::Int);
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("out", new PinValue<float>("out", 0, GetNextId(), "Out", PinType::Float, 0)));
+    s_Nodes.back()->outputs.at("out")->isTemplate = true;
+    s_Nodes.back()->outputs.at("out")->template_allowed_types.push_back(PinType::Float);
+    s_Nodes.back()->outputs.at("out")->template_allowed_types.push_back(PinType::Int);
+
+    s_Nodes.back()->node_funcs = std::make_shared<MathDivideNode_Func>();
+    std::dynamic_pointer_cast<MathDivideNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
 
     s_Nodes.back()->node_funcs->Initialize();
 
@@ -474,7 +477,7 @@ void MathNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::vector<std::string> keywords_3{ "*", "Multiply", "Operator", "Math" };
     search_nodes_vector.push_back(SearchNodeObj("* Operator", keywords_3, func_3));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = MathSubtractNode;
-    std::vector<std::string> keywords_4{ "/", "Subtract", "Operator", "Math" };
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = MathDivideNode;
+    std::vector<std::string> keywords_4{ "/", "Divide", "Operator", "Math" };
     search_nodes_vector.push_back(SearchNodeObj("/ Operator", keywords_4, func_4));
 }
