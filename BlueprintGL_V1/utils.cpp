@@ -290,7 +290,7 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
                                             ed::DeleteLink(input->links.at(link_i)->id);
                                         }
                                         input->links.clear();
-                                        input->node->node_funcs->ChangePinType(input->kind, input->pin_key, input->template_allowed_types[n]);
+                                        UtilsChangePinType(input->node, input->kind, input->pin_key, input->template_allowed_types[n]);
                                     }
                                     if (is_selected)
                                         ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
@@ -320,7 +320,7 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
                                             ed::DeleteLink(output->links.at(link_i)->id);
                                         }
                                         output->links.clear();
-                                        output->node->node_funcs->ChangePinType(output->kind, output->pin_key, output->template_allowed_types[n]);
+                                        UtilsChangePinType(output->node, output->kind, output->pin_key, output->template_allowed_types[n]);
                                     }
                                     if (is_selected)
                                         ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
@@ -437,6 +437,7 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::st
         parent_node->outputs.at(index)->isTemplate = isTemplate;
         parent_node->outputs.at(index)->template_allowed_types = template_allowed_types;
     }
+    BuildNode(parent_node);
 }
 
 template<typename T>

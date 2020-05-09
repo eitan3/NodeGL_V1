@@ -57,10 +57,6 @@ void DummySendFloat_Func::NoFlowUpdatePinsValues()
 
 }
 
-void DummySendFloat_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-}
-
 void DummySendFloat_Func::PressButton(PinKind, std::string pin_key)
 {
 }
@@ -112,10 +108,6 @@ void DummyRecvSendFloat_Func::Delete()
 void DummyRecvSendFloat_Func::NoFlowUpdatePinsValues()
 {
 
-}
-
-void DummyRecvSendFloat_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
 }
 
 void DummyRecvSendFloat_Func::PressButton(PinKind, std::string pin_key)
@@ -171,10 +163,6 @@ void DummySendInt_Func::NoFlowUpdatePinsValues()
 
 }
 
-void DummySendInt_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-}
-
 void DummySendInt_Func::PressButton(PinKind, std::string pin_key)
 {
 }
@@ -226,10 +214,6 @@ void DummyRecvSendInt_Func::Delete()
 void DummyRecvSendInt_Func::NoFlowUpdatePinsValues()
 {
 
-}
-
-void DummyRecvSendInt_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
 }
 
 void DummyRecvSendInt_Func::PressButton(PinKind, std::string pin_key)

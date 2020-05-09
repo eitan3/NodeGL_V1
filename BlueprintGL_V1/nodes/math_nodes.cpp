@@ -77,12 +77,6 @@ void MathPlusNode_Func::NoFlowUpdatePinsValues()
     }
 }
 
-void MathPlusNode_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-    UtilsChangePinType(parent_node, kind, pin_key, type);
-    BuildNode(parent_node);
-}
-
 std::shared_ptr<Node> MathPlusNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Plus", true));
@@ -188,12 +182,6 @@ void MathMinusNode_Func::NoFlowUpdatePinsValues()
             output_pin->value = pin_0_value - pin_1_value;
         }
     }
-}
-
-void MathMinusNode_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-    UtilsChangePinType(parent_node, kind, pin_key, type);
-    BuildNode(parent_node);
 }
 
 std::shared_ptr<Node> MathMinusNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -302,12 +290,6 @@ void MathMultiplyNode_Func::NoFlowUpdatePinsValues()
             output_pin->value = pin_0_value * pin_1_value;
         }
     }
-}
-
-void MathMultiplyNode_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-    UtilsChangePinType(parent_node, kind, pin_key, type);
-    BuildNode(parent_node);
 }
 
 std::shared_ptr<Node> MathMultiplyNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -424,12 +406,6 @@ void MathDivideNode_Func::NoFlowUpdatePinsValues()
             output_pin->value = pin_0_value / pin_1_value;
         }
     }
-}
-
-void MathDivideNode_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-    UtilsChangePinType(parent_node, kind, pin_key, type);
-    BuildNode(parent_node);
 }
 
 std::shared_ptr<Node> MathDivideNode(std::vector<std::shared_ptr<Node>>& s_Nodes)

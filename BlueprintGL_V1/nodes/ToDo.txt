@@ -1,4 +1,10 @@
+Fix node interface
+Add the option to change the texture's name
 Siquencer
+If
+For Loop
+While Loop
+Binary Operations
 PBR Rendering & Simple
 Make functions for objects (like meshes)
 Need to freeze the editor when other window open up

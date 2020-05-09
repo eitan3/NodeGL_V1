@@ -18,7 +18,6 @@ public:
     void Delete();
     void DeleteShader();
     void NoFlowUpdatePinsValues() {};
-    void ChangePinType(PinKind kind, std::string pin_key, PinType type) {};
     void PressButton(PinKind, std::string pin_key);
     void UpdateUI();
 
@@ -46,7 +45,6 @@ public:
     void Delete();
     void DeleteProgram();
     void NoFlowUpdatePinsValues();
-    void ChangePinType(PinKind kind, std::string pin_key, PinType type) {};
     void PressButton(PinKind, std::string pin_key) {};
     void UpdateUI();
 

@@ -14,7 +14,6 @@ public:
     virtual void Run() = 0;
     virtual void Delete() = 0;
     virtual void NoFlowUpdatePinsValues() = 0;
-    virtual void ChangePinType(PinKind kind, std::string pin_key, PinType type) = 0;
     virtual void PressButton(PinKind, std::string pin_key) = 0;
     virtual void UpdateUI() = 0;
 

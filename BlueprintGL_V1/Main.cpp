@@ -724,7 +724,7 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
                 ed::DeleteLink(node->inputs.at("placeholder_pin")->links.at(link_i)->id);
             }
             node->inputs.at("placeholder_pin")->links.clear();
-            std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->ChangePinType(PinKind::Input, "placeholder_pin", ph->type);
+            UtilsChangePinType(node, PinKind::Input, "placeholder_pin", ph->type);
         }
         else if (node->is_get_placeholder)
         {
@@ -742,7 +742,7 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
                 ed::DeleteLink(node->outputs.at("placeholder_pin")->links.at(link_i)->id);
             }
             node->outputs.at("placeholder_pin")->links.clear();
-            std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->ChangePinType(PinKind::Output, "placeholder_pin", ph->type);
+            UtilsChangePinType(node, PinKind::Output, "placeholder_pin", ph->type);
         }
         ph->nodesID_vec.push_back(selectedNode);
         showSelectPlaceholderWindow = false;
@@ -1555,7 +1555,7 @@ void Application_Frame()
                                 ed::DeleteLink(pin->links.at(link_i)->id);
                             }
                             pin->links.clear();
-                            pin->node->node_funcs->ChangePinType(pin->kind, pin->pin_key, pin->template_allowed_types[n]);
+                            UtilsChangePinType(pin->node, pin->kind, pin->pin_key, pin->template_allowed_types[n]);
                         }
                         if (is_selected)
                             ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)

@@ -53,11 +53,6 @@ void GlMainLoop_Func::NoFlowUpdatePinsValues()
 
 }
 
-void GlMainLoop_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-
-}
-
 void GlMainLoop_Func::SetupFrameBuffer()
 {
     auto config = InstanceConfig::instance();
@@ -172,11 +167,6 @@ void GlClear_Func::NoFlowUpdatePinsValues()
 
 }
 
-void GlClear_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-
-}
-
 std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "glClrear"));
@@ -264,11 +254,6 @@ void GlRenderToTexture_Func::Delete()
 }
 
 void GlRenderToTexture_Func::NoFlowUpdatePinsValues()
-{
-
-}
-
-void GlRenderToTexture_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
 {
 
 }

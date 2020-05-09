@@ -23,10 +23,6 @@ void PrintString_Func::NoFlowUpdatePinsValues()
 {
 }
 
-void PrintString_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-}
-
 std::shared_ptr<Node> PrintString(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Print String"));
@@ -169,12 +165,6 @@ void ConvertTo_Func::NoFlowUpdatePinsValues()
     }
 }
 
-void ConvertTo_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-    UtilsChangePinType(parent_node, kind, pin_key, type);
-    BuildNode(parent_node);
-}
-
 std::shared_ptr<Node> ConvertTo(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Convert To", true));
@@ -278,12 +268,6 @@ void SetPlaceholder_Func::Delete()
 
 void SetPlaceholder_Func::NoFlowUpdatePinsValues()
 {
-}
-
-void SetPlaceholder_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-    UtilsChangePinType(parent_node, kind, pin_key, type);
-    BuildNode(parent_node);
 }
 
 std::shared_ptr<Node> SetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -393,12 +377,6 @@ void GetPlaceholder_Func::NoFlowUpdatePinsValues()
         std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<ShaderObject>>>(parent_node->outputs.at("placeholder_pin"));
         output_pin->value = ph_value;
     }
-}
-
-void GetPlaceholder_Func::ChangePinType(PinKind kind, std::string pin_key, PinType type)
-{
-    UtilsChangePinType(parent_node, kind, pin_key, type);
-    BuildNode(parent_node);
 }
 
 std::shared_ptr<Node> GetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes)
