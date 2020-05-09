@@ -151,6 +151,56 @@ std::shared_ptr<Node> WhileLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
+void ForLoop_Func::Run()
+{
+    float start = GetInputPinValue<float>(parent_node, "start");
+    float end = GetInputPinValue<float>(parent_node, "end");
+    float inc = GetInputPinValue<float>(parent_node, "increase");
+    std::shared_ptr<PinValue<float>> iter_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("iter"));
+    for (float i = start; i < end; i += inc)
+    {
+        if (iter_pin)
+        {
+            iter_pin->value = i;
+        }
+        RunNextNodeFunc(parent_node, "loop_body");
+    }
+    RunNextNodeFunc(parent_node, "complete");
+}
+
+void ForLoop_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+std::shared_ptr<Node> ForLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), "For Loop"));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("start", new PinValue<float>("start", 1, GetNextId(), "Start Value", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("end", new PinValue<float>("end", 2, GetNextId(), "End Value", PinType::Float, 1)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("increase", new PinValue<float>("increase", 3, GetNextId(), "Increase By", PinType::Float, 1)));
+
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("loop_body", new BasePin("loop_body", 0, GetNextId(), "Loop Body", PinType::Flow)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("complete", new BasePin("complete", 1, GetNextId(), "Complete", PinType::Flow)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("iter", new PinValue<float>("iter", 2, GetNextId(), "Iterator Value", PinType::Float, 0)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<ForLoop_Func>();
+    std::dynamic_pointer_cast<ForLoop_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+
 
 void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
@@ -165,4 +215,8 @@ void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = WhileLoopNode;
     std::vector<std::string> keywords_3{ "Flow", "While", "Loop" };
     search_nodes_vector.push_back(SearchNodeObj("While Loop", keywords_3, func_3));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = ForLoopNode;
+    std::vector<std::string> keywords_4{ "Flow", "For", "Loop" };
+    search_nodes_vector.push_back(SearchNodeObj("For Loop", keywords_4, func_4));
 }
