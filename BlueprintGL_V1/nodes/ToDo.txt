@@ -1,4 +1,3 @@
-Add the option to change the texture's name
 Siquencer
 If
 For Loop

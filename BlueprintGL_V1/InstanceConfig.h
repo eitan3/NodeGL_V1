@@ -122,6 +122,45 @@ public:
 		return nullptr;
 	}
 
+	bool RenameTextureKey(std::string old_key, std::string new_key)
+	{
+		if (texture_map.count(old_key) > 0)
+		{
+			texture_map.at(old_key)->object_name = new_key;
+			auto nodeHandler = texture_map.extract(old_key);
+			nodeHandler.key() = new_key;
+			texture_map.insert(std::move(nodeHandler));
+			return true;
+		}
+		return false;
+	}
+
+	bool RenameRenderBufferKey(std::string old_key, std::string new_key)
+	{
+		if (renderbuffer_map.count(old_key) > 0)
+		{
+			renderbuffer_map.at(old_key)->object_name = new_key;
+			auto nodeHandler = renderbuffer_map.extract(old_key);
+			nodeHandler.key() = new_key;
+			renderbuffer_map.insert(std::move(nodeHandler));
+			return true;
+		}
+		return false;
+	}
+
+	bool RenameFrameBufferKey(std::string old_key, std::string new_key)
+	{
+		if (framebuffer_map.count(old_key) > 0)
+		{
+			framebuffer_map.at(old_key)->object_name = new_key;
+			auto nodeHandler = framebuffer_map.extract(old_key);
+			nodeHandler.key() = new_key;
+			framebuffer_map.insert(std::move(nodeHandler));
+			return true;
+		}
+		return false;
+	}
+
 	bool DeleteTexture(std::string name)
 	{
 		if (texture_map.count(name) > 0)

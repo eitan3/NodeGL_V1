@@ -2,7 +2,7 @@
 
 void GlMainLoop_Func::Initialize()
 {
-    object_prefix = "glMainLoop_" + std::to_string(parent_node->id.Get());
+    object_prefix = GetInputPinValue<std::string>(parent_node, "name");
     output_width = GetInputPinValue<int>(parent_node, "width");
     output_height = GetInputPinValue<int>(parent_node, "height");
     SetupFrameBuffer();
@@ -10,36 +10,53 @@ void GlMainLoop_Func::Initialize()
 
 void GlMainLoop_Func::Run()
 {
-    int new_width = GetInputPinValue<int>(parent_node, "width");
-    int new_height = GetInputPinValue<int>(parent_node, "height");
-    if (new_width != output_width || new_height != output_height)
+    if (parent_node->error == "")
     {
-        output_width = new_width;
-        output_height = new_height;
-        DeleteFrameBuffer();
-        SetupFrameBuffer();
+        auto config = InstanceConfig::instance();
+        int new_width = GetInputPinValue<int>(parent_node, "width");
+        int new_height = GetInputPinValue<int>(parent_node, "height");
+        if (new_width != output_width || new_height != output_height)
+        {
+            output_width = new_width;
+            output_height = new_height;
+            DeleteFrameBuffer();
+            SetupFrameBuffer();
+        }
+
+        std::string new_prefix = GetInputPinValue<std::string>(parent_node, "name");
+        if (new_prefix != object_prefix)
+        {
+            config->RenameTextureKey(object_prefix, new_prefix);
+            config->RenameRenderBufferKey(object_prefix, new_prefix);
+            config->RenameFrameBufferKey(object_prefix, new_prefix);
+            object_prefix = new_prefix;
+        }
+
+        // Get previous viewport and set new viewport
+        GLint prev_viewport[4];
+        glGetIntegerv(GL_VIEWPORT, prev_viewport);
+        glViewport(0, 0, output_width, output_height);
+
+        // Bind framebuffer
+        config->current_framebuffer = object_prefix;
+        GLuint new_framebuffer_id = config->GetFrameBuffer(config->current_framebuffer)->object_id;
+        glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer_id);
+
+        std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<TextureObject>>>(parent_node->outputs.at("texture_out"));
+        output_pin->value = config->GetTexture(object_prefix);
+
+        // Run next node
+        RunNextNodeFunc(parent_node, "next");
+
+        // Unbind frambebuffer and return to previous viewport
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, prev_viewport[2], prev_viewport[3]);
+        parent_node->info = "Texture name: '" + object_prefix + "'";
     }
-
-    // Get previous viewport and set new viewport
-    auto config = InstanceConfig::instance();
-    GLint prev_viewport[4];
-    glGetIntegerv(GL_VIEWPORT, prev_viewport);
-    glViewport(0, 0, output_width, output_height);
-
-    // Bind framebuffer
-    config->current_framebuffer = object_prefix;
-    GLuint new_framebuffer_id = config->GetFrameBuffer(config->current_framebuffer)->object_id;
-    glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer_id);
-
-    std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<TextureObject>>>(parent_node->outputs.at("texture_out"));
-    output_pin->value = config->GetTexture(object_prefix);
-
-    // Run next node
-    RunNextNodeFunc(parent_node, "next");
-
-    // Unbind frambebuffer and return to previous viewport
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, prev_viewport[2], prev_viewport[3]);
+    else
+    {
+        parent_node->info = "";
+    }
 }
 
 void GlMainLoop_Func::Delete()
@@ -86,13 +103,14 @@ void GlMainLoop_Func::SetupFrameBuffer()
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
         parent_node->error = "Somehting went wrong with Gl Main Loop!!";
+        parent_node->info = "";
         return;
     }
 
     config->InsertTexture(object_prefix, std::make_shared<TextureObject>(object_prefix, renderedTexture, output_width, output_height));
     config->InsertRenderBuffer(object_prefix, std::make_shared<RenderBufferObject>(object_prefix, depthrenderbuffer, output_width, output_height));
     config->InsertFrameBuffer(object_prefix, std::make_shared<FrameBufferObject>(object_prefix, framebuffer_id));
-    parent_node->info = "Texture name: 'glMainLoop_" + std::to_string(parent_node->id.Get())+"'";
+    parent_node->error = "";
 }
 
 void GlMainLoop_Func::DeleteFrameBuffer()
@@ -107,8 +125,9 @@ std::shared_ptr<Node> GlMainLoop(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "GL Main Loop", ImColor(255, 128, 128)));
 
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("width", new PinValue<int>("width", 0, GetNextId(), "Width", PinType::Int, 1920)));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("height", new PinValue<int>("height", 1, GetNextId(), "Height", PinType::Int, 1080)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("name", new PinValue<std::string>("name", 0, GetNextId(), "Name", PinType::String, "glMainLoop_" + std::to_string(s_Nodes.back()->id.Get()))));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("width", new PinValue<int>("width", 1, GetNextId(), "Width", PinType::Int, 1920)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("height", new PinValue<int>("height", 2, GetNextId(), "Height", PinType::Int, 1080)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("next", new BasePin("next", 0, GetNextId(), "Next", PinType::Flow)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>>>("texture_out", new PinValue<std::shared_ptr<TextureObject>>("texture_out", 1, GetNextId(), "Texture Object", PinType::TextureObject, nullptr)));
 
@@ -199,7 +218,7 @@ std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 void GlRenderToTexture_Func::Initialize()
 {
-    object_prefix = "glRenderToTexture_" + std::to_string(parent_node->id.Get());
+    object_prefix = GetInputPinValue<std::string>(parent_node, "name");
     output_width = GetInputPinValue<int>(parent_node, "width");
     output_height = GetInputPinValue<int>(parent_node, "height");
     SetupFrameBuffer();
@@ -207,44 +226,61 @@ void GlRenderToTexture_Func::Initialize()
 
 void GlRenderToTexture_Func::Run()
 {
-    int new_width = GetInputPinValue<int>(parent_node, "width");
-    int new_height = GetInputPinValue<int>(parent_node, "height");
-    if (new_width != output_width || new_height != output_height)
+    if (parent_node->error == "")
     {
-        output_width = new_width;
-        output_height = new_height;
-        DeleteFrameBuffer();
-        SetupFrameBuffer();
+        auto config = InstanceConfig::instance();
+        int new_width = GetInputPinValue<int>(parent_node, "width");
+        int new_height = GetInputPinValue<int>(parent_node, "height");
+        if (new_width != output_width || new_height != output_height)
+        {
+            output_width = new_width;
+            output_height = new_height;
+            DeleteFrameBuffer();
+            SetupFrameBuffer();
+        }
+
+        std::string new_prefix = GetInputPinValue<std::string>(parent_node, "name");
+        if (new_prefix != object_prefix)
+        {
+            config->RenameTextureKey(object_prefix, new_prefix);
+            config->RenameRenderBufferKey(object_prefix, new_prefix);
+            config->RenameFrameBufferKey(object_prefix, new_prefix);
+            object_prefix = new_prefix;
+        }
+
+        // Get previous viewport and set new viewport
+        GLint prev_viewport[4];
+        glGetIntegerv(GL_VIEWPORT, prev_viewport);
+        glViewport(0, 0, output_width, output_height);
+
+        // Bind framebuffer
+        config->framebuffer_stack.push(config->current_framebuffer);
+        config->current_framebuffer = object_prefix;
+        GLuint new_framebuffer_id = config->GetFrameBuffer(config->current_framebuffer)->object_id;
+        glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer_id);
+
+        // Run next node
+        RunNextNodeFunc(parent_node, "render_body");
+
+        // Return to previous viewport and framebuffer
+        std::string prev_framebuffer = config->framebuffer_stack.top();
+        config->current_framebuffer = prev_framebuffer;
+        config->framebuffer_stack.pop();
+        GLuint prev_framebuffer_id = config->GetFrameBuffer(prev_framebuffer)->object_id;
+        glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer_id);
+        glViewport(0, 0, prev_viewport[2], prev_viewport[3]);
+
+        std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<TextureObject>>>(parent_node->outputs.at("texture_out"));
+        output_pin->value = config->GetTexture(object_prefix);
+
+        // Run next node
+        RunNextNodeFunc(parent_node, "next");
+        parent_node->info = "Texture name: '" + object_prefix + "'";
     }
-
-    // Get previous viewport and set new viewport
-    auto config = InstanceConfig::instance();
-    GLint prev_viewport[4];
-    glGetIntegerv(GL_VIEWPORT, prev_viewport);
-    glViewport(0, 0, output_width, output_height);
-
-    // Bind framebuffer
-    config->framebuffer_stack.push(config->current_framebuffer);
-    config->current_framebuffer = object_prefix;
-    GLuint new_framebuffer_id = config->GetFrameBuffer(config->current_framebuffer)->object_id;
-    glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer_id);
-
-    // Run next node
-    RunNextNodeFunc(parent_node, "render_body");
-
-    // Return to previous viewport and framebuffer
-    std::string prev_framebuffer = config->framebuffer_stack.top();
-    config->current_framebuffer = prev_framebuffer;
-    config->framebuffer_stack.pop();
-    GLuint prev_framebuffer_id = config->GetFrameBuffer(prev_framebuffer)->object_id;
-    glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer_id);
-    glViewport(0, 0, prev_viewport[2], prev_viewport[3]);
-
-    std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<TextureObject>>>(parent_node->outputs.at("texture_out"));
-    output_pin->value = config->GetTexture(object_prefix);
-
-    // Run next node
-    RunNextNodeFunc(parent_node, "next");
+    else
+    {
+        parent_node->info = "";
+    }
 }
 
 void GlRenderToTexture_Func::Delete()
@@ -291,13 +327,14 @@ void GlRenderToTexture_Func::SetupFrameBuffer()
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
         parent_node->error = "Somehting went wrong with Gl Redner To Texture!!";
+        parent_node->info = "";
         return;
     }
 
     config->InsertTexture(object_prefix, std::make_shared<TextureObject>(object_prefix, renderedTexture, output_width, output_height));
     config->InsertRenderBuffer(object_prefix, std::make_shared<RenderBufferObject>(object_prefix, depthrenderbuffer, output_width, output_height));
     config->InsertFrameBuffer(object_prefix, std::make_shared<FrameBufferObject>(object_prefix, framebuffer_id));
-    parent_node->info = "Texture name: 'glRenderToTexture_" + std::to_string(parent_node->id.Get())+"'";
+    parent_node->error = "";
 }
 
 void GlRenderToTexture_Func::DeleteFrameBuffer()
@@ -313,8 +350,9 @@ std::shared_ptr<Node> GlRenderToTexture(std::vector<std::shared_ptr<Node>>& s_No
     s_Nodes.emplace_back(new Node(GetNextId(), "GL Render To Texture"));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("width", new PinValue<int>("width", 1, GetNextId(), "Width", PinType::Int, 1920)));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("height", new PinValue<int>("height", 2, GetNextId(), "Height", PinType::Int, 1080)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("name", new PinValue<std::string>("name", 1, GetNextId(), "Name", PinType::String, "glRenderToTexture_" + std::to_string(s_Nodes.back()->id.Get()))));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("width", new PinValue<int>("width", 2, GetNextId(), "Width", PinType::Int, 1920)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("height", new PinValue<int>("height", 3, GetNextId(), "Height", PinType::Int, 1080)));
 
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("render_body", new BasePin("render_body", 0, GetNextId(), "Render Body", PinType::Flow)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("next", new BasePin("next", 1, GetNextId(), "After Rendering", PinType::Flow)));

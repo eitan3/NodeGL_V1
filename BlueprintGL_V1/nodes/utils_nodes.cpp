@@ -475,6 +475,7 @@ void SpoutSender_Func::Run()
     {
         DeleteSpout();
     }
+    RunNextNodeFunc(parent_node, "next");
 }
 
 void SpoutSender_Func::Delete()
