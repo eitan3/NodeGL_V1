@@ -1525,27 +1525,8 @@ void Application_Frame()
         ImGui::EndPopup();
     }
 
-    if (ImGui::BeginPopup("Link Context Menu"))
-    {
-        auto link = FindLink(contextLinkId, config->s_Links);
-
-        ImGui::TextUnformatted("Link Context Menu");
-        ImGui::Separator();
-        if (link)
-        {
-            ImGui::Text("ID: %p", link->id.AsPointer());
-            ImGui::Text("From: %p", link->startPinID.AsPointer());
-            ImGui::Text("To: %p", link->endPinID.AsPointer());
-        }
-        else
-            ImGui::Text("Unknown link: %p", contextLinkId.AsPointer());
-        ImGui::Separator();
-        if (ImGui::MenuItem("Delete"))
-            ed::DeleteLink(contextLinkId);
-        ImGui::EndPopup();
-    }
-
-    if (ImGui::BeginPopup("Create New Node"))
+    ImGui::SetNextWindowSize(ImVec2(0, 350));
+    if (ImGui::BeginPopup("Create New Node", ImGuiWindowFlags_AlwaysVerticalScrollbar))
     {
         ImGui::PushItemWidth(100.0f);
         if (reset_search_node)
@@ -1638,6 +1619,27 @@ void Application_Frame()
     }
     else
         createNewNode = false;
+
+    if (ImGui::BeginPopup("Link Context Menu"))
+    {
+        auto link = FindLink(contextLinkId, config->s_Links);
+
+        ImGui::TextUnformatted("Link Context Menu");
+        ImGui::Separator();
+        if (link)
+        {
+            ImGui::Text("ID: %p", link->id.AsPointer());
+            ImGui::Text("From: %p", link->startPinID.AsPointer());
+            ImGui::Text("To: %p", link->endPinID.AsPointer());
+        }
+        else
+            ImGui::Text("Unknown link: %p", contextLinkId.AsPointer());
+        ImGui::Separator();
+        if (ImGui::MenuItem("Delete"))
+            ed::DeleteLink(contextLinkId);
+        ImGui::EndPopup();
+    }
+
     ImGui::PopStyleVar();
     ed::Resume();
 
