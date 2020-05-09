@@ -112,6 +112,45 @@ std::shared_ptr<Node> BranchNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
+void WhileLoop_Func::Run()
+{
+    bool condition = GetInputPinValue<bool>(parent_node, "condition");
+    while (condition)
+    {
+        RunNextNodeFunc(parent_node, "loop_body");
+    }
+    RunNextNodeFunc(parent_node, "complete");
+}
+
+void WhileLoop_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+std::shared_ptr<Node> WhileLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), "While Loop"));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("condition", new PinValue<bool>("condition", 1, GetNextId(), "Condition", PinType::Bool, false)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("loop_body", new BasePin("loop_body", 0, GetNextId(), "Loop Body", PinType::Flow)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("complete", new BasePin("complete", 1, GetNextId(), "Complete", PinType::Flow)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<WhileLoop_Func>();
+    std::dynamic_pointer_cast<WhileLoop_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+
 
 void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
@@ -122,4 +161,8 @@ void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = BranchNode;
     std::vector<std::string> keywords_2{ "Flow", "Branch", "If" };
     search_nodes_vector.push_back(SearchNodeObj("Branch", keywords_2, func_2));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = WhileLoopNode;
+    std::vector<std::string> keywords_3{ "Flow", "While", "Loop" };
+    search_nodes_vector.push_back(SearchNodeObj("While Loop", keywords_3, func_3));
 }

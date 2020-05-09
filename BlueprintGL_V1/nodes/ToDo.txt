@@ -1,6 +1,4 @@
-If
 For Loop
-While Loop
 Binary Operations
 Remove input and output pins from placeholder if the user didn't select one
 PBR Rendering & Simple

@@ -36,6 +36,21 @@ std::shared_ptr<Node> BranchNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
+class WhileLoop_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run();
+    void Delete();
+    void NoFlowUpdatePinsValues() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+};
+
+std::shared_ptr<Node> WhileLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+
 void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
 
 #endif
