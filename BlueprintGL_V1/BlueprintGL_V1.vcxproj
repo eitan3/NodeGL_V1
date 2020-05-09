@@ -151,6 +151,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="nodes\collect_search_nodes.cpp" />
     <ClCompile Include="nodes\dummy_nodes.cpp" />
+    <ClCompile Include="nodes\flow_nodes.cpp" />
     <ClCompile Include="nodes\gl_nodes_1.cpp" />
     <ClCompile Include="nodes\math_nodes.cpp" />
     <ClCompile Include="nodes\shaders_nodes.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="InstanceConfig.h" />
     <ClInclude Include="nodes\collect_search_nodes.h" />
     <ClInclude Include="nodes\dummy_nodes.h" />
+    <ClInclude Include="nodes\flow_nodes.h" />
     <ClInclude Include="nodes\gl_nodes_1.h" />
     <ClInclude Include="nodes\math_nodes.h" />
     <ClInclude Include="nodes\node_function_interface.h" />

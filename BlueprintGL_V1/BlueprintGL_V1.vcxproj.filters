@@ -114,6 +114,9 @@
     <ClCompile Include="SpoutSDK\SpoutReceiver.cpp">
       <Filter>Source Files\SpoutSDK</Filter>
     </ClCompile>
+    <ClCompile Include="nodes\flow_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_utils.h">
@@ -214,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="EditorConfig.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\flow_nodes.h">
+      <Filter>Header Files\nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
