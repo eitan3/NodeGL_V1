@@ -15,8 +15,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key) {};
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 };
 
 std::shared_ptr<Node> PrintString(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -29,8 +29,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key) {};
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 };
 
 std::shared_ptr<Node> ConvertTo(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -43,8 +43,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key) {};
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector();
 
     std::shared_ptr<BasePlaceholder> placeholder;
 };
@@ -59,8 +59,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key) {};
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector();
 
     std::shared_ptr<BasePlaceholder> placeholder;
     PinType placeholder_type;
@@ -77,8 +77,8 @@ public:
     void Delete();
     void DeleteSpout();
     void NoFlowUpdatePinsValues() {};
-    void PressButton(PinKind, std::string pin_key) {};
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 
     SpoutSender spoutsender;
     bool bInitialized;

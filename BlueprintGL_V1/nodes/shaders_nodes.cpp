@@ -37,11 +37,6 @@ void CreateSahder_Func::DeleteShader()
     }
 }
 
-void CreateSahder_Func::PressButton(PinKind, std::string pin_key)
-{
-    showShaderEditorWindow = true;
-}
-
 void CreateSahder_Func::ShowFileBrowserWindow(bool* show)
 {
     ImGui::OpenPopup("Open File");
@@ -176,7 +171,7 @@ void CreateSahder_Func::ShowShaderEditorWindow(bool* show)
     ImGui::End();
 }
 
-void CreateSahder_Func::UpdateUI()
+void CreateSahder_Func::UpdateNodeUI()
 {
     if (showFileBrowserWindow)
     {
@@ -188,10 +183,20 @@ void CreateSahder_Func::UpdateUI()
     }
 }
 
+void CreateSahder_Func::UpdateNodeInspector()
+{
+    if (ImGui::BeginTabItem("Shader Configs"))
+    {
+        if (ImGui::Button("Shader Editor"))
+        {
+            showShaderEditorWindow = true;
+        }
+    }
+}
+
 std::shared_ptr<Node> CreateSahder(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Create Shader", true));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("edit_btn", new PinValue<std::string>("edit_btn", 0, GetNextId(), "Edit Shader", PinType::Button, "")));
 
     s_Nodes.back()->node_funcs = std::make_shared<CreateSahder_Func>();
     std::dynamic_pointer_cast<CreateSahder_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
@@ -245,7 +250,7 @@ void CreateProgram_Func::NoFlowUpdatePinsValues()
 {
 }
 
-void CreateProgram_Func::UpdateUI()
+void CreateProgram_Func::UpdateNodeUI()
 {
     std::shared_ptr<ShaderObject> vertex_shader = GetInputPinValue<std::shared_ptr<ShaderObject>>(parent_node, "vs");
     std::shared_ptr<ShaderObject> fragment_shader = GetInputPinValue<std::shared_ptr<ShaderObject>>(parent_node, "fs");

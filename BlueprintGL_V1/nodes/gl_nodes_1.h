@@ -16,8 +16,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key) {};
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 
 private:
     void SetupFrameBuffer();
@@ -39,8 +39,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key) {};
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 };
 
 std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -55,8 +55,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key) {};
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 
 private:
     void SetupFrameBuffer();

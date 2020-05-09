@@ -212,6 +212,9 @@
     <ClInclude Include="SpoutSDK\SpoutSenderMemory.h">
       <Filter>Header Files\SpoutSDK</Filter>
     </ClInclude>
+    <ClInclude Include="EditorConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="nodes\ToDo.txt" />

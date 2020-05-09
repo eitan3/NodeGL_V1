@@ -14,8 +14,8 @@ public:
     virtual void Run() = 0;
     virtual void Delete() = 0;
     virtual void NoFlowUpdatePinsValues() = 0;
-    virtual void PressButton(PinKind, std::string pin_key) = 0;
-    virtual void UpdateUI() = 0;
+    virtual void UpdateNodeUI() = 0;
+    virtual void UpdateNodeInspector() = 0;
 
     std::shared_ptr<Node> parent_node;
 };

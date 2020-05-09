@@ -176,6 +176,7 @@
   <ItemGroup>
     <ClInclude Include="bp_enums.h" />
     <ClInclude Include="bp_structs.h" />
+    <ClInclude Include="EditorConfig.h" />
     <ClInclude Include="id_generator.h" />
     <ClInclude Include="imgui_utils.h" />
     <ClInclude Include="InstanceConfig.h" />

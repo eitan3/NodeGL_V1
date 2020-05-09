@@ -57,10 +57,6 @@ void DummySendFloat_Func::NoFlowUpdatePinsValues()
 
 }
 
-void DummySendFloat_Func::PressButton(PinKind, std::string pin_key)
-{
-}
-
 std::shared_ptr<Node> DummySendFloat(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Dummy Send Float"));
@@ -108,10 +104,6 @@ void DummyRecvSendFloat_Func::Delete()
 void DummyRecvSendFloat_Func::NoFlowUpdatePinsValues()
 {
 
-}
-
-void DummyRecvSendFloat_Func::PressButton(PinKind, std::string pin_key)
-{
 }
 
 std::shared_ptr<Node> DummyRecvSendFloat(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -163,10 +155,6 @@ void DummySendInt_Func::NoFlowUpdatePinsValues()
 
 }
 
-void DummySendInt_Func::PressButton(PinKind, std::string pin_key)
-{
-}
-
 std::shared_ptr<Node> DummySendInt(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Dummy Send Integer"));
@@ -214,10 +202,6 @@ void DummyRecvSendInt_Func::Delete()
 void DummyRecvSendInt_Func::NoFlowUpdatePinsValues()
 {
 
-}
-
-void DummyRecvSendInt_Func::PressButton(PinKind, std::string pin_key)
-{
 }
 
 std::shared_ptr<Node> DummyRecvSendInt(std::vector<std::shared_ptr<Node>>& s_Nodes)

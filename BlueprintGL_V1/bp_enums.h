@@ -7,7 +7,6 @@ enum class PinType
 {
     Unknown,
     Flow,
-    Button,
     Bool,
     Int,
     Float,

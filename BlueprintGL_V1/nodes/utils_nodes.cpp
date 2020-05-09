@@ -1,4 +1,6 @@
 #include "utils_nodes.h"
+#include "../EditorConfig.h"
+#include "../InstanceConfig.h"
 
 void PrintString_Func::Initialize()
 {
@@ -270,6 +272,31 @@ void SetPlaceholder_Func::NoFlowUpdatePinsValues()
 {
 }
 
+void SetPlaceholder_Func::UpdateNodeInspector()
+{
+    auto editor_config = EditorConfig::instance();
+    auto config = InstanceConfig::instance();
+    std::string ph_name = "";
+    if (placeholder)
+            ph_name = placeholder->name;
+    if (ph_name != "")
+        ImGui::Text(((std::string)("Placeholder Name: " + ph_name)).c_str());
+    if (ImGui::BeginTabItem("Placeholder"))
+    {
+        if (ImGui::Button("Create Placeholder"))
+        {
+            editor_config->showCreatePlaceholderWindow = true;
+        }
+        if (config->GetPlaceholdersMapKeys().size() > 0)
+        {
+            if (ImGui::Button("Select Placeholder"))
+            {
+                editor_config->showSelectPlaceholderWindow = true;
+            }
+        }
+    }
+}
+
 std::shared_ptr<Node> SetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Set Placeholder"));
@@ -376,6 +403,31 @@ void GetPlaceholder_Func::NoFlowUpdatePinsValues()
             ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<ShaderObject>>>(placeholder)->value;
         std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<ShaderObject>>>(parent_node->outputs.at("placeholder_pin"));
         output_pin->value = ph_value;
+    }
+}
+
+void GetPlaceholder_Func::UpdateNodeInspector()
+{
+    auto editor_config = EditorConfig::instance();
+    auto config = InstanceConfig::instance();
+    std::string ph_name = "";
+    if (placeholder)
+        ph_name = placeholder->name;
+    if (ph_name != "")
+        ImGui::Text(((std::string)("Placeholder Name: " + ph_name)).c_str());
+    if (ImGui::BeginTabItem("Placeholder"))
+    {
+        if (ImGui::Button("Create Placeholder"))
+        {
+            editor_config->showCreatePlaceholderWindow = true;
+        }
+        if (config->GetPlaceholdersMapKeys().size() > 0)
+        {
+            if (ImGui::Button("Select Placeholder"))
+            {
+                editor_config->showSelectPlaceholderWindow = true;
+            }
+        }
     }
 }
 

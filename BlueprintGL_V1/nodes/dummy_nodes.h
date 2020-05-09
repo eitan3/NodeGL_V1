@@ -12,8 +12,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues() {};
-    void PressButton(PinKind, std::string pin_key) {};
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 };
 
 std::shared_ptr<Node> DummyNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -26,8 +26,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key);
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 };
 
 std::shared_ptr<Node> DummySendFloat(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -40,8 +40,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key);
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 };
 
 std::shared_ptr<Node> DummyRecvSendFloat(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -54,8 +54,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key);
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 };
 
 std::shared_ptr<Node> DummySendInt(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -68,8 +68,8 @@ public:
     void Run();
     void Delete();
     void NoFlowUpdatePinsValues();
-    void PressButton(PinKind, std::string pin_key);
-    void UpdateUI() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
 };
 
 std::shared_ptr<Node> DummyRecvSendInt(std::vector<std::shared_ptr<Node>>& s_Nodes);

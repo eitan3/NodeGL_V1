@@ -18,6 +18,7 @@
 #include <functional>
 
 #include "InstanceConfig.h"
+#include "EditorConfig.h"
 #include "imgui_utils.h"
 #include "bp_enums.h"
 #include "bp_structs.h"
@@ -57,10 +58,6 @@ bool showStyleEditor = false;
 bool showNodeHierarchyWindow = false;
 bool showTextureViewer = false;
 bool showNodeInspector = false;
-bool showCreatePlaceholderWindow = false;
-bool showSelectPlaceholderWindow = false;
-bool showRenamePlaceholderWindow = false;
-bool showDeletePlaceholderWindow = false;
 
 // Variables for 'Create Placeholder' Window
 std::string create_placeholder_name;
@@ -531,36 +528,8 @@ void ShowNodeInspector(bool* show = nullptr, std::shared_ptr<Node> node = nullpt
     ImGui::Text(((std::string)("Node: " + node->name)).c_str());
     if (ImGui::BeginTabBar("TabBar 0", 0))
     {
-        if (node->is_set_placeholder || node->is_get_placeholder)
-        {
-            std::string ph_name = "";
-            if (node->is_set_placeholder)
-                if (std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder)
-                    ph_name = std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder->name;
-            if (node->is_get_placeholder)
-                if (std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder)
-                    ph_name = std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder->name;
-            if (ph_name != "")
-                ImGui::Text(((std::string)("Placeholder Name: " + ph_name)).c_str());
-            if (ImGui::BeginTabItem("Placeholder"))
-            {
-                if (ImGui::Button("Create Placeholder"))
-                    showCreatePlaceholderWindow = true;
-                if (config->GetPlaceholdersMapKeys().size() > 0)
-                {
-                    if (ImGui::Button("Select Placeholder"))
-                        showSelectPlaceholderWindow = true;
-                }
-            }
-        }
-        else
-        {
-            /*if (ImGui::BeginTabItem("General"))
-            {
-                ImGui::EndTabItem();
-            }*/
-            AddInputPinsTab(node);
-        }
+        AddInputPinsTab(node);
+        node->node_funcs->UpdateNodeInspector();
         ImGui::EndTabBar();
     }
 
@@ -575,6 +544,7 @@ void ShowCreatePlaceholderWindow(bool* show = nullptr)
         return;
     }
     ImGui::SetWindowSize(ImVec2(256, 0));
+    auto editor_config = EditorConfig::instance();
     auto config = InstanceConfig::instance();
     auto paneWidth = ImGui::GetContentRegionAvailWidth();
 
@@ -618,55 +588,55 @@ void ShowCreatePlaceholderWindow(bool* show = nullptr)
             {
                 std::shared_ptr<PlaceholderValue<std::string>> ph = std::make_shared< PlaceholderValue<std::string>>(create_placeholder_name, pinType, "");;
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
-                showCreatePlaceholderWindow = false;
+                editor_config->showCreatePlaceholderWindow = false;
             }
             else if (pinType == PinType::Bool)
             {
                 std::shared_ptr<PlaceholderValue<bool>> ph = std::make_shared< PlaceholderValue<bool>>(create_placeholder_name, pinType, false);;
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
-                showCreatePlaceholderWindow = false;
+                editor_config->showCreatePlaceholderWindow = false;
             }
             else if (pinType == PinType::Float)
             {
                 std::shared_ptr<PlaceholderValue<float>> ph = std::make_shared< PlaceholderValue<float>>(create_placeholder_name, pinType, 0);;
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
-                showCreatePlaceholderWindow = false;
+                editor_config->showCreatePlaceholderWindow = false;
             }
             else if (pinType == PinType::Int)
             {
                 std::shared_ptr<PlaceholderValue<int>> ph = std::make_shared< PlaceholderValue<int>>(create_placeholder_name, pinType, 0);;
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
-                showCreatePlaceholderWindow = false;
+                editor_config->showCreatePlaceholderWindow = false;
             }
             else if (pinType == PinType::TextureObject)
             {
                 std::shared_ptr<PlaceholderValue<std::shared_ptr<TextureObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<TextureObject>>>(create_placeholder_name, pinType, nullptr);;
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
-                showCreatePlaceholderWindow = false;
+                editor_config->showCreatePlaceholderWindow = false;
             }
             else if (pinType == PinType::ProgramObject)
             {
                 std::shared_ptr<PlaceholderValue<std::shared_ptr<ProgramObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ProgramObject>>>(create_placeholder_name, pinType, nullptr);;
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
-                showCreatePlaceholderWindow = false;
+                editor_config->showCreatePlaceholderWindow = false;
             }
             else if (pinType == PinType::VertexShaderObject)
             {
                 std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ShaderObject>>>(create_placeholder_name, pinType, nullptr);;
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
-                showCreatePlaceholderWindow = false;
+                editor_config->showCreatePlaceholderWindow = false;
             }
             else if (pinType == PinType::FragmentShaderObject)
             {
                 std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ShaderObject>>>(create_placeholder_name, pinType, nullptr);;
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
-                showCreatePlaceholderWindow = false;
+                editor_config->showCreatePlaceholderWindow = false;
             }
         }
     }
     if (ImGui::Button("Cancel"))
     {
-        showCreatePlaceholderWindow = false;
+        editor_config->showCreatePlaceholderWindow = false;
     }
 
     ImGui::EndHorizontal();
@@ -681,6 +651,7 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
         return;
     }
     ImGui::SetWindowSize(ImVec2(256, 0));
+    auto editor_config = EditorConfig::instance();
     auto config = InstanceConfig::instance();
     auto paneWidth = ImGui::GetContentRegionAvailWidth();
 
@@ -745,11 +716,11 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
             UtilsChangePinType(node, PinKind::Output, "placeholder_pin", ph->type);
         }
         ph->nodesID_vec.push_back(selectedNode);
-        showSelectPlaceholderWindow = false;
+        editor_config->showSelectPlaceholderWindow = false;
     }
     if (ImGui::Button("Cancel"))
     {
-        showSelectPlaceholderWindow = false;
+        editor_config->showSelectPlaceholderWindow = false;
     }
 
     ImGui::EndHorizontal();
@@ -764,6 +735,7 @@ void ShowRenamePlaceholderWindow(bool* show = nullptr)
         return;
     }
     ImGui::SetWindowSize(ImVec2(256, 0));
+    auto editor_config = EditorConfig::instance();
     auto config = InstanceConfig::instance();
     auto paneWidth = ImGui::GetContentRegionAvailWidth();
 
@@ -804,12 +776,12 @@ void ShowRenamePlaceholderWindow(bool* show = nullptr)
             ph->name = rename_placeholder_name;
             config->DeletePlaceholder(rename_placeholder_original_combo);
             config->InsertNewPlaceholder(rename_placeholder_name, ph);
-            showRenamePlaceholderWindow = false;
+            editor_config->showRenamePlaceholderWindow = false;
         }
     }
     if (ImGui::Button("Cancel"))
     {
-        showRenamePlaceholderWindow = false;
+        editor_config->showRenamePlaceholderWindow = false;
     }
 
     ImGui::EndHorizontal();
@@ -824,6 +796,7 @@ void ShowDeletePlaceholderWindow(bool* show = nullptr)
         return;
     }
     ImGui::SetWindowSize(ImVec2(256, 0));
+    auto editor_config = EditorConfig::instance();
     auto config = InstanceConfig::instance();
     auto paneWidth = ImGui::GetContentRegionAvailWidth();
 
@@ -857,11 +830,11 @@ void ShowDeletePlaceholderWindow(bool* show = nullptr)
             ed::DeleteNode(ph->nodesID_vec.at(ph_node_i));
         }
         config->DeletePlaceholder(delete_placeholder_combo);
-        showDeletePlaceholderWindow = false;
+        editor_config->showDeletePlaceholderWindow = false;
     }
     if (ImGui::Button("Cancel"))
     {
-        showDeletePlaceholderWindow = false;
+        editor_config->showDeletePlaceholderWindow = false;
     }
 
     ImGui::EndHorizontal();
@@ -870,6 +843,7 @@ void ShowDeletePlaceholderWindow(bool* show = nullptr)
 
 void ShowWindows()
 {
+    auto editor_config = EditorConfig::instance();
     if (showStyleEditor)
         ShowStyleEditor(&showStyleEditor);
 
@@ -879,9 +853,9 @@ void ShowWindows()
     if (showNodeHierarchyWindow)
         ShowNodeHierarchyWindow(&showNodeHierarchyWindow);
 
-    if (showCreatePlaceholderWindow)
+    if (editor_config->showCreatePlaceholderWindow)
     {
-        ShowCreatePlaceholderWindow(&showCreatePlaceholderWindow);
+        ShowCreatePlaceholderWindow(&editor_config->showCreatePlaceholderWindow);
     }
     else
     {
@@ -889,18 +863,18 @@ void ShowWindows()
         create_placeholder_type_combo = "";
     }
 
-    if (showSelectPlaceholderWindow)
+    if (editor_config->showSelectPlaceholderWindow)
     {
-        ShowSelectPlaceholderWindow(&showSelectPlaceholderWindow);
+        ShowSelectPlaceholderWindow(&editor_config->showSelectPlaceholderWindow);
     }
     else
     {
         select_placeholder_combo = "";
     }
 
-    if (showRenamePlaceholderWindow)
+    if (editor_config->showRenamePlaceholderWindow)
     {
-        ShowRenamePlaceholderWindow(&showRenamePlaceholderWindow);
+        ShowRenamePlaceholderWindow(&editor_config->showRenamePlaceholderWindow);
     }
     else
     {
@@ -908,9 +882,9 @@ void ShowWindows()
         rename_placeholder_original_combo = "";
     }
 
-    if (showDeletePlaceholderWindow)
+    if (editor_config->showDeletePlaceholderWindow)
     {
-        ShowDeletePlaceholderWindow(&showDeletePlaceholderWindow);
+        ShowDeletePlaceholderWindow(&editor_config->showDeletePlaceholderWindow);
     }
     else
     {
@@ -920,6 +894,7 @@ void ShowWindows()
 
 void CreateMenuBar()
 {
+    auto editor_config = EditorConfig::instance();
     auto config = InstanceConfig::instance();
     if (ImGui::BeginMainMenuBar())
     {
@@ -963,13 +938,13 @@ void CreateMenuBar()
         if (ImGui::BeginMenu("Placeholders"))
         {
             if (ImGui::MenuItem("Create Placeholder"))
-                showCreatePlaceholderWindow = true;
+                editor_config->showCreatePlaceholderWindow = true;
             if (config->GetPlaceholdersMapKeys().size() > 0)
             {
                 if (ImGui::MenuItem("Rename Placeholder"))
-                    showRenamePlaceholderWindow = true;
+                    editor_config->showRenamePlaceholderWindow = true;
                 if (ImGui::MenuItem("Delete Placeholder"))
-                    showDeletePlaceholderWindow = true;
+                    editor_config->showDeletePlaceholderWindow = true;
             }
             ImGui::EndMenu();
         }
@@ -1035,7 +1010,7 @@ void Application_Frame()
 
     for (auto& node : config->s_Nodes)
     {
-        node->node_funcs->UpdateUI();
+        node->node_funcs->UpdateNodeUI();
     }
 
     ed::Begin("Node editor");
@@ -1087,6 +1062,7 @@ void Application_Frame()
                 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
                 DrawPinIcon(input, IsPinLinked(input->id, config->s_Links), (int)(alpha * 255));
                 ImGui::Spring(0);
+                
                 static bool wasActive = false;
                 if (input->type == PinType::String)
                 {
@@ -1178,22 +1154,13 @@ void Application_Frame()
                     }
                     ImGui::Spring(0);
                 }
-                // Buttons
+                
                 if (!input->name.empty())
                 {
-                    if (input->type == PinType::Button)
-                    {
-                        if (ImGui::Button(input->name.c_str()))
-                        {
-                            input->node->node_funcs->PressButton(PinKind::Input, input->pin_key);
-                        }
-                    }
-                    else
-                    {
-                        ImGui::TextUnformatted(input->name.c_str());
-                    }
+                    ImGui::TextUnformatted(input->name.c_str());
                     ImGui::Spring(0);
                 }
+                
                 ImGui::PopStyleVar();
                 builder.EndInput();
             }
@@ -1328,10 +1295,6 @@ void Application_Frame()
                         {
                             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
                         }
-                        if (endPin->type == PinType::Button || startPin->type == PinType::Button)
-                        {
-                            ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-                        }
                         else if (endPin->kind == startPin->kind)
                         {
                             showLabelOnMouse("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
@@ -1388,24 +1351,16 @@ void Application_Frame()
                     newLinkPin = FindPin(pinId, config->s_Nodes);
                     if (newLinkPin)
                     {
-                        if (newLinkPin->type != PinType::Button)
+                        showLabelOnMouse("+ Create Node", ImColor(32, 45, 32, 180));
+                        if (ed::AcceptNewItem())
                         {
-                            showLabelOnMouse("+ Create Node", ImColor(32, 45, 32, 180));
-                            if (ed::AcceptNewItem())
-                            {
-                                createNewNode = true;
-                                newNodeLinkPin = FindPin(pinId, config->s_Nodes);
-                                newLinkPin = nullptr;
-                                ed::Suspend();
-                                ImGui::OpenPopup("Create New Node");
-                                reset_search_node = true;
-                                ed::Resume();
-                            }
-                        }
-                        else
-                        {
+                            createNewNode = true;
+                            newNodeLinkPin = FindPin(pinId, config->s_Nodes);
                             newLinkPin = nullptr;
-                            ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+                            ed::Suspend();
+                            ImGui::OpenPopup("Create New Node");
+                            reset_search_node = true;
+                            ed::Resume();
                         }
                     }
                 }
