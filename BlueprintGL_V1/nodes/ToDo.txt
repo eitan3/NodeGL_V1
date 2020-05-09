@@ -2,6 +2,7 @@ If
 For Loop
 While Loop
 Binary Operations
+Remove input and output pins from placeholder if the user didn't select one
 PBR Rendering & Simple
 Make functions for objects (like meshes)
 Draw functions (inside mesh object as a function, I think.. need to plan it)

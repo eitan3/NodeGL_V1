@@ -70,10 +70,56 @@ std::shared_ptr<Node> SequenceNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
+void Branch_Func::Run()
+{
+    bool condition = GetInputPinValue<bool>(parent_node, "condition");
+    if (condition)
+    {
+        RunNextNodeFunc(parent_node, "true");
+    }
+    else
+    {
+        RunNextNodeFunc(parent_node, "false");
+    }
+}
+
+void Branch_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+std::shared_ptr<Node> BranchNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), "Branch"));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("condition", new PinValue<bool>("condition", 1, GetNextId(), "Condition", PinType::Bool, false)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("true", new BasePin("true", 0, GetNextId(), "True", PinType::Flow)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("false", new BasePin("false", 1, GetNextId(), "False", PinType::Flow)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<Branch_Func>();
+    std::dynamic_pointer_cast<Branch_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+
 
 void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = SequenceNode;
     std::vector<std::string> keywords_1{ "Flow", "Sequence" };
     search_nodes_vector.push_back(SearchNodeObj("Sequence", keywords_1, func_1));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = BranchNode;
+    std::vector<std::string> keywords_2{ "Flow", "Branch", "If" };
+    search_nodes_vector.push_back(SearchNodeObj("Branch", keywords_2, func_2));
 }
