@@ -690,11 +690,19 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
                 prev_ph = nullptr;
             }
             std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder = ph;
-            for (int link_i = 0; link_i < node->inputs.at("placeholder_pin")->links.size(); link_i++)
+            if (node->inputs.count("placeholder_pin") > 0)
             {
-                ed::DeleteLink(node->inputs.at("placeholder_pin")->links.at(link_i)->id);
+                for (int link_i = 0; link_i < node->inputs.at("placeholder_pin")->links.size(); link_i++)
+                {
+                    ed::DeleteLink(node->inputs.at("placeholder_pin")->links.at(link_i)->id);
+                }
+                node->inputs.at("placeholder_pin")->links.clear();
             }
-            node->inputs.at("placeholder_pin")->links.clear();
+            else
+            {
+                node->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 1, GetNextId(), "Value", PinType::String, "")));
+                BuildNode(node);
+            }
             UtilsChangePinType(node, PinKind::Input, "placeholder_pin", ph->type);
         }
         else if (node->is_get_placeholder)
@@ -708,11 +716,19 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
             std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder = ph;
             std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder_type = ph->type;
             
-            for (int link_i = 0; link_i < node->outputs.at("placeholder_pin")->links.size(); link_i++)
+            if (node->outputs.count("placeholder_pin") > 0)
             {
-                ed::DeleteLink(node->outputs.at("placeholder_pin")->links.at(link_i)->id);
+                for (int link_i = 0; link_i < node->outputs.at("placeholder_pin")->links.size(); link_i++)
+                {
+                    ed::DeleteLink(node->outputs.at("placeholder_pin")->links.at(link_i)->id);
+                }
+                node->outputs.at("placeholder_pin")->links.clear();
             }
-            node->outputs.at("placeholder_pin")->links.clear();
+            else
+            {
+                node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 0, GetNextId(), "Value", PinType::String, "")));
+                BuildNode(node);
+            }
             UtilsChangePinType(node, PinKind::Output, "placeholder_pin", ph->type);
         }
         ph->nodesID_vec.push_back(selectedNode);
