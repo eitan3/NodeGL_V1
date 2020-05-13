@@ -78,6 +78,12 @@ std::string PinTypeToString(PinType type)
         return "Int";
     else if (type == PinType::String)
         return "String";
+    else if (type == PinType::Vector3)
+        return "Vector 3";
+    else if (type == PinType::Vector4)
+        return "Vector 4";
+    else if (type == PinType::Matrix4x4)
+        return "Matrix 4x4";
     else if (type == PinType::ProgramObject)
         return "Program Object";
     else if (type == PinType::VertexShaderObject)
@@ -86,6 +92,8 @@ std::string PinTypeToString(PinType type)
         return "Fragment Shader Object";
     else if (type == PinType::TextureObject)
         return "Texture Object";
+    else if (type == PinType::MeshObject)
+        return "Mesh Object";
     std::cout << "Error!!! Cant find pin type" << std::endl;
     return "Unkown";
 }
@@ -100,6 +108,12 @@ PinType StringToPinType(std::string str)
         return PinType::Int;
     else if (str == "String")
         return PinType::String;
+    else if (str == "Vector 3")
+        return PinType::Vector3;
+    else if (str == "Vector 4")
+        return PinType::Vector4;
+    else if (str == "Matrix 4x4")
+        return PinType::Matrix4x4;
     else if (str == "Program Object")
         return PinType::ProgramObject;
     else if (str == "Vertex Shader Object")
@@ -108,6 +122,8 @@ PinType StringToPinType(std::string str)
         return PinType::FragmentShaderObject;
     else if (str == "Texture Object")
         return PinType::TextureObject;
+    else if (str == "Mesh Object")
+        return PinType::MeshObject;
     std::cout << "Error!!! Cant find pin type" << std::endl;
     return PinType::Unknown;
 }
@@ -128,7 +144,7 @@ std::vector<std::string> SortPins(std::map<std::string, std::shared_ptr<BasePin>
 
 bool CanAddToInputsTab(std::shared_ptr<BasePin> pin)
 {
-    if (pin->type == PinType::Bool || pin->type == PinType::Float || pin->type == PinType::Int || pin->type == PinType::String)
+    if (pin->type == PinType::Bool || pin->type == PinType::Float || pin->type == PinType::Int || pin->type == PinType::String || pin->type == PinType::Vector3 || pin->type == PinType::Vector4)
         return true;
     return false;
 }
@@ -259,6 +275,50 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
                                     isEditDefaultActive = false;
                                 }
                             }
+                            else if (input->type == PinType::Vector3)
+                            {
+                                std::shared_ptr<PinValue<glm::vec3>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(input);
+                                ImGui::PushItemWidth(150.0f);
+
+                                //ImGui::InputFloat("##edit", &input_pin_value->default_value, 0.0, 0.0, "%.6f", 0);
+                                float float3[3] = { input_pin_value->default_value.x, input_pin_value->default_value.y, input_pin_value->default_value.z };
+                                ImGui::InputFloat3("##edit", float3);
+                                input_pin_value->default_value = glm::vec3(float3[0], float3[1], float3[2]);
+
+                                ImGui::PopItemWidth();
+                                if (ImGui::IsItemActive() && !isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(false);
+                                    isEditDefaultActive = true;
+                                }
+                                else if (!ImGui::IsItemActive() && isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(true);
+                                    isEditDefaultActive = false;
+                                }
+                            }
+                            else if (input->type == PinType::Vector4)
+                            {
+                                std::shared_ptr<PinValue<glm::vec4>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec4>>(input);
+                                ImGui::PushItemWidth(150.0f);
+
+                                //ImGui::InputFloat("##edit", &input_pin_value->default_value, 0.0, 0.0, "%.6f", 0);
+                                float float4[4] = { input_pin_value->default_value.x, input_pin_value->default_value.y, input_pin_value->default_value.z, input_pin_value->default_value.w };
+                                ImGui::InputFloat4("##edit", float4);
+                                input_pin_value->default_value = glm::vec4(float4[0], float4[1], float4[2], float4[3]);
+
+                                ImGui::PopItemWidth();
+                                if (ImGui::IsItemActive() && !isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(false);
+                                    isEditDefaultActive = true;
+                                }
+                                else if (!ImGui::IsItemActive() && isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(true);
+                                    isEditDefaultActive = false;
+                                }
+                            }
 
                             ImGui::EndHorizontal();
                         }
@@ -364,6 +424,21 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::st
             std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, "");
             parent_node->inputs.at(index) = new_node;
         }
+        else if (type == PinType::Vector3)
+        {
+            std::shared_ptr<PinValue<glm::vec3>> new_node = std::make_shared<PinValue<glm::vec3>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::vec3(0));
+            parent_node->inputs.at(index) = new_node;
+        }
+        else if (type == PinType::Vector4)
+        {
+            std::shared_ptr<PinValue<glm::vec4>> new_node = std::make_shared<PinValue<glm::vec4>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::vec4(0));
+            parent_node->inputs.at(index) = new_node;
+        }
+        else if (type == PinType::Matrix4x4)
+        {
+            std::shared_ptr<PinValue<glm::mat4>> new_node = std::make_shared<PinValue<glm::mat4>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::mat4(1.0));
+            parent_node->inputs.at(index) = new_node;
+        }
         else if (type == PinType::TextureObject)
         {
             std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
@@ -382,6 +457,11 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::st
         else if (type == PinType::FragmentShaderObject)
         {
             std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
+            parent_node->inputs.at(index) = new_node;
+        }
+        else if (type == PinType::MeshObject)
+        {
+            std::shared_ptr<PinValue<std::shared_ptr<MeshObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<MeshObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
             parent_node->inputs.at(index) = new_node;
         }
         parent_node->inputs.at(index)->node = node;
@@ -413,6 +493,21 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::st
             std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, "");
             parent_node->outputs.at(index) = new_node;
         }
+        else if (type == PinType::Vector3)
+        {
+            std::shared_ptr<PinValue<glm::vec3>> new_node = std::make_shared<PinValue<glm::vec3>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::vec3(0));
+            parent_node->outputs.at(index) = new_node;
+        }
+        else if (type == PinType::Vector4)
+        {
+            std::shared_ptr<PinValue<glm::vec4>> new_node = std::make_shared<PinValue<glm::vec4>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::vec4(0));
+            parent_node->outputs.at(index) = new_node;
+        }
+        else if (type == PinType::Matrix4x4)
+        {
+            std::shared_ptr<PinValue<glm::mat4>> new_node = std::make_shared<PinValue<glm::mat4>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::mat4(1.0));
+            parent_node->outputs.at(index) = new_node;
+        }
         else if (type == PinType::TextureObject)
         {
             std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
@@ -431,6 +526,11 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::st
         else if (type == PinType::FragmentShaderObject)
         {
             std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
+            parent_node->outputs.at(index) = new_node;
+        }
+        else if (type == PinType::MeshObject)
+        {
+            std::shared_ptr<PinValue<std::shared_ptr<MeshObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<MeshObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
             parent_node->outputs.at(index) = new_node;
         }
         parent_node->outputs.at(index)->node = node;
@@ -481,6 +581,10 @@ template bool GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string p
 template int GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template float GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::string GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template glm::vec3 GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template glm::vec4 GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template glm::mat4 GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<TextureObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<ProgramObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<ShaderObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<MeshObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);

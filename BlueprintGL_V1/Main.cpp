@@ -206,10 +206,14 @@ ImColor GetIconColor(PinType type)
     case PinType::Int:      return ImColor(68, 201, 156);
     case PinType::Float:    return ImColor(147, 226, 74);
     case PinType::String:   return ImColor(124, 21, 153);
+    case PinType::Vector3:   return ImColor(1, 91, 60);
+    case PinType::Vector4:   return ImColor(107, 32, 124);
+    case PinType::Matrix4x4:   return ImColor(223, 234, 149);
     case PinType::ProgramObject:   return ImColor(89, 48, 156);
     case PinType::VertexShaderObject:   return ImColor(100, 149, 106);
     case PinType::FragmentShaderObject:   return ImColor(239, 194, 154);
     case PinType::TextureObject:   return ImColor(75, 116, 117);
+    case PinType::MeshObject:   return ImColor(90, 176, 177);
     }
 };
 
@@ -227,10 +231,14 @@ void DrawPinIcon(std::shared_ptr<BasePin> pin, bool connected, int alpha)
         case PinType::Int:      iconType = IconType::Circle; break;
         case PinType::Float:    iconType = IconType::Circle; break;
         case PinType::String:   iconType = IconType::Circle; break;
+        case PinType::Vector3:   iconType = IconType::Circle; break;
+        case PinType::Vector4:   iconType = IconType::Circle; break;
+        case PinType::Matrix4x4:   iconType = IconType::Circle; break;
         case PinType::ProgramObject:   iconType = IconType::Circle; break;
         case PinType::VertexShaderObject:   iconType = IconType::Circle; break;
         case PinType::FragmentShaderObject:   iconType = IconType::Circle; break;
         case PinType::TextureObject:   iconType = IconType::Circle; break;
+        case PinType::MeshObject:   iconType = IconType::Circle; break;
         default:
             return;
         }
@@ -557,9 +565,10 @@ void ShowCreatePlaceholderWindow(bool* show = nullptr)
 
     ImGui::BeginHorizontal("##placeholder_type", ImVec2(paneWidth, 0), 1.0f);
     ImGui::TextUnformatted("Placeholder Type");
-    std::string items[] = { PinTypeToString(PinType::String), PinTypeToString(PinType::Bool),
-    PinTypeToString(PinType::Float), PinTypeToString(PinType::Int),PinTypeToString(PinType::TextureObject),
-    PinTypeToString(PinType::ProgramObject), PinTypeToString(PinType::VertexShaderObject), PinTypeToString(PinType::FragmentShaderObject) };
+    std::string items[] = { PinTypeToString(PinType::String), PinTypeToString(PinType::Bool), PinTypeToString(PinType::Float), PinTypeToString(PinType::Int), 
+        PinTypeToString(PinType::Vector3), PinTypeToString(PinType::Vector4), PinTypeToString(PinType::Matrix4x4), PinTypeToString(PinType::TextureObject), 
+        PinTypeToString(PinType::ProgramObject), PinTypeToString(PinType::VertexShaderObject), PinTypeToString(PinType::FragmentShaderObject), 
+        PinTypeToString(PinType::MeshObject) };
     if (create_placeholder_type_combo == "")
         create_placeholder_type_combo = items[0];
     if (ImGui::BeginCombo("##placeholder_type_combo", create_placeholder_type_combo.data())) // The second parameter is the label previewed before opening the combo.
@@ -608,6 +617,24 @@ void ShowCreatePlaceholderWindow(bool* show = nullptr)
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
                 editor_config->showCreatePlaceholderWindow = false;
             }
+            else if (pinType == PinType::Vector3)
+            {
+                std::shared_ptr<PlaceholderValue<glm::vec3>> ph = std::make_shared< PlaceholderValue<glm::vec3>>(create_placeholder_name, pinType, glm::vec3(0.0));;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                editor_config->showCreatePlaceholderWindow = false;
+            }
+            else if (pinType == PinType::Vector4)
+            {
+                std::shared_ptr<PlaceholderValue<glm::vec4>> ph = std::make_shared< PlaceholderValue<glm::vec4>>(create_placeholder_name, pinType, glm::vec4(0.0));;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                editor_config->showCreatePlaceholderWindow = false;
+            }
+            else if (pinType == PinType::Matrix4x4)
+            {
+                std::shared_ptr<PlaceholderValue<glm::mat4>> ph = std::make_shared< PlaceholderValue<glm::mat4>>(create_placeholder_name, pinType, glm::mat4(1.0));;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                editor_config->showCreatePlaceholderWindow = false;
+            }
             else if (pinType == PinType::TextureObject)
             {
                 std::shared_ptr<PlaceholderValue<std::shared_ptr<TextureObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<TextureObject>>>(create_placeholder_name, pinType, nullptr);;
@@ -629,6 +656,12 @@ void ShowCreatePlaceholderWindow(bool* show = nullptr)
             else if (pinType == PinType::FragmentShaderObject)
             {
                 std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ShaderObject>>>(create_placeholder_name, pinType, nullptr);;
+                config->InsertNewPlaceholder(create_placeholder_name, ph);
+                editor_config->showCreatePlaceholderWindow = false;
+            }
+            else if (pinType == PinType::MeshObject)
+            {
+                std::shared_ptr<PlaceholderValue<std::shared_ptr<MeshObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<MeshObject>>>(create_placeholder_name, pinType, nullptr);;
                 config->InsertNewPlaceholder(create_placeholder_name, ph);
                 editor_config->showCreatePlaceholderWindow = false;
             }
@@ -1136,6 +1169,64 @@ void Application_Frame()
                         ImGui::InputFloat("##edit", &input_pin_value->value, 0.0, 0.0, "%.6f", 0);
                     else
                         ImGui::InputFloat("##edit", &input_pin_value->default_value, 0.0, 0.0, "%.6f", 0);
+                    ImGui::PopItemWidth();
+                    if (ImGui::IsItemActive() && !wasActive)
+                    {
+                        ed::EnableShortcuts(false);
+                        wasActive = true;
+                    }
+                    else if (!ImGui::IsItemActive() && wasActive)
+                    {
+                        ed::EnableShortcuts(true);
+                        wasActive = false;
+                    }
+                    ImGui::Spring(0);
+                }
+                else if (input->type == PinType::Vector3)
+                {
+                    std::shared_ptr<PinValue<glm::vec3>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(input);
+                    ImGui::PushItemWidth(125.0f);
+                    if (input_pin_value->links.size() > 0)
+                    {
+                        float float3[3] = { input_pin_value->value.x, input_pin_value->value.y, input_pin_value->value.z };
+                        ImGui::InputFloat3("##edit", float3);
+                        input_pin_value->value = glm::vec3(float3[0], float3[1], float3[2]);
+                    }
+                    else
+                    {
+                        float float3[3] = { input_pin_value->default_value.x, input_pin_value->default_value.y, input_pin_value->default_value.z };
+                        ImGui::InputFloat3("##edit", float3);
+                        input_pin_value->default_value = glm::vec3(float3[0], float3[1], float3[2]);
+                    }
+                    ImGui::PopItemWidth();
+                    if (ImGui::IsItemActive() && !wasActive)
+                    {
+                        ed::EnableShortcuts(false);
+                        wasActive = true;
+                    }
+                    else if (!ImGui::IsItemActive() && wasActive)
+                    {
+                        ed::EnableShortcuts(true);
+                        wasActive = false;
+                    }
+                    ImGui::Spring(0);
+                }
+                else if (input->type == PinType::Vector4)
+                {
+                    std::shared_ptr<PinValue<glm::vec4>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec4>>(input);
+                    ImGui::PushItemWidth(125.0f);
+                    if (input_pin_value->links.size() > 0)
+                    {
+                        float float4[4] = { input_pin_value->value.x, input_pin_value->value.y, input_pin_value->value.z, input_pin_value->value.w };
+                        ImGui::InputFloat4("##edit", float4);
+                        input_pin_value->value = glm::vec4(float4[0], float4[1], float4[2], float4[3]);
+                    }
+                    else
+                    {
+                        float float4[4] = { input_pin_value->default_value.x, input_pin_value->default_value.y, input_pin_value->default_value.z, input_pin_value->default_value.w };
+                        ImGui::InputFloat4("##edit", float4);
+                        input_pin_value->default_value = glm::vec4(float4[0], float4[1], float4[2], float4[3]);
+                    }
                     ImGui::PopItemWidth();
                     if (ImGui::IsItemActive() && !wasActive)
                     {

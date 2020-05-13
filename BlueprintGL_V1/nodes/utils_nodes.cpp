@@ -230,6 +230,24 @@ void SetPlaceholder_Func::Run()
             std::shared_ptr<PlaceholderValue<bool>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<bool>>(placeholder);
             ph_value->value = placeholder_value;
         }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Vector3)
+        {
+            glm::vec3 placeholder_value = GetInputPinValue<glm::vec3>(parent_node, "placeholder_pin");
+            std::shared_ptr<PlaceholderValue<glm::vec3>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec3>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Vector4)
+        {
+            glm::vec4 placeholder_value = GetInputPinValue<glm::vec4>(parent_node, "placeholder_pin");
+            std::shared_ptr<PlaceholderValue<glm::vec4>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec4>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Matrix4x4)
+        {
+            glm::mat4 placeholder_value = GetInputPinValue<glm::mat4>(parent_node, "placeholder_pin");
+            std::shared_ptr<PlaceholderValue<glm::mat4>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::mat4>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
         else if (parent_node->inputs.at("placeholder_pin")->type == PinType::TextureObject)
         {
             std::shared_ptr<TextureObject> placeholder_value = GetInputPinValue<std::shared_ptr<TextureObject>>(parent_node, "placeholder_pin");
@@ -252,6 +270,12 @@ void SetPlaceholder_Func::Run()
         {
             std::shared_ptr<ShaderObject> placeholder_value = GetInputPinValue<std::shared_ptr<ShaderObject>>(parent_node, "placeholder_pin");
             std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<ShaderObject>>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::MeshObject)
+        {
+            std::shared_ptr<MeshObject> placeholder_value = GetInputPinValue<std::shared_ptr<MeshObject>>(parent_node, "placeholder_pin");
+            std::shared_ptr<PlaceholderValue<std::shared_ptr<MeshObject>>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<MeshObject>>>(placeholder);
             ph_value->value = placeholder_value;
         }
     }
@@ -372,6 +396,30 @@ void GetPlaceholder_Func::NoFlowUpdatePinsValues()
         std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("placeholder_pin"));
         output_pin->value = ph_value;
     }
+    else if (placeholder_type == PinType::Vector3)
+    {
+        glm::vec3 ph_value = glm::vec3(0);
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec3>>(placeholder)->value;
+        std::shared_ptr<PinValue<glm::vec3>> output_pin = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->outputs.at("placeholder_pin"));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::Vector4)
+    {
+        glm::vec4 ph_value = glm::vec4(0);
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec4>>(placeholder)->value;
+        std::shared_ptr<PinValue<glm::vec4>> output_pin = std::dynamic_pointer_cast<PinValue<glm::vec4>>(parent_node->outputs.at("placeholder_pin"));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::Matrix4x4)
+    {
+        glm::mat4 ph_value = glm::mat4(1);
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::mat4>>(placeholder)->value;
+        std::shared_ptr<PinValue<glm::mat4>> output_pin = std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("placeholder_pin"));
+        output_pin->value = ph_value;
+    }
     else if (placeholder_type == PinType::TextureObject)
     {
         std::shared_ptr<TextureObject> ph_value = nullptr;
@@ -402,6 +450,14 @@ void GetPlaceholder_Func::NoFlowUpdatePinsValues()
         if (placeholder)
             ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<ShaderObject>>>(placeholder)->value;
         std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<ShaderObject>>>(parent_node->outputs.at("placeholder_pin"));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::MeshObject)
+    {
+        std::shared_ptr<MeshObject> ph_value = nullptr;
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<std::shared_ptr<MeshObject>>>(placeholder)->value;
+        std::shared_ptr<PinValue<std::shared_ptr<MeshObject>>> output_pin = std::dynamic_pointer_cast<PinValue<std::shared_ptr<MeshObject>>>(parent_node->outputs.at("placeholder_pin"));
         output_pin->value = ph_value;
     }
 }
@@ -515,6 +571,158 @@ std::shared_ptr<Node> SpoutSenderNode(std::vector<std::shared_ptr<Node>>& s_Node
 
 
 
+void MakeFloat3_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void MakeFloat3_Func::NoFlowUpdatePinsValues()
+{
+    float pin_0_value = GetInputPinValue<float>(parent_node, "x");
+    float pin_1_value = GetInputPinValue<float>(parent_node, "y");
+    float pin_2_value = GetInputPinValue<float>(parent_node, "z");
+    std::shared_ptr<PinValue<glm::vec3>> output_pin = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->outputs.at("out"));
+    output_pin->value = glm::vec3(pin_0_value, pin_1_value, pin_2_value);
+}
+
+std::shared_ptr<Node> MakeFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), "Make Float 3", true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x", new PinValue<float>("x", 0, GetNextId(), "X", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("y", new PinValue<float>("y", 1, GetNextId(), "Y", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("z", new PinValue<float>("z", 2, GetNextId(), "Z", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("out", new PinValue<glm::vec3>("out", 0, GetNextId(), "Out", PinType::Vector3, glm::vec3(0))));
+
+    s_Nodes.back()->node_funcs = std::make_shared<MakeFloat3_Func>();
+    std::dynamic_pointer_cast<MakeFloat3_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+void MakeFloat4_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void MakeFloat4_Func::NoFlowUpdatePinsValues()
+{
+    float pin_0_value = GetInputPinValue<float>(parent_node, "x");
+    float pin_1_value = GetInputPinValue<float>(parent_node, "y");
+    float pin_2_value = GetInputPinValue<float>(parent_node, "z");
+    float pin_3_value = GetInputPinValue<float>(parent_node, "w");
+    std::shared_ptr<PinValue<glm::vec4>> output_pin = std::dynamic_pointer_cast<PinValue<glm::vec4>>(parent_node->outputs.at("out"));
+    output_pin->value = glm::vec4(pin_0_value, pin_1_value, pin_2_value, pin_3_value);
+}
+
+std::shared_ptr<Node> MakeFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), "Make Float 4", true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x", new PinValue<float>("x", 0, GetNextId(), "X", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("y", new PinValue<float>("y", 1, GetNextId(), "Y", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("z", new PinValue<float>("z", 2, GetNextId(), "Z", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("w", new PinValue<float>("w", 3, GetNextId(), "W", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec4>>>("out", new PinValue<glm::vec4>("out", 0, GetNextId(), "Out", PinType::Vector4, glm::vec4(0))));
+
+    s_Nodes.back()->node_funcs = std::make_shared<MakeFloat4_Func>();
+    std::dynamic_pointer_cast<MakeFloat4_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+void BreakFloat3_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void BreakFloat3_Func::NoFlowUpdatePinsValues()
+{
+    glm::vec3 pin_0_value = GetInputPinValue<glm::vec3>(parent_node, "in");
+    std::shared_ptr<PinValue<float>> output_pin_1 = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("x"));
+    std::shared_ptr<PinValue<float>> output_pin_2 = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("y"));
+    std::shared_ptr<PinValue<float>> output_pin_3 = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("z"));
+    output_pin_1->value = pin_0_value.x;
+    output_pin_2->value = pin_0_value.y;
+    output_pin_3->value = pin_0_value.z;
+}
+
+std::shared_ptr<Node> BreakFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), "Break Float 3", true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("in", new PinValue<glm::vec3>("in", 0, GetNextId(), "In", PinType::Vector3, glm::vec3(0))));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x", new PinValue<float>("x", 0, GetNextId(), "X", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("y", new PinValue<float>("y", 1, GetNextId(), "Y", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("z", new PinValue<float>("z", 2, GetNextId(), "Z", PinType::Float, 0)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<BreakFloat3_Func>();
+    std::dynamic_pointer_cast<BreakFloat3_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+void BreakFloat4_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void BreakFloat4_Func::NoFlowUpdatePinsValues()
+{
+    glm::vec4 pin_0_value = GetInputPinValue<glm::vec4>(parent_node, "in");
+    std::shared_ptr<PinValue<float>> output_pin_1 = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("x"));
+    std::shared_ptr<PinValue<float>> output_pin_2 = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("y"));
+    std::shared_ptr<PinValue<float>> output_pin_3 = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("z"));
+    std::shared_ptr<PinValue<float>> output_pin_4 = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("w"));
+    output_pin_1->value = pin_0_value.x;
+    output_pin_2->value = pin_0_value.y;
+    output_pin_3->value = pin_0_value.z;
+    output_pin_4->value = pin_0_value.w;
+}
+
+std::shared_ptr<Node> BreakFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), "Break Float 4", true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec4>>>("in", new PinValue<glm::vec4>("in", 0, GetNextId(), "In", PinType::Vector4, glm::vec4(0))));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x", new PinValue<float>("x", 0, GetNextId(), "X", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("y", new PinValue<float>("y", 1, GetNextId(), "Y", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("z", new PinValue<float>("z", 2, GetNextId(), "Z", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("w", new PinValue<float>("w", 3, GetNextId(), "W", PinType::Float, 0)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<BreakFloat4_Func>();
+    std::dynamic_pointer_cast<BreakFloat4_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
 void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = ConvertTo;
@@ -536,4 +744,20 @@ void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = SpoutSenderNode;
     std::vector<std::string> keywords_5{ "Spout", "Sender" };
     search_nodes_vector.push_back(SearchNodeObj("Spout Sender", keywords_5, func_5));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_6 = MakeFloat3Node;
+    std::vector<std::string> keywords_6{ "Make", "Float", "3" };
+    search_nodes_vector.push_back(SearchNodeObj("Make Float 3", keywords_6, func_6));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_7 = MakeFloat4Node;
+    std::vector<std::string> keywords_7{ "Make", "Float", "4" };
+    search_nodes_vector.push_back(SearchNodeObj("Make Float 4", keywords_7, func_7));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_8 = BreakFloat3Node;
+    std::vector<std::string> keywords_8{ "Break", "Float", "3" };
+    search_nodes_vector.push_back(SearchNodeObj("Break Float 3", keywords_8, func_8));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_9 = BreakFloat4Node;
+    std::vector<std::string> keywords_9{ "Break", "Float", "4" };
+    search_nodes_vector.push_back(SearchNodeObj("Break Float 4", keywords_9, func_9));
 }

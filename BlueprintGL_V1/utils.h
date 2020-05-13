@@ -9,6 +9,7 @@
 #include "objects/texture_object.h"
 #include "objects/program_object.h"
 #include "objects/shader_object.h"
+#include "objects/mesh_object.h"
 #include <memory>
 #include <set>
 

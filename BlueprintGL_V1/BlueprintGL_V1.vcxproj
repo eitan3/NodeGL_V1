@@ -158,6 +158,7 @@
     <ClCompile Include="nodes\utils_nodes.cpp" />
     <ClCompile Include="nodes_builder.cpp" />
     <ClCompile Include="objects\framebuffer_object.cpp" />
+    <ClCompile Include="objects\mesh_object.cpp" />
     <ClCompile Include="objects\program_object.cpp" />
     <ClCompile Include="objects\renderbuffer_object.cpp" />
     <ClCompile Include="objects\shader_object.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="nodes\utils_nodes.h" />
     <ClInclude Include="nodes_builder.h" />
     <ClInclude Include="objects\framebuffer_object.h" />
+    <ClInclude Include="objects\mesh_object.h" />
     <ClInclude Include="objects\program_object.h" />
     <ClInclude Include="objects\renderbuffer_object.h" />
     <ClInclude Include="objects\shader_object.h" />

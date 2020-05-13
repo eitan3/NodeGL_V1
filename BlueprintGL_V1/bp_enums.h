@@ -11,10 +11,14 @@ enum class PinType
     Int,
     Float,
     String,
+    Vector3,
+    Vector4,
+    Matrix4x4,
     ProgramObject,
     VertexShaderObject,
     FragmentShaderObject,
     TextureObject,
+    MeshObject,
 };
 
 enum class PinKind

@@ -91,6 +91,62 @@ std::shared_ptr<Node> SpoutSenderNode(std::vector<std::shared_ptr<Node>>& s_Node
 
 
 
+class MakeFloat3_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+};
+
+std::shared_ptr<Node> MakeFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class MakeFloat4_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+};
+
+std::shared_ptr<Node> MakeFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class BreakFloat3_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+};
+
+std::shared_ptr<Node> BreakFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class BreakFloat4_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+};
+
+std::shared_ptr<Node> BreakFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
 void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
 
 #endif
