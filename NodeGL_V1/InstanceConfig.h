@@ -7,7 +7,7 @@
 #include <stack> 
 #include <gl/gl3w.h>
 
-#include "bp_structs.h"
+#include "project_classes.h"
 #include "objects/texture_object.h"
 #include "objects/renderbuffer_object.h"
 #include "objects/framebuffer_object.h"

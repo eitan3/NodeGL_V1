@@ -147,10 +147,6 @@ void CalculateTangents(std::vector<Vertex>& vertices, std::vector<unsigned int> 
         unsigned int v2 = indices.at(i * 3 + 1);
         unsigned int v3 = indices.at(i * 3 + 2);
 
-        assert(v1 < getNbVertices());
-        assert(v2 < getNbVertices());
-        assert(v3 < getNbVertices());
-
         // Get the vertices positions
         glm::vec3 p = vertices.at(v1).Position;
         glm::vec3 q = vertices.at(v2).Position;

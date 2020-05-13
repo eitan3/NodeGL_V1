@@ -20,8 +20,8 @@
 #include "InstanceConfig.h"
 #include "EditorConfig.h"
 #include "imgui_utils.h"
-#include "bp_enums.h"
-#include "bp_structs.h"
+#include "project_enums.h"
+#include "project_classes.h"
 #include "utils.h"
 #include "id_generator.h"
 #include "nodes_builder.h"
@@ -123,7 +123,7 @@ static void UpdateTouch()
 // Main App
 const char* Application_GetName()
 {
-    return "Blueprints";
+    return "NodeGL V1";
 }
 
 void Application_Initialize()
@@ -134,7 +134,7 @@ void Application_Initialize()
     s_RestoreIcon = Application_LoadTexture("Data/ic_restore_white_24dp.png");
 
     ed::Config ed_config;
-    ed_config.SettingsFile = "Blueprints.json";
+    ed_config.SettingsFile = "NodeGL.json";
     ed_config.LoadNodeSettings = [](ed::NodeId nodeId, char* data, void* userPointer) -> size_t
     {
         auto config = InstanceConfig::instance();

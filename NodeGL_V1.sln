@@ -3,16 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlueprintGL_V1", "BlueprintGL_V1\BlueprintGL_V1.vcxproj", "{24B91D54-F482-4B58-96CF-B783F5A02282}"
-	ProjectSection(ProjectDependencies) = postProject
-		{93C44B33-7AB2-413A-8101-AE0FB2077797} = {93C44B33-7AB2-413A-8101-AE0FB2077797}
-		{C04E3747-35FA-4A02-9183-1A558FB2E2A1} = {C04E3747-35FA-4A02-9183-1A558FB2E2A1}
-		{23987971-87BB-4C41-B021-B63FBA7F22CD} = {23987971-87BB-4C41-B021-B63FBA7F22CD}
-		{64F9DE9C-3985-4E4E-AD79-DDBD92EAC4EB} = {64F9DE9C-3985-4E4E-AD79-DDBD92EAC4EB}
-		{FBCE019D-71FE-4977-8136-5BD4DD292AAB} = {FBCE019D-71FE-4977-8136-5BD4DD292AAB}
-		{87A056DB-A731-4130-BB80-B066C83B22FC} = {87A056DB-A731-4130-BB80-B066C83B22FC}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "imgui\imgui.vcxproj", "{64F9DE9C-3985-4E4E-AD79-DDBD92EAC4EB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dxerr", "dxerr\dxerr.vcxproj", "{93C44B33-7AB2-413A-8101-AE0FB2077797}"
@@ -31,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Application\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "blueprint-utilities", "blueprint-utilities\blueprint-utilities.vcxproj", "{23987971-87BB-4C41-B021-B63FBA7F22CD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NodeGL_V1", "NodeGL_V1\NodeGL_V1.vcxproj", "{24B91D54-F482-4B58-96CF-B783F5A02282}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -39,14 +31,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{24B91D54-F482-4B58-96CF-B783F5A02282}.Debug|x64.ActiveCfg = Debug|x64
-		{24B91D54-F482-4B58-96CF-B783F5A02282}.Debug|x64.Build.0 = Debug|x64
-		{24B91D54-F482-4B58-96CF-B783F5A02282}.Debug|x86.ActiveCfg = Debug|Win32
-		{24B91D54-F482-4B58-96CF-B783F5A02282}.Debug|x86.Build.0 = Debug|Win32
-		{24B91D54-F482-4B58-96CF-B783F5A02282}.Release|x64.ActiveCfg = Release|x64
-		{24B91D54-F482-4B58-96CF-B783F5A02282}.Release|x64.Build.0 = Release|x64
-		{24B91D54-F482-4B58-96CF-B783F5A02282}.Release|x86.ActiveCfg = Release|Win32
-		{24B91D54-F482-4B58-96CF-B783F5A02282}.Release|x86.Build.0 = Release|Win32
 		{64F9DE9C-3985-4E4E-AD79-DDBD92EAC4EB}.Debug|x64.ActiveCfg = Debug|x64
 		{64F9DE9C-3985-4E4E-AD79-DDBD92EAC4EB}.Debug|x64.Build.0 = Debug|x64
 		{64F9DE9C-3985-4E4E-AD79-DDBD92EAC4EB}.Debug|x86.ActiveCfg = Debug|Win32
@@ -95,6 +79,14 @@ Global
 		{23987971-87BB-4C41-B021-B63FBA7F22CD}.Release|x64.Build.0 = Release|x64
 		{23987971-87BB-4C41-B021-B63FBA7F22CD}.Release|x86.ActiveCfg = Release|Win32
 		{23987971-87BB-4C41-B021-B63FBA7F22CD}.Release|x86.Build.0 = Release|Win32
+		{24B91D54-F482-4B58-96CF-B783F5A02282}.Debug|x64.ActiveCfg = Debug|x64
+		{24B91D54-F482-4B58-96CF-B783F5A02282}.Debug|x64.Build.0 = Debug|x64
+		{24B91D54-F482-4B58-96CF-B783F5A02282}.Debug|x86.ActiveCfg = Debug|Win32
+		{24B91D54-F482-4B58-96CF-B783F5A02282}.Debug|x86.Build.0 = Debug|Win32
+		{24B91D54-F482-4B58-96CF-B783F5A02282}.Release|x64.ActiveCfg = Release|x64
+		{24B91D54-F482-4B58-96CF-B783F5A02282}.Release|x64.Build.0 = Release|x64
+		{24B91D54-F482-4B58-96CF-B783F5A02282}.Release|x86.ActiveCfg = Release|Win32
+		{24B91D54-F482-4B58-96CF-B783F5A02282}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

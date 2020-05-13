@@ -43,7 +43,7 @@ Generated\ Files/
 *.VisualState.xml
 TestResult.xml
 
-BlueprintGL_V1/Blueprints.json
+BlueprintGL_V1/NodeGL.json
 
 # Build Results of an ATL Project
 [Dd]ebugPS/

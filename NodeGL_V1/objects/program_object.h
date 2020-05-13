@@ -2,7 +2,7 @@
 #ifndef PROGRAM_OBJECT_H
 #define PROGRAM_OBJECT_H
 
-#include "../bp_enums.h"
+#include "../project_enums.h"
 #include <string>
 #include <vector>
 #include <gl/gl3w.h>

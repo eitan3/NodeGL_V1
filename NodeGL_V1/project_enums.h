@@ -1,6 +1,6 @@
 #pragma once
-#ifndef BP_ENUMS_H
-#define BP_ENUMS_H
+#ifndef PROJECT_ENUMS_H
+#define PROJECT_ENUMS_H
 
 
 enum class PinType

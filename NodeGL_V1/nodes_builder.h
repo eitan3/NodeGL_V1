@@ -2,7 +2,7 @@
 #ifndef NODES_BUILDER_H
 #define NODES_BUILDER_H
 
-#include "bp_structs.h"
+#include "project_classes.h"
 #include "utils.h"
 #include "id_generator.h"
 

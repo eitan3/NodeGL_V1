@@ -4,7 +4,7 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include "bp_structs.h"
+#include "project_classes.h"
 #include "nodes_builder.h"
 #include "objects/texture_object.h"
 #include "objects/program_object.h"

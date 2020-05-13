@@ -1,6 +1,6 @@
 #pragma once
-#ifndef BP_CLASSES_H
-#define BP_CLASSES_H
+#ifndef PROJECT_CLASSES_H
+#define PROJECT_CLASSES_H
 
 #include <iostream>
 #include <string>
@@ -10,7 +10,7 @@
 #include <ax/Builders.h>
 #include <memory>
 #include <functional>
-#include "bp_enums.h"
+#include "project_enums.h"
 #include "nodes/node_function_interface.h"
 
 namespace ed = ax::NodeEditor;
