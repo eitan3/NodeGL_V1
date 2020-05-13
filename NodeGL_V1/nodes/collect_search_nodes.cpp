@@ -3,7 +3,6 @@
 void CollectSearchNodes(std::vector<SearchNodeObj>& search_nodes_vector)
 {
 	GlNodes1_SearchSetup(search_nodes_vector);
-	DummiesSearchSetup(search_nodes_vector);
 	NodesUtilsSearchSetup(search_nodes_vector);
 	ShadersNodesSearchSetup(search_nodes_vector);
 	FlowNodesSearchSetup(search_nodes_vector);

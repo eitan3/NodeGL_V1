@@ -3,7 +3,6 @@
 #define COLLECT_SEARCH_NODES_H
 
 #include "gl_nodes_1.h"
-#include "dummy_nodes.h"
 #include "utils_nodes.h"
 #include "shaders_nodes.h"
 #include "flow_nodes.h"
