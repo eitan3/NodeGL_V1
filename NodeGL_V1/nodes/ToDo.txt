@@ -1,5 +1,8 @@
-PBR Rendering & Simple
+Add Save Load
 Make functions for objects (like meshes)
+Need to freeze the editor when other window open up
+Recreate https://cables.gl/p/j8R1Q7
+
+PBR Rendering & Simple
 Draw functions (inside mesh object as a function, I think.. need to plan it)
 Blend Textures (draw fullscreen rectangle and draw 2 textures with blend)
-Need to freeze the editor when other window open up

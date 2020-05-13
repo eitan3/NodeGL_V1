@@ -5,6 +5,7 @@ void CollectSearchNodes(std::vector<SearchNodeObj>& search_nodes_vector)
 	GlNodes1_SearchSetup(search_nodes_vector);
 	NodesUtilsSearchSetup(search_nodes_vector);
 	ShadersNodesSearchSetup(search_nodes_vector);
+	AnimNodesSearchSetup(search_nodes_vector);
 	FlowNodesSearchSetup(search_nodes_vector);
 	MathNodesSearchSetup(search_nodes_vector);
 }

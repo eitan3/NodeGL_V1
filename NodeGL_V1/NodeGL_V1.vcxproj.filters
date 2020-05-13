@@ -120,6 +120,9 @@
     <ClCompile Include="objects\mesh_object.cpp">
       <Filter>Source Files\objects</Filter>
     </ClCompile>
+    <ClCompile Include="nodes\animations_nodes_1.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_utils.h">
@@ -226,6 +229,9 @@
     </ClInclude>
     <ClInclude Include="project_classes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\animations_nodes_1.h">
+      <Filter>Header Files\nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
