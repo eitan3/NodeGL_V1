@@ -5,10 +5,15 @@ void EaseAnimation_Func::Initialize()
 {
     anim_time = 0;
     is_reverse = false;
-    const char* items[] = { "Ease In Sine", "Ease Out Sine", "Ease In Out Sine", "Ease In Quad", "Ease Out Quad", "Ease In Out Quad",
+    const char* items[] = { "Linear", "Ease In Sine", "Ease Out Sine", "Ease In Out Sine", "Ease In Quad", "Ease Out Quad", "Ease In Out Quad",
         "Ease In Cubic", "Ease Out Cubic", "Ease In Out Cubic", "Ease In Quart", "Ease Out Quart", "Ease In Out Quart" };
     if (current_ease == NULL)
         current_ease = (char*)items[0];
+}
+
+float linearFunc(float x)
+{
+    return x;
 }
 
 float easeInSine(float x){
@@ -110,7 +115,9 @@ void EaseAnimation_Func::Run()
     float norm_anim_time = anim_time / new_duration_val;
     float computed_ease = 0;
 
-    if (current_ease == "Ease In Sine")
+    if (current_ease == "Linear")
+        computed_ease = linearFunc(norm_anim_time);
+    else if (current_ease == "Ease In Sine")
         computed_ease = easeInSine(norm_anim_time);
     else if (current_ease == "Ease Out Sine")
         computed_ease = easeOutSine(norm_anim_time);
@@ -151,7 +158,7 @@ void EaseAnimation_Func::UpdateNodeInspector()
 {
     if (ImGui::BeginTabItem("Animation Settings"))
     {
-        const char* items[] = { "Ease In Sine", "Ease Out Sine", "Ease In Out Sine", "Ease In Quad", "Ease Out Quad", "Ease In Out Quad", 
+        const char* items[] = { "Linear", "Ease In Sine", "Ease Out Sine", "Ease In Out Sine", "Ease In Quad", "Ease Out Quad", "Ease In Out Quad",
             "Ease In Cubic", "Ease Out Cubic", "Ease In Out Cubic", "Ease In Quart", "Ease Out Quart", "Ease In Out Quart" };
         if (current_ease == NULL)
             current_ease = (char *)items[0];
