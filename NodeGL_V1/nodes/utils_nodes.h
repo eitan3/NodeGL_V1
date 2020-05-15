@@ -11,12 +11,13 @@
 
 class PrintString_Func : public NodeFunctions {
 public:
-    void Initialize();
+    void Initialize() {};
     void Run();
     void Delete();
-    void NoFlowUpdatePinsValues();
+    void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 };
 
 std::shared_ptr<Node> PrintString(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -25,12 +26,13 @@ std::shared_ptr<Node> PrintString(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 class ConvertTo_Func : public NodeFunctions {
 public:
-    void Initialize();
-    void Run();
+    void Initialize() {};
+    void Run() {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 };
 
 std::shared_ptr<Node> ConvertTo(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -45,6 +47,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector();
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
     std::shared_ptr<BasePlaceholder> placeholder;
 };
@@ -61,6 +64,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector();
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
     std::shared_ptr<BasePlaceholder> placeholder;
     PinType placeholder_type;
@@ -79,6 +83,7 @@ public:
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
     SpoutSender spoutsender;
     bool bInitialized;
@@ -99,6 +104,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 };
 
 std::shared_ptr<Node> MakeFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -113,6 +119,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 };
 
 std::shared_ptr<Node> MakeFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -127,6 +134,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 };
 
 std::shared_ptr<Node> BreakFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -141,6 +149,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 };
 
 std::shared_ptr<Node> BreakFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes);

@@ -15,9 +15,10 @@ public:
     void Initialize();
     void Run();
     void Delete();
-    void NoFlowUpdatePinsValues();
+    void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
 private:
     void SetupFrameBuffer();
@@ -38,9 +39,10 @@ public:
     void Initialize();
     void Run();
     void Delete();
-    void NoFlowUpdatePinsValues();
+    void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 };
 
 std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -54,9 +56,10 @@ public:
     void Initialize();
     void Run();
     void Delete();
-    void NoFlowUpdatePinsValues();
+    void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
 private:
     void SetupFrameBuffer();

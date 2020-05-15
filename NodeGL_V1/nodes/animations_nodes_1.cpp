@@ -182,6 +182,21 @@ void EaseAnimation_Func::UpdateNodeInspector()
     }
 }
 
+void EaseAnimation_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("min");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("min"))->default_value);
+    writer.Key("max");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("max"))->default_value);
+    writer.Key("duration");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("duration"))->default_value);
+    writer.Key("reverse");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("reverse"))->default_value);
+    writer.Key("ease");
+    writer.String(current_ease);
+    //std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at(""))->default_value;
+}
+
 std::shared_ptr<Node> EaseAnimationhNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Ease Animation"));

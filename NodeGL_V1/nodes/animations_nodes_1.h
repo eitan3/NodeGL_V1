@@ -16,6 +16,7 @@ public:
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
     void UpdateNodeInspector();
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
     float min_val;
     float max_val;

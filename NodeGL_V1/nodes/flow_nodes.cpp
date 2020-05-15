@@ -47,6 +47,12 @@ void Sequence_Func::UpdateNodeInspector()
     }
 }
 
+void Sequence_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("num_outputs");
+    writer.Uint(parent_node->outputs.size());
+}
+
 std::shared_ptr<Node> SequenceNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Sequence"));
@@ -88,6 +94,12 @@ void Branch_Func::Delete()
     parent_node = nullptr;
 }
 
+void Branch_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("condition");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("condition"))->default_value);
+}
+
 std::shared_ptr<Node> BranchNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Branch"));
@@ -125,6 +137,12 @@ void WhileLoop_Func::Run()
 void WhileLoop_Func::Delete()
 {
     parent_node = nullptr;
+}
+
+void WhileLoop_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("condition");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("condition"))->default_value);
 }
 
 std::shared_ptr<Node> WhileLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -171,6 +189,16 @@ void ForLoop_Func::Run()
 void ForLoop_Func::Delete()
 {
     parent_node = nullptr;
+}
+
+void ForLoop_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("start");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("start"))->default_value);
+    writer.Key("end");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("end"))->default_value);
+    writer.Key("increase");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("increase"))->default_value);
 }
 
 std::shared_ptr<Node> ForLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)

@@ -11,12 +11,12 @@ void MathPlusNode_Func::NoFlowUpdatePinsValues()
     {
         int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
         int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value + pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value + pin_1_value;
@@ -26,12 +26,12 @@ void MathPlusNode_Func::NoFlowUpdatePinsValues()
     {
         float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
         int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value + pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value + pin_1_value;
@@ -41,12 +41,12 @@ void MathPlusNode_Func::NoFlowUpdatePinsValues()
     {
         int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
         float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value + pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value + pin_1_value;
@@ -56,17 +56,46 @@ void MathPlusNode_Func::NoFlowUpdatePinsValues()
     {
         float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
         float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value + pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value + pin_1_value;
         }
     }
+}
+
+void MathPlusNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    writer.Key("x_1_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_1")->type).c_str());
+
+    writer.Key("x_2");
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    writer.Key("x_2_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
+    writer.Key("out_type");
+    writer.String(PinTypeToString(parent_node->outputs.at("out")->type).c_str());
 }
 
 std::shared_ptr<Node> MathPlusNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -110,12 +139,12 @@ void MathMinusNode_Func::NoFlowUpdatePinsValues()
     {
         int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
         int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value - pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value - pin_1_value;
@@ -125,12 +154,12 @@ void MathMinusNode_Func::NoFlowUpdatePinsValues()
     {
         float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
         int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value - pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value - pin_1_value;
@@ -140,12 +169,12 @@ void MathMinusNode_Func::NoFlowUpdatePinsValues()
     {
         int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
         float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value - pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value - pin_1_value;
@@ -155,17 +184,46 @@ void MathMinusNode_Func::NoFlowUpdatePinsValues()
     {
         float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
         float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value - pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value - pin_1_value;
         }
     }
+}
+
+void MathMinusNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    writer.Key("x_1_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_1")->type).c_str());
+
+    writer.Key("x_2");
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    writer.Key("x_2_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
+    writer.Key("out_type");
+    writer.String(PinTypeToString(parent_node->outputs.at("out")->type).c_str());
 }
 
 std::shared_ptr<Node> MathMinusNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -210,12 +268,12 @@ void MathMultiplyNode_Func::NoFlowUpdatePinsValues()
     {
         int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
         int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value * pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value * pin_1_value;
@@ -225,12 +283,12 @@ void MathMultiplyNode_Func::NoFlowUpdatePinsValues()
     {
         float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
         int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value * pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value * pin_1_value;
@@ -240,12 +298,12 @@ void MathMultiplyNode_Func::NoFlowUpdatePinsValues()
     {
         int pin_0_value = GetInputPinValue<int>(parent_node, "x_1");
         float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value * pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value * pin_1_value;
@@ -255,17 +313,46 @@ void MathMultiplyNode_Func::NoFlowUpdatePinsValues()
     {
         float pin_0_value = GetInputPinValue<float>(parent_node, "x_1");
         float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value * pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value * pin_1_value;
         }
     }
+}
+
+void MathMultiplyNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    writer.Key("x_1_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_1")->type).c_str());
+
+    writer.Key("x_2");
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    writer.Key("x_2_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
+    writer.Key("out_type");
+    writer.String(PinTypeToString(parent_node->outputs.at("out")->type).c_str());
 }
 
 std::shared_ptr<Node> MathMultiplyNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -312,12 +399,12 @@ void MathDivideNode_Func::NoFlowUpdatePinsValues()
         int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
         if (pin_1_value == 0)
             pin_1_value = 1;
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value / pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value / pin_1_value;
@@ -329,12 +416,12 @@ void MathDivideNode_Func::NoFlowUpdatePinsValues()
         int pin_1_value = GetInputPinValue<int>(parent_node, "x_2");
         if (pin_1_value == 0)
             pin_1_value = 1;
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value / pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value / pin_1_value;
@@ -346,12 +433,12 @@ void MathDivideNode_Func::NoFlowUpdatePinsValues()
         float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
         if (pin_1_value == 0)
             pin_1_value = 1;
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value / pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value / pin_1_value;
@@ -363,12 +450,12 @@ void MathDivideNode_Func::NoFlowUpdatePinsValues()
         float pin_1_value = GetInputPinValue<float>(parent_node, "x_2");
         if (pin_1_value == 0)
             pin_1_value = 1;
-        if (parent_node->outputs.at("x_1")->type == PinType::Int)
+        if (parent_node->outputs.at("out")->type == PinType::Int)
         {
             std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("out"));
             output_pin->value = (int)(pin_0_value / pin_1_value);
         }
-        else if (parent_node->outputs.at("x_1")->type == PinType::Float)
+        else if (parent_node->outputs.at("out")->type == PinType::Float)
         {
             std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
             output_pin->value = pin_0_value / pin_1_value;
@@ -376,15 +463,44 @@ void MathDivideNode_Func::NoFlowUpdatePinsValues()
     }
 }
 
+void MathDivideNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    writer.Key("x_1_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_1")->type).c_str());
+
+    writer.Key("x_2");
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    writer.Key("x_2_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
+    writer.Key("out_type");
+    writer.String(PinTypeToString(parent_node->outputs.at("out")->type).c_str());
+}
+
 std::shared_ptr<Node> MathDivideNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Divide", true));
 
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 1)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
     s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Float);
     s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Int);
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_2", new PinValue<float>("x_2", 1, GetNextId(), "X 2", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_2", new PinValue<float>("x_2", 1, GetNextId(), "X 2", PinType::Float, 1)));
     s_Nodes.back()->inputs.at("x_2")->isTemplate = true;;
     s_Nodes.back()->inputs.at("x_2")->template_allowed_types.push_back(PinType::Float);
     s_Nodes.back()->inputs.at("x_2")->template_allowed_types.push_back(PinType::Int);
@@ -446,6 +562,33 @@ void EqualNode_Func::NoFlowUpdatePinsValues()
         std::shared_ptr<PinValue<bool>> output_pin = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->outputs.at("out"));
         output_pin->value = pin_0_value == pin_1_value;
     }
+}
+
+void EqualNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    writer.Key("x_1_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_1")->type).c_str());
+
+    writer.Key("x_2");
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    writer.Key("x_2_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
 }
 
 std::shared_ptr<Node> EqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -517,6 +660,33 @@ void NotEqualNode_Func::NoFlowUpdatePinsValues()
     }
 }
 
+void NotEqualNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    writer.Key("x_1_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_1")->type).c_str());
+
+    writer.Key("x_2");
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    writer.Key("x_2_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
+}
+
 std::shared_ptr<Node> NotEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Not Equal", true));
@@ -584,6 +754,33 @@ void LessNode_Func::NoFlowUpdatePinsValues()
         std::shared_ptr<PinValue<bool>> output_pin = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->outputs.at("out"));
         output_pin->value = pin_0_value < pin_1_value;
     }
+}
+
+void LessNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    writer.Key("x_1_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_1")->type).c_str());
+
+    writer.Key("x_2");
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    writer.Key("x_2_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
 }
 
 std::shared_ptr<Node> LessNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -655,6 +852,33 @@ void LessEqualNode_Func::NoFlowUpdatePinsValues()
     }
 }
 
+void LessEqualNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    writer.Key("x_1_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_1")->type).c_str());
+
+    writer.Key("x_2");
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    writer.Key("x_2_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
+}
+
 std::shared_ptr<Node> LessEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Less Equal ( <= )", true));
@@ -722,6 +946,33 @@ void GreaterNode_Func::NoFlowUpdatePinsValues()
         std::shared_ptr<PinValue<bool>> output_pin = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->outputs.at("out"));
         output_pin->value = pin_0_value > pin_1_value;
     }
+}
+
+void GreaterNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    writer.Key("x_1_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_1")->type).c_str());
+
+    writer.Key("x_2");
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    writer.Key("x_2_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
 }
 
 std::shared_ptr<Node> GreaterNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -793,6 +1044,33 @@ void GreaterEqualNode_Func::NoFlowUpdatePinsValues()
     }
 }
 
+void GreaterEqualNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value);
+    }
+    writer.Key("x_1_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_1")->type).c_str());
+
+    writer.Key("x_2");
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+    {
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+    {
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value);
+    }
+    writer.Key("x_2_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
+}
+
 std::shared_ptr<Node> GreaterEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Greater Equal ( >= )", true));
@@ -835,6 +1113,14 @@ void AndNode_Func::NoFlowUpdatePinsValues()
     output_pin->value = pin_0_value && pin_1_value;
 }
 
+void AndNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("x_1"))->default_value);
+    writer.Key("x_2");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("x_2"))->default_value);
+}
+
 std::shared_ptr<Node> AndNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "And ( && )", true));
@@ -871,6 +1157,14 @@ void OrNode_Func::NoFlowUpdatePinsValues()
     output_pin->value = pin_0_value || pin_1_value;
 }
 
+void OrNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x_1");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("x_1"))->default_value);
+    writer.Key("x_2");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("x_2"))->default_value);
+}
+
 std::shared_ptr<Node> OrNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Or ( || )", true));
@@ -904,6 +1198,12 @@ void NotNode_Func::NoFlowUpdatePinsValues()
 
     std::shared_ptr<PinValue<bool>> output_pin = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->outputs.at("out"));
     output_pin->value = !pin_0_value;
+}
+
+void NotNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("in");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("in"))->default_value);
 }
 
 std::shared_ptr<Node> NotNode(std::vector<std::shared_ptr<Node>>& s_Nodes)

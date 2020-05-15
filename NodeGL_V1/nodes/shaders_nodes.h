@@ -20,6 +20,7 @@ public:
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI();
     void UpdateNodeInspector();
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
     void ShowShaderEditorWindow(bool* show = nullptr);
     void ShowFileBrowserWindow(bool* show = nullptr);
@@ -47,6 +48,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI();
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
 
     void CreateProgram(GLuint vertex_shader, GLuint fragment_shader);
 

@@ -191,6 +191,11 @@ public:
 		return false;
 	}
 
+	void ClearPlaceholders()
+	{
+		placeholders_map.clear();
+	}
+
 	std::vector<std::string>  GetTextureMapKeys()
 	{
 		std::vector<std::string> v;

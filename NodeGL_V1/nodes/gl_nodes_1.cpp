@@ -65,9 +65,14 @@ void GlMainLoop_Func::Delete()
     parent_node = nullptr;
 }
 
-void GlMainLoop_Func::NoFlowUpdatePinsValues()
+void GlMainLoop_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-
+    writer.Key("name");
+    writer.String(std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("name"))->default_value.c_str());
+    writer.Key("width");
+    writer.Uint(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("width"))->default_value);
+    writer.Key("height");
+    writer.Uint(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value);
 }
 
 void GlMainLoop_Func::SetupFrameBuffer()
@@ -181,9 +186,16 @@ void GlClear_Func::Delete()
     parent_node = nullptr;
 }
 
-void GlClear_Func::NoFlowUpdatePinsValues()
+void GlClear_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-
+    writer.Key("r");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("r"))->default_value);
+    writer.Key("g");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("g"))->default_value);
+    writer.Key("b");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("b"))->default_value);
+    writer.Key("a");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("a"))->default_value);
 }
 
 std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -289,9 +301,14 @@ void GlRenderToTexture_Func::Delete()
     parent_node = nullptr;
 }
 
-void GlRenderToTexture_Func::NoFlowUpdatePinsValues()
+void GlRenderToTexture_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-
+    writer.Key("name");
+    writer.String(std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("name"))->default_value.c_str());
+    writer.Key("width");
+    writer.Uint(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("width"))->default_value);
+    writer.Key("height");
+    writer.Uint(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value);
 }
 
 void GlRenderToTexture_Func::SetupFrameBuffer()

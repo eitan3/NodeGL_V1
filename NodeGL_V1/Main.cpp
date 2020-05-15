@@ -12,6 +12,9 @@
 #include <ax/Builders.h>
 #include <ax/Widgets.h>
 
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
 #include <memory>
@@ -38,6 +41,7 @@ using ax::Widgets::IconType;
 
 // Set main variables
 ed::EditorContext* m_Editor = nullptr;
+imgui_addons::ImGuiFileBrowser file_dialog;
 
 // Varialbes for editor
 const int            s_PinIconSize = 24;
@@ -890,9 +894,92 @@ void ShowDeletePlaceholderWindow(bool* show = nullptr)
     ImGui::End();
 }
 
+void ResetInstance()
+{
+    auto config = InstanceConfig::instance();
+    for (int link_i = 0; link_i < config->s_Links.size(); link_i++)
+    {
+        ed::DeleteLink(config->s_Links.at(link_i)->id);
+    }
+    for (int node_i = 0; node_i < config->s_Nodes.size(); node_i++)
+    {
+        ed::DeleteNode(config->s_Nodes.at(node_i)->id);
+    }
+    config->ClearPlaceholders();
+}
+
+void ShowSaveInstanceWindow()
+{
+    auto editor_config = EditorConfig::instance();
+    auto config = InstanceConfig::instance();
+
+    ImGui::OpenPopup("Save File");
+    if (file_dialog.showFileDialog("Save File", imgui_addons::ImGuiFileBrowser::DialogMode::SAVE, ImVec2(700, 310), ".ngl"))
+    {
+        rapidjson::StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+        writer.StartObject();
+        writer.Key("placeholders");
+        writer.StartArray();
+        std::vector<std::string> ph_keys = config->GetPlaceholdersMapKeys();
+        for (int ph_i = 0; ph_i < ph_keys.size(); ph_i++)
+        {
+            std::shared_ptr<BasePlaceholder> ph = config->GetPlaceholder(ph_keys.at(ph_i));
+            writer.StartArray();
+            writer.String(ph->name.c_str());
+            writer.String(PinTypeToString(ph->type).c_str());
+            writer.EndArray();
+        }
+        writer.EndArray();
+
+        writer.Key("nodes");
+        writer.StartObject();
+        for (int node_i = 0; node_i < config->s_Nodes.size(); node_i++)
+        {
+            std::shared_ptr<Node> node = config->s_Nodes.at(node_i);
+            ImVec2 pos = ed::GetNodePosition(node->id);
+
+            writer.Key((node->name + " - ID: " + std::to_string(node->id.Get())).c_str());
+            writer.StartObject();
+
+            writer.Key("pos");
+            writer.StartArray();
+            writer.Double(pos.x);
+            writer.Double(pos.y);
+            writer.EndArray();
+
+            node->node_funcs->SaveNodeData(writer);
+
+            writer.EndObject();
+        }
+        writer.EndObject();
+
+        writer.EndObject();
+
+        std::string file_name = file_dialog.selected_path;
+        if (!file_name.ends_with(file_dialog.ext))
+            file_name = file_name + file_dialog.ext;
+        std::ofstream out(file_name);
+        out << s.GetString();
+        out.close();
+        editor_config->showSaveInstanceWindow = false;
+    }
+    else
+    {
+        if (file_dialog.is_cancel)
+        {
+            editor_config->showSaveInstanceWindow = false;
+        }
+    }
+}
+
 void ShowWindows()
 {
     auto editor_config = EditorConfig::instance();
+    if (editor_config->showSaveInstanceWindow)
+        ShowSaveInstanceWindow();
+
     if (showStyleEditor)
         ShowStyleEditor(&showStyleEditor);
 
@@ -949,6 +1036,18 @@ void CreateMenuBar()
     {
         if (ImGui::BeginMenu("File"))
         {
+            if (ImGui::MenuItem("New"))
+            {
+                ResetInstance();
+            }
+            if (ImGui::MenuItem("Open"))
+            {
+                
+            }
+            if (ImGui::MenuItem("Save"))
+            {
+                editor_config->showSaveInstanceWindow = true;
+            }
             if (ImGui::MenuItem("Exit"))
             {
                 exit(0);
@@ -1424,16 +1523,8 @@ void Application_Frame()
                             {
                                 for (int link_i = 0; link_i < config->s_Links.size(); link_i++)
                                 {
-                                    if (config->s_Links.at(link_i)->startPinID == startPinId && startPin->type == PinType::Flow)
-                                    {
-                                        config->s_Links.at(link_i)->endPin->links.erase(std::remove(config->s_Links.at(link_i)->endPin->links.begin(), config->s_Links.at(link_i)->endPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->endPin->links.end());
-                                        config->s_Links.at(link_i)->startPin->links.erase(std::remove(config->s_Links.at(link_i)->startPin->links.begin(), config->s_Links.at(link_i)->startPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->startPin->links.end());
-                                        config->s_Links.at(link_i)->startPin = nullptr;
-                                        config->s_Links.at(link_i)->endPin = nullptr;
-                                        ed::DeleteLink(config->s_Links.at(link_i)->id);
-                                        link_i = config->s_Links.size();
-                                    }
-                                    else if (config->s_Links.at(link_i)->endPinID == endPinId && endPin->type != PinType::Flow && endPin->kind == PinKind::Input)
+                                    if ((config->s_Links.at(link_i)->startPinID == startPinId && startPin->type == PinType::Flow) ||
+                                        (config->s_Links.at(link_i)->endPinID == endPinId && endPin->type != PinType::Flow && endPin->kind == PinKind::Input))
                                     {
                                         config->s_Links.at(link_i)->endPin->links.erase(std::remove(config->s_Links.at(link_i)->endPin->links.begin(), config->s_Links.at(link_i)->endPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->endPin->links.end());
                                         config->s_Links.at(link_i)->startPin->links.erase(std::remove(config->s_Links.at(link_i)->startPin->links.begin(), config->s_Links.at(link_i)->startPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->startPin->links.end());

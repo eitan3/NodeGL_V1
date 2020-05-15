@@ -2,10 +2,6 @@
 #include "../EditorConfig.h"
 #include "../InstanceConfig.h"
 
-void PrintString_Func::Initialize()
-{
-
-}
 
 void PrintString_Func::Run()
 {
@@ -21,8 +17,10 @@ void PrintString_Func::Delete()
     parent_node = nullptr;
 }
 
-void PrintString_Func::NoFlowUpdatePinsValues()
+void PrintString_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
+    writer.Key("value");
+    writer.String(std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("value"))->default_value.c_str());
 }
 
 std::shared_ptr<Node> PrintString(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -47,13 +45,6 @@ std::shared_ptr<Node> PrintString(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
-void ConvertTo_Func::Initialize()
-{
-}
-
-void ConvertTo_Func::Run()
-{
-}
 
 void ConvertTo_Func::Delete()
 {
@@ -165,6 +156,23 @@ void ConvertTo_Func::NoFlowUpdatePinsValues()
                 output_pin->value = 0.0;
         }
     }
+}
+
+void ConvertTo_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("in_value");
+    if (parent_node->inputs.at("in")->type == PinType::String)
+        writer.String(std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("in"))->default_value.c_str());
+    else if (parent_node->inputs.at("in")->type == PinType::Bool)
+        writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("in"))->default_value);
+    else if (parent_node->inputs.at("in")->type == PinType::Int)
+        writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("in"))->default_value);
+    else if (parent_node->inputs.at("in")->type == PinType::Float)
+        writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value);
+    writer.Key("in_type");
+    writer.String(PinTypeToString(parent_node->inputs.at("in")->type).c_str());
+    writer.Key("out_type");
+    writer.String(PinTypeToString(parent_node->outputs.at("out")->type).c_str());
 }
 
 std::shared_ptr<Node> ConvertTo(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -318,6 +326,15 @@ void SetPlaceholder_Func::UpdateNodeInspector()
                 editor_config->showSelectPlaceholderWindow = true;
             }
         }
+    }
+}
+
+void SetPlaceholder_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    if (placeholder)
+    {
+        writer.Key("placeholder_name");
+        writer.String(placeholder->name.c_str());
     }
 }
 
@@ -487,6 +504,15 @@ void GetPlaceholder_Func::UpdateNodeInspector()
     }
 }
 
+void GetPlaceholder_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    if (placeholder)
+    {
+        writer.Key("placeholder_name");
+        writer.String(placeholder->name.c_str());
+    }
+}
+
 std::shared_ptr<Node> GetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Get Placeholder", true));
@@ -549,6 +575,10 @@ void SpoutSender_Func::DeleteSpout()
     }
 }
 
+void SpoutSender_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+}
+
 std::shared_ptr<Node> SpoutSenderNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Spout Sender"));
@@ -583,6 +613,16 @@ void MakeFloat3_Func::NoFlowUpdatePinsValues()
     float pin_2_value = GetInputPinValue<float>(parent_node, "z");
     std::shared_ptr<PinValue<glm::vec3>> output_pin = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->outputs.at("out"));
     output_pin->value = glm::vec3(pin_0_value, pin_1_value, pin_2_value);
+}
+
+void MakeFloat3_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x"))->default_value);
+    writer.Key("y");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("y"))->default_value);
+    writer.Key("z");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("z"))->default_value);
 }
 
 std::shared_ptr<Node> MakeFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -620,6 +660,18 @@ void MakeFloat4_Func::NoFlowUpdatePinsValues()
     float pin_3_value = GetInputPinValue<float>(parent_node, "w");
     std::shared_ptr<PinValue<glm::vec4>> output_pin = std::dynamic_pointer_cast<PinValue<glm::vec4>>(parent_node->outputs.at("out"));
     output_pin->value = glm::vec4(pin_0_value, pin_1_value, pin_2_value, pin_3_value);
+}
+
+void MakeFloat4_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x"))->default_value);
+    writer.Key("y");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("y"))->default_value);
+    writer.Key("z");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("z"))->default_value);
+    writer.Key("w");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("w"))->default_value);
 }
 
 std::shared_ptr<Node> MakeFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
@@ -661,6 +713,17 @@ void BreakFloat3_Func::NoFlowUpdatePinsValues()
     output_pin_3->value = pin_0_value.z;
 }
 
+void BreakFloat3_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    glm::vec3 pin_0_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in"))->default_value;
+    writer.Key("x");
+    writer.Double(pin_0_value.x);
+    writer.Key("y");
+    writer.Double(pin_0_value.y);
+    writer.Key("z");
+    writer.Double(pin_0_value.z);
+}
+
 std::shared_ptr<Node> BreakFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Break Float 3", true));
@@ -699,6 +762,19 @@ void BreakFloat4_Func::NoFlowUpdatePinsValues()
     output_pin_2->value = pin_0_value.y;
     output_pin_3->value = pin_0_value.z;
     output_pin_4->value = pin_0_value.w;
+}
+
+void BreakFloat4_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    glm::vec4 pin_0_value = std::dynamic_pointer_cast<PinValue<glm::vec4>>(parent_node->inputs.at("in"))->default_value;
+    writer.Key("x");
+    writer.Double(pin_0_value.x);
+    writer.Key("y");
+    writer.Double(pin_0_value.y);
+    writer.Key("z");
+    writer.Double(pin_0_value.z);
+    writer.Key("w");
+    writer.Double(pin_0_value.w);
 }
 
 std::shared_ptr<Node> BreakFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes)

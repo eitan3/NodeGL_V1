@@ -22,6 +22,7 @@ public:
 	}
 
 
+	bool showSaveInstanceWindow = false;
 	bool showCreatePlaceholderWindow = false;
 	bool showSelectPlaceholderWindow = false;
 	bool showRenamePlaceholderWindow = false;

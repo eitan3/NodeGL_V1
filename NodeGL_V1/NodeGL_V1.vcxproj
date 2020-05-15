@@ -100,7 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\Application;..\blueprint-utilities;..\dxerr;..\imgui;..\imgui_canvas;..\imgui_node_editor;..\Dependencies\gl3w\Include;..\Dependencies\glfw-3.3.2\include;..\Dependencies\Dirent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Application;..\blueprint-utilities;..\dxerr;..\imgui;..\imgui_canvas;..\imgui_node_editor;..\Dependencies\gl3w\Include;..\Dependencies\glfw-3.3.2\include;..\Dependencies\Dirent;..\Dependencies\Json\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -134,7 +134,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\Application;..\blueprint-utilities;..\dxerr;..\imgui;..\imgui_canvas;..\imgui_node_editor;..\Dependencies\gl3w\Include;..\Dependencies\glfw-3.3.2\include;..\Dependencies\Dirent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Application;..\blueprint-utilities;..\dxerr;..\imgui;..\imgui_canvas;..\imgui_node_editor;..\Dependencies\gl3w\Include;..\Dependencies\glfw-3.3.2\include;..\Dependencies\Dirent;..\Dependencies\Json\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>

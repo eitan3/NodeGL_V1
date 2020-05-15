@@ -14,6 +14,7 @@ public:
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) {};
 };
 
 std::shared_ptr<Node> DummyNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -28,6 +29,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) {};
 };
 
 std::shared_ptr<Node> DummySendFloat(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -42,6 +44,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) {};
 };
 
 std::shared_ptr<Node> DummyRecvSendFloat(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -56,6 +59,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) {};
 };
 
 std::shared_ptr<Node> DummySendInt(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -70,6 +74,7 @@ public:
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) {};
 };
 
 std::shared_ptr<Node> DummyRecvSendInt(std::vector<std::shared_ptr<Node>>& s_Nodes);

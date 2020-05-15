@@ -2,7 +2,7 @@
 
 void CreateSahder_Func::Initialize()
 {
-    object_prefix = "ShaderObject_" + std::to_string(parent_node->id.Get());
+    object_prefix = GetInputPinValue<std::string>(parent_node, "name");
     showShaderEditorWindow = false;
     showFileBrowserWindow = false;
     shader_obj = nullptr;
@@ -181,6 +181,14 @@ void CreateSahder_Func::UpdateNodeUI()
     {
         ShowShaderEditorWindow(&showShaderEditorWindow);
     }
+
+    std::string new_object_prefix = GetInputPinValue<std::string>(parent_node, "name");
+    if (object_prefix != new_object_prefix)
+    {
+        object_prefix = new_object_prefix;
+        if (shader_obj)
+            shader_obj->object_name = object_prefix;
+    }
 }
 
 void CreateSahder_Func::UpdateNodeInspector()
@@ -194,9 +202,21 @@ void CreateSahder_Func::UpdateNodeInspector()
     }
 }
 
+void CreateSahder_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("name");
+    writer.String(std::dynamic_pointer_cast<PinValue < std::string >> (parent_node->inputs.at("name"))->default_value.c_str());
+    writer.Key("current_shader_type");
+    writer.String(current_shader_type);
+    writer.Key("shader_source");
+    writer.String(editor.GetText().c_str());
+}
+
 std::shared_ptr<Node> CreateSahder(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Create Shader", true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("name", new PinValue<std::string>("name", 0, GetNextId(), "Shader Name", PinType::String, "ShaderObject_" + std::to_string(s_Nodes.back()->id.Get()))));
+    s_Nodes.back()->inputs.at("name")->always_expose = false;
 
     s_Nodes.back()->node_funcs = std::make_shared<CreateSahder_Func>();
     std::dynamic_pointer_cast<CreateSahder_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
@@ -214,7 +234,7 @@ std::shared_ptr<Node> CreateSahder(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 void CreateProgram_Func::Initialize()
 {
-    object_prefix = "ProgramObject_" + std::to_string(parent_node->id.Get());
+    object_prefix = GetInputPinValue<std::string>(parent_node, "name");
     program_obj = nullptr;
 }
 
@@ -270,6 +290,20 @@ void CreateProgram_Func::UpdateNodeUI()
     {
         DeleteProgram();
     }
+
+    std::string new_object_prefix = GetInputPinValue<std::string>(parent_node, "name");
+    if (object_prefix != new_object_prefix)
+    {
+        object_prefix = new_object_prefix;
+        if (program_obj)
+            program_obj->object_name = object_prefix;
+    }
+}
+
+void CreateProgram_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("name");
+    writer.String(std::dynamic_pointer_cast<PinValue < std::string >> (parent_node->inputs.at("name"))->default_value.c_str());
 }
 
 void CreateProgram_Func::CreateProgram(GLuint vertex_shader, GLuint fragment_shader)
@@ -307,8 +341,11 @@ void CreateProgram_Func::CreateProgram(GLuint vertex_shader, GLuint fragment_sha
 std::shared_ptr<Node> CreateProgram(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Create Program", true));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("vs", new PinValue<std::shared_ptr<ShaderObject>>("vs", 0, GetNextId(), "Vertex Shader", PinType::VertexShaderObject, nullptr)));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("fs", new PinValue<std::shared_ptr<ShaderObject>>("fs", 1, GetNextId(), "Fragment Shader", PinType::FragmentShaderObject, nullptr)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("name", new PinValue<std::string>("name", 0, GetNextId(), "Program Name", PinType::String, "ProgramObject_" + std::to_string(s_Nodes.back()->id.Get()))));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("vs", new PinValue<std::shared_ptr<ShaderObject>>("vs", 1, GetNextId(), "Vertex Shader", PinType::VertexShaderObject, nullptr)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("fs", new PinValue<std::shared_ptr<ShaderObject>>("fs", 2, GetNextId(), "Fragment Shader", PinType::FragmentShaderObject, nullptr)));
+
+    s_Nodes.back()->inputs.at("name")->always_expose = false;
 
     s_Nodes.back()->node_funcs = std::make_shared<CreateProgram_Func>();
     std::dynamic_pointer_cast<CreateProgram_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();

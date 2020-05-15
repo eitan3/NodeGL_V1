@@ -4,6 +4,8 @@
 
 #include <string>
 #include <memory>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 #include "../project_enums.h"
 
 class Node;
@@ -16,6 +18,7 @@ public:
     virtual void NoFlowUpdatePinsValues() = 0;
     virtual void UpdateNodeUI() = 0;
     virtual void UpdateNodeInspector() = 0;
+    virtual void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) = 0;
 
     std::shared_ptr<Node> parent_node;
 };
