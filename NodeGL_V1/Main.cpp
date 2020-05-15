@@ -955,6 +955,24 @@ void ShowSaveInstanceWindow()
         }
         writer.EndObject();
 
+        writer.Key("links");
+        writer.StartArray();
+        for (int link_i = 0; link_i < config->s_Links.size(); link_i++)
+        {
+            std::shared_ptr<Link> link = config->s_Links.at(link_i);
+            writer.StartObject();
+            writer.Key("start_node");
+            writer.String((link->startPin->node->name + " - ID: " + std::to_string(link->startPin->node->id.Get())).c_str());
+            writer.Key("start_pin");
+            writer.String(link->startPin->pin_key.c_str());
+            writer.Key("end_node");
+            writer.String((link->endPin->node->name + " - ID: " + std::to_string(link->endPin->node->id.Get())).c_str());
+            writer.Key("end_pin");
+            writer.String(link->endPin->pin_key.c_str());
+            writer.EndObject();
+        }
+        writer.EndArray();
+
         writer.EndObject();
 
         std::string file_name = file_dialog.selected_path;
