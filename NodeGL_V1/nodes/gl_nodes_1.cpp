@@ -75,6 +75,13 @@ void GlMainLoop_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& w
     writer.Uint(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value);
 }
 
+void GlMainLoop_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("name"))->default_value = std::string(node_obj["name"].GetString());
+    std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("width"))->default_value = node_obj["width"].GetUint();
+    std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value = node_obj["height"].GetUint();
+}
+
 void GlMainLoop_Func::SetupFrameBuffer()
 {
     auto config = InstanceConfig::instance();
@@ -126,9 +133,10 @@ void GlMainLoop_Func::DeleteFrameBuffer()
     config->DeleteFrameBuffer(object_prefix);
 }
 
+std::string glMainLoopName = "GL Main Loop";
 std::shared_ptr<Node> GlMainLoop(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "GL Main Loop", ImColor(255, 128, 128)));
+    s_Nodes.emplace_back(new Node(GetNextId(), glMainLoopName.c_str(), ImColor(255, 128, 128)));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("name", new PinValue<std::string>("name", 0, GetNextId(), "Name", PinType::String, "glMainLoop_" + std::to_string(s_Nodes.back()->id.Get()))));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("width", new PinValue<int>("width", 1, GetNextId(), "Width", PinType::Int, 1920)));
@@ -198,9 +206,18 @@ void GlClear_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writ
     writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("a"))->default_value);
 }
 
+void GlClear_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("r"))->default_value = node_obj["r"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("g"))->default_value = node_obj["g"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("b"))->default_value = node_obj["b"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("a"))->default_value = node_obj["a"].GetFloat();
+}
+
+std::string glClearNodeName = "glClrear";
 std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "glClrear"));
+    s_Nodes.emplace_back(new Node(GetNextId(), glClearNodeName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("r", new PinValue<float>("r", 1, GetNextId(), "R", PinType::Float, 0)));
@@ -311,6 +328,13 @@ void GlRenderToTexture_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuf
     writer.Uint(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value);
 }
 
+void GlRenderToTexture_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("name"))->default_value = std::string(node_obj["name"].GetString());
+    std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("width"))->default_value = node_obj["width"].GetUint();
+    std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value = node_obj["height"].GetUint();
+}
+
 void GlRenderToTexture_Func::SetupFrameBuffer()
 {
     auto config = InstanceConfig::instance();
@@ -362,9 +386,10 @@ void GlRenderToTexture_Func::DeleteFrameBuffer()
     config->DeleteFrameBuffer(object_prefix);
 }
 
+std::string glRenderToTextureName = "GL Render To Texture";
 std::shared_ptr<Node> GlRenderToTexture(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "GL Render To Texture"));
+    s_Nodes.emplace_back(new Node(GetNextId(), glRenderToTextureName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("name", new PinValue<std::string>("name", 1, GetNextId(), "Name", PinType::String, "glRenderToTexture_" + std::to_string(s_Nodes.back()->id.Get()))));
@@ -396,4 +421,16 @@ void GlNodes1_SearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = GlRenderToTexture;
     std::vector<std::string> keywords_2{ "glRenderToTexture", "Gl", "gl", "Render", "To", "Texture" };
     search_nodes_vector.push_back(SearchNodeObj("GL Render To Texture", keywords_2, func_2));
+}
+
+std::shared_ptr<Node> GlNodes1_LoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
+{
+    std::shared_ptr<Node> loaded_node = nullptr;
+    if (loaded_node == nullptr && node_key.rfind(glClearNodeName, 0) == 0) {
+        loaded_node = GlClearNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(glRenderToTextureName, 0) == 0) {
+        loaded_node = GlRenderToTexture(s_Nodes);
+    }
+    return loaded_node;
 }

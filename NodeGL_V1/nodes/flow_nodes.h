@@ -15,6 +15,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector();
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> SequenceNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -31,6 +32,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> BranchNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -47,6 +49,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> WhileLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -63,6 +66,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> ForLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -71,5 +75,6 @@ std::shared_ptr<Node> ForLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+std::shared_ptr<Node> FlowNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 
 #endif

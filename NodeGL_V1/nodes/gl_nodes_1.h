@@ -19,6 +19,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 
 private:
     void SetupFrameBuffer();
@@ -43,6 +44,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj) ;
 };
 
 std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -60,6 +62,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 
 private:
     void SetupFrameBuffer();
@@ -77,5 +80,6 @@ std::shared_ptr<Node> GlRenderToTexture(std::vector<std::shared_ptr<Node>>& s_No
 
 
 void GlNodes1_SearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+std::shared_ptr<Node> GlNodes1_LoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 
 #endif

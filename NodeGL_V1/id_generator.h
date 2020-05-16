@@ -8,5 +8,6 @@ namespace ed = ax::NodeEditor;
 static int s_NextId = 1;
 int GetNextId();
 ed::LinkId GetNextLinkId();
+void ResetId();
 
 #endif

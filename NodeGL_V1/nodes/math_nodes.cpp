@@ -98,9 +98,30 @@ void MathPlusNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>&
     writer.String(PinTypeToString(parent_node->outputs.at("out")->type).c_str());
 }
 
+void MathPlusNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
+    PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
+    PinType out_type = StringToPinType(std::string(node_obj["out_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type);
+    
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetInt();
+    
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetFloat();
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetInt();
+}
+
+std::string mathPlusNodeName = "Plus ( + )";
 std::shared_ptr<Node> MathPlusNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Plus", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), mathPlusNodeName.c_str(), true));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
     s_Nodes.back()->inputs.at("x_1")->template_allowed_types.push_back(PinType::Float);
@@ -226,9 +247,30 @@ void MathMinusNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>
     writer.String(PinTypeToString(parent_node->outputs.at("out")->type).c_str());
 }
 
+void MathMinusNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
+    PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
+    PinType out_type = StringToPinType(std::string(node_obj["out_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type);
+
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetInt();
+
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetFloat();
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetInt();
+}
+
+std::string mathMinusNodeName = "Minus ( - )";
 std::shared_ptr<Node> MathMinusNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Minus", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), mathMinusNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
@@ -355,9 +397,30 @@ void MathMultiplyNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuff
     writer.String(PinTypeToString(parent_node->outputs.at("out")->type).c_str());
 }
 
+void MathMultiplyNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
+    PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
+    PinType out_type = StringToPinType(std::string(node_obj["out_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type);
+
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetInt();
+
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetFloat();
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetInt();
+}
+
+std::string mathMultiplyNodeName = "Multiply ( * )";
 std::shared_ptr<Node> MathMultiplyNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Multiply", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), mathMultiplyNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
@@ -492,9 +555,30 @@ void MathDivideNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer
     writer.String(PinTypeToString(parent_node->outputs.at("out")->type).c_str());
 }
 
+void MathDivideNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
+    PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
+    PinType out_type = StringToPinType(std::string(node_obj["out_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type);
+
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetInt();
+
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetFloat();
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetInt();
+}
+
+std::string mathDivideNodeName = "Divide ( / )";
 std::shared_ptr<Node> MathDivideNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Divide", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), mathDivideNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 1)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
@@ -591,9 +675,28 @@ void EqualNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& wr
     writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
 }
 
+void EqualNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
+    PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetInt();
+
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetFloat();
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetInt();
+}
+
+std::string equalNodeName = "Equal ( == )";
 std::shared_ptr<Node> EqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Equal", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), equalNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
@@ -687,9 +790,28 @@ void NotEqualNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>&
     writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
 }
 
+void NotEqualNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
+    PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetInt();
+
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetFloat();
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetInt();
+}
+
+std::string notEqualNodeName = "Not Equal ( != )";
 std::shared_ptr<Node> NotEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Not Equal", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), notEqualNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
@@ -783,9 +905,28 @@ void LessNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& wri
     writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
 }
 
+void LessNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
+    PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetInt();
+
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetFloat();
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetInt();
+}
+
+std::string lessNodeName = "Less ( < )";
 std::shared_ptr<Node> LessNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Less ( < )", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), lessNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
@@ -879,9 +1020,28 @@ void LessEqualNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>
     writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
 }
 
+void LessEqualNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
+    PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetInt();
+
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetFloat();
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetInt();
+}
+
+std::string lessEqualNodeName = "Less Equal ( <= )";
 std::shared_ptr<Node> LessEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Less Equal ( <= )", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), lessEqualNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
@@ -975,9 +1135,28 @@ void GreaterNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& 
     writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
 }
 
+void GreaterNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
+    PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetInt();
+
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetFloat();
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetInt();
+}
+
+std::string greaterNodeName = "Greater ( > )";
 std::shared_ptr<Node> GreaterNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Greater ( > )", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), greaterNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
@@ -1071,9 +1250,28 @@ void GreaterEqualNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuff
     writer.String(PinTypeToString(parent_node->inputs.at("x_2")->type).c_str());
 }
 
+void GreaterEqualNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
+    PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+
+    if (parent_node->inputs.at("x_1")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
+    else if (parent_node->inputs.at("x_1")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetInt();
+
+    if (parent_node->inputs.at("x_2")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetFloat();
+    else if (parent_node->inputs.at("x_2")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetInt();
+}
+
+std::string greaterEqualNodeName = "Greater Equal ( >= )";
 std::shared_ptr<Node> GreaterEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Greater Equal ( >= )", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), greaterEqualNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x_1", new PinValue<float>("x_1", 0, GetNextId(), "X 1", PinType::Float, 0)));
     s_Nodes.back()->inputs.at("x_1")->isTemplate = true;;
@@ -1280,4 +1478,40 @@ void MathNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_13 = NotNode;
     std::vector<std::string> keywords_13{ "Not", "Binary", "Operator", "!" };
     search_nodes_vector.push_back(SearchNodeObj("Not ( ! )", keywords_13, func_13));
+}
+
+std::shared_ptr<Node> MathNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
+{
+    std::shared_ptr<Node> loaded_node = nullptr;
+    if (loaded_node == nullptr && node_key.rfind(mathPlusNodeName, 0) == 0) {
+        loaded_node = MathPlusNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(mathMinusNodeName, 0) == 0) {
+        loaded_node = MathMinusNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(mathMultiplyNodeName, 0) == 0) {
+        loaded_node = MathMultiplyNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(mathDivideNodeName, 0) == 0) {
+        loaded_node = MathDivideNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(equalNodeName, 0) == 0) {
+        loaded_node = EqualNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(notEqualNodeName, 0) == 0) {
+        loaded_node = NotEqualNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(lessNodeName, 0) == 0) {
+        loaded_node = LessNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(lessEqualNodeName, 0) == 0) {
+        loaded_node = LessEqualNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(greaterNodeName, 0) == 0) {
+        loaded_node = GreaterNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(greaterEqualNodeName, 0) == 0) {
+        loaded_node = GreaterEqualNode(s_Nodes);
+    }
+    return loaded_node;
 }

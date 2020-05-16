@@ -48,9 +48,6 @@
     <ClCompile Include="nodes\dummy_nodes.cpp">
       <Filter>Source Files\nodes</Filter>
     </ClCompile>
-    <ClCompile Include="nodes\collect_search_nodes.cpp">
-      <Filter>Source Files\nodes</Filter>
-    </ClCompile>
     <ClCompile Include="utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -123,6 +120,9 @@
     <ClCompile Include="nodes\animations_nodes_1.cpp">
       <Filter>Source Files\nodes</Filter>
     </ClCompile>
+    <ClCompile Include="nodes\nodes_collection.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_utils.h">
@@ -138,9 +138,6 @@
       <Filter>Header Files\nodes</Filter>
     </ClInclude>
     <ClInclude Include="nodes\dummy_nodes.h">
-      <Filter>Header Files\nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="nodes\collect_search_nodes.h">
       <Filter>Header Files\nodes</Filter>
     </ClInclude>
     <ClInclude Include="utils.h">
@@ -231,6 +228,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="nodes\animations_nodes_1.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\nodes_collection.h">
       <Filter>Header Files\nodes</Filter>
     </ClInclude>
   </ItemGroup>

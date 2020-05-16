@@ -15,6 +15,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> MathPlusNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -30,6 +31,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> MathMinusNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -45,6 +47,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> MathMultiplyNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -60,6 +63,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> MathDivideNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -75,6 +79,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> EqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -90,6 +95,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> NotEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -105,6 +111,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> LessNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -120,6 +127,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> LessEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -135,6 +143,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> GreaterNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -150,6 +159,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> GreaterEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -165,6 +175,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj) {};
 };
 
 std::shared_ptr<Node> AndNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -180,6 +191,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj) {};
 };
 
 std::shared_ptr<Node> OrNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -195,6 +207,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj) {};
 };
 
 std::shared_ptr<Node> NotNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -202,5 +215,6 @@ std::shared_ptr<Node> NotNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 void MathNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+std::shared_ptr<Node> MathNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 
 #endif

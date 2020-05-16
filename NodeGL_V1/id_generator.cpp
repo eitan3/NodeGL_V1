@@ -9,3 +9,8 @@ ed::LinkId GetNextLinkId()
 {
     return ed::LinkId(GetNextId());
 }
+
+void ResetId()
+{
+    s_NextId = 1;
+}

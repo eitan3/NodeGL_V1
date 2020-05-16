@@ -1,14 +1,14 @@
 #include "animations_nodes_1.h"
 
 
+const char* ease_items[] = { "Linear", "Ease In Sine", "Ease Out Sine", "Ease In Out Sine", "Ease In Quad", "Ease Out Quad", "Ease In Out Quad",
+        "Ease In Cubic", "Ease Out Cubic", "Ease In Out Cubic", "Ease In Quart", "Ease Out Quart", "Ease In Out Quart" };
 void EaseAnimation_Func::Initialize()
 {
     anim_time = 0;
     is_reverse = false;
-    const char* items[] = { "Linear", "Ease In Sine", "Ease Out Sine", "Ease In Out Sine", "Ease In Quad", "Ease Out Quad", "Ease In Out Quad",
-        "Ease In Cubic", "Ease Out Cubic", "Ease In Out Cubic", "Ease In Quart", "Ease Out Quart", "Ease In Out Quart" };
     if (current_ease == NULL)
-        current_ease = (char*)items[0];
+        current_ease = (char*)ease_items[0];
 }
 
 float linearFunc(float x)
@@ -158,21 +158,19 @@ void EaseAnimation_Func::UpdateNodeInspector()
 {
     if (ImGui::BeginTabItem("Animation Settings"))
     {
-        const char* items[] = { "Linear", "Ease In Sine", "Ease Out Sine", "Ease In Out Sine", "Ease In Quad", "Ease Out Quad", "Ease In Out Quad",
-            "Ease In Cubic", "Ease Out Cubic", "Ease In Out Cubic", "Ease In Quart", "Ease Out Quart", "Ease In Out Quart" };
         if (current_ease == NULL)
-            current_ease = (char *)items[0];
+            current_ease = (char *)ease_items[0];
 
         auto paneWidth = ImGui::GetContentRegionAvailWidth();
         ImGui::TextUnformatted("Ease Type: ");
         ImGui::BeginHorizontal("##ease_anim_config_panel_1", ImVec2(paneWidth, 0), 1.0f);
         if (ImGui::BeginCombo("##combo", current_ease)) // The second parameter is the label previewed before opening the combo.
         {
-            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+            for (int n = 0; n < IM_ARRAYSIZE(ease_items); n++)
             {
-                bool is_selected = (current_ease == items[n]); // You can store your selection however you want, outside or inside your objects
-                if (ImGui::Selectable(items[n], is_selected))
-                    current_ease = (char*)items[n];
+                bool is_selected = std::string(current_ease) == std::string(ease_items[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(ease_items[n], is_selected))
+                    current_ease = (char*)ease_items[n];
                     if (is_selected)
                         ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
             }
@@ -197,9 +195,30 @@ void EaseAnimation_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>
     //std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at(""))->default_value;
 }
 
+void EaseAnimation_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("min"))->default_value = node_obj["min"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("max"))->default_value = node_obj["max"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("duration"))->default_value = node_obj["duration"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("reverse"))->default_value = node_obj["reverse"].GetBool();
+    current_ease = (char *)node_obj["ease"].GetString();
+    bool is_found = false;
+    int index = 0;
+    for (int n = 0; n < IM_ARRAYSIZE(ease_items) && is_found == false; n++)
+    {
+        is_found = std::string(current_ease) == std::string(ease_items[n]);
+        index = n;
+    }
+    if (is_found)
+        current_ease = (char*)ease_items[index];
+    else
+        current_ease = (char*)ease_items[0];
+}
+
+std::string easeAnimationhNodeName = "Ease Animation";
 std::shared_ptr<Node> EaseAnimationhNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Ease Animation"));
+    s_Nodes.emplace_back(new Node(GetNextId(), easeAnimationhNodeName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("min", new PinValue<float>("min", 1, GetNextId(), "Min", PinType::Float, 0)));
@@ -234,4 +253,13 @@ void AnimNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = EaseAnimationhNode;
     std::vector<std::string> keywords_1{ "Ease", "Animation" };
     search_nodes_vector.push_back(SearchNodeObj("Ease Animation", keywords_1, func_1, true));
+}
+
+std::shared_ptr<Node> AnimNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
+{
+    std::shared_ptr<Node> loaded_node = nullptr;
+    if (loaded_node == nullptr && node_key.rfind(easeAnimationhNodeName, 0) == 0) {
+        loaded_node = EaseAnimationhNode(s_Nodes);
+    }
+    return loaded_node;
 }

@@ -53,9 +53,21 @@ void Sequence_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& wri
     writer.Uint(parent_node->outputs.size());
 }
 
+void Sequence_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    int num_additional_nodes = node_obj["num_outputs"].GetUint();
+    for (int i = 2; i < num_additional_nodes; i++)
+    {
+        std::string id = std::to_string(parent_node->outputs.size() + 1);
+        parent_node->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>(id, new BasePin(id, std::stoi(id), GetNextId(), ("Out " + id).c_str(), PinType::Flow)));
+        BuildNode(parent_node);
+    }
+}
+
+std::string sequenceNodeName = "Sequence";
 std::shared_ptr<Node> SequenceNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Sequence"));
+    s_Nodes.emplace_back(new Node(GetNextId(), sequenceNodeName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("1", new BasePin("1", 1, GetNextId(), "Out 1", PinType::Flow)));
@@ -100,9 +112,15 @@ void Branch_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& write
     writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("condition"))->default_value);
 }
 
+void Branch_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("condition"))->default_value = node_obj["condition"].GetBool();
+}
+
+std::string branchNodeName = "Branch";
 std::shared_ptr<Node> BranchNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Branch"));
+    s_Nodes.emplace_back(new Node(GetNextId(), branchNodeName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("condition", new PinValue<bool>("condition", 1, GetNextId(), "Condition", PinType::Bool, false)));
@@ -145,9 +163,15 @@ void WhileLoop_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& wr
     writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("condition"))->default_value);
 }
 
+void WhileLoop_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("condition"))->default_value = node_obj["condition"].GetBool();
+}
+
+std::string whileLoopNodeName = "While Loop";
 std::shared_ptr<Node> WhileLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "While Loop"));
+    s_Nodes.emplace_back(new Node(GetNextId(), whileLoopNodeName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("condition", new PinValue<bool>("condition", 1, GetNextId(), "Condition", PinType::Bool, false)));
@@ -201,9 +225,17 @@ void ForLoop_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writ
     writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("increase"))->default_value);
 }
 
+void ForLoop_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("start"))->default_value = node_obj["start"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("end"))->default_value = node_obj["end"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("increase"))->default_value = node_obj["increase"].GetFloat();
+}
+
+std::string forLoopNodeName = "For Loop";
 std::shared_ptr<Node> ForLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "For Loop"));
+    s_Nodes.emplace_back(new Node(GetNextId(), forLoopNodeName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("start", new PinValue<float>("start", 1, GetNextId(), "Start Value", PinType::Float, 0)));
@@ -247,4 +279,22 @@ void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = ForLoopNode;
     std::vector<std::string> keywords_4{ "Flow", "For", "Loop" };
     search_nodes_vector.push_back(SearchNodeObj("For Loop", keywords_4, func_4));
+}
+
+std::shared_ptr<Node> FlowNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
+{
+    std::shared_ptr<Node> loaded_node = nullptr;
+    if (loaded_node == nullptr && node_key.rfind(sequenceNodeName, 0) == 0) {
+        loaded_node = SequenceNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(branchNodeName, 0) == 0) {
+        loaded_node = BranchNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(whileLoopNodeName, 0) == 0) {
+        loaded_node = WhileLoopNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(forLoopNodeName, 0) == 0) {
+        loaded_node = ForLoopNode(s_Nodes);
+    }
+    return loaded_node;
 }

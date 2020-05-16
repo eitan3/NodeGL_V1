@@ -21,6 +21,7 @@ public:
     void UpdateNodeUI();
     void UpdateNodeInspector();
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj) {};
 
     void ShowShaderEditorWindow(bool* show = nullptr);
     void ShowFileBrowserWindow(bool* show = nullptr);
@@ -49,6 +50,7 @@ public:
     void UpdateNodeUI();
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj) {};
 
     void CreateProgram(GLuint vertex_shader, GLuint fragment_shader);
 

@@ -1629,6 +1629,9 @@ public:
     Object GetObject() { RAPIDJSON_ASSERT(IsObject()); return Object(*this); }
     ConstObject GetObject() const { RAPIDJSON_ASSERT(IsObject()); return ConstObject(*this); }
 
+    Object GetObject2() { RAPIDJSON_ASSERT(IsObject()); return Object(*this); }
+    ConstObject GetObject2() const { RAPIDJSON_ASSERT(IsObject()); return ConstObject(*this); }
+
     //@}
 
     //!@name Array

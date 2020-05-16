@@ -151,7 +151,7 @@
     <ClCompile Include="imgui_utils.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="nodes\animations_nodes_1.cpp" />
-    <ClCompile Include="nodes\collect_search_nodes.cpp" />
+    <ClCompile Include="nodes\nodes_collection.cpp" />
     <ClCompile Include="nodes\dummy_nodes.cpp" />
     <ClCompile Include="nodes\flow_nodes.cpp" />
     <ClCompile Include="nodes\gl_nodes_1.cpp" />
@@ -186,7 +186,7 @@
     <ClInclude Include="id_generator.h" />
     <ClInclude Include="imgui_utils.h" />
     <ClInclude Include="InstanceConfig.h" />
-    <ClInclude Include="nodes\collect_search_nodes.h" />
+    <ClInclude Include="nodes\nodes_collection.h" />
     <ClInclude Include="nodes\dummy_nodes.h" />
     <ClInclude Include="nodes\flow_nodes.h" />
     <ClInclude Include="nodes\gl_nodes_1.h" />

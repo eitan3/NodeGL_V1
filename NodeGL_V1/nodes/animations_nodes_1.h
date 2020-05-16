@@ -17,6 +17,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector();
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
 
     float min_val;
     float max_val;
@@ -35,4 +36,5 @@ std::shared_ptr<Node> EaseAnimationhNode(std::vector<std::shared_ptr<Node>>& s_N
 
 
 void AnimNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+std::shared_ptr<Node> AnimNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 #endif 

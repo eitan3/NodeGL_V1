@@ -12,6 +12,7 @@
 #include <ax/Builders.h>
 #include <ax/Widgets.h>
 
+#include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
@@ -28,7 +29,7 @@
 #include "utils.h"
 #include "id_generator.h"
 #include "nodes_builder.h"
-#include "nodes/collect_search_nodes.h"
+#include "nodes/nodes_collection.h"
 
 // To add GL Main Loop
 #include "nodes/gl_nodes_1.h"
@@ -88,6 +89,7 @@ std::string template_pin_type_selected_item;
 std::string preview_texture;
 
 
+#pragma region Set Touch Node Functions (not my code)
 // Set timer functions variables
 struct NodeIdLess
 {
@@ -96,15 +98,15 @@ struct NodeIdLess
         return lhs.AsPointer() < rhs.AsPointer();
     }
 };
-static const float          s_TouchTime = 1.0f;
-static std::map<ed::NodeId, float, NodeIdLess> s_NodeTouchTime;
+const float          s_TouchTime = 1.0f;
+std::map<ed::NodeId, float, NodeIdLess> s_NodeTouchTime;
 
-static void TouchNode(ed::NodeId id)
+void TouchNode(ed::NodeId id)
 {
     s_NodeTouchTime[id] = s_TouchTime;
 }
 
-static float GetTouchProgress(ed::NodeId id)
+float GetTouchProgress(ed::NodeId id)
 {
     auto it = s_NodeTouchTime.find(id);
     if (it != s_NodeTouchTime.end() && it->second > 0.0f)
@@ -113,7 +115,7 @@ static float GetTouchProgress(ed::NodeId id)
         return 0.0f;
 }
 
-static void UpdateTouch()
+void UpdateTouch()
 {
     const auto deltaTime = ImGui::GetIO().DeltaTime;
     for (auto& entry : s_NodeTouchTime)
@@ -122,9 +124,10 @@ static void UpdateTouch()
             entry.second -= deltaTime;
     }
 }
+#pragma endregion
 
 
-// Main App
+#pragma region Init, Finalize, And Apllication_GetName
 const char* Application_GetName()
 {
     return "NodeGL V1";
@@ -199,7 +202,9 @@ void Application_Finalize()
         m_Editor = nullptr;
     }
 }
+#pragma endregion
 
+#pragma region Type Color and Pin Icone
 ImColor GetIconColor(PinType type)
 {
     switch (type)
@@ -254,7 +259,9 @@ void DrawPinIcon(std::shared_ptr<BasePin> pin, bool connected, int alpha)
 
     ax::Widgets::Icon(ImVec2(s_PinIconSize, s_PinIconSize), iconType, connected, color, ImColor(32, 32, 32, alpha));
 };
+#pragma endregion
 
+#pragma region Popup Windows
 void ShowStyleEditor(bool* show = nullptr)
 {
     if (!ImGui::Begin("Style", show))
@@ -523,29 +530,96 @@ void ShowTextureViewer(bool* show = nullptr)
 
 void ShowNodeInspector(bool* show = nullptr, std::shared_ptr<Node> node = nullptr)
 {
-    ImVec2 win_size = ImGui::GetWindowSize();
-    if (!ImGui::Begin("Node Inspector", show, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_HorizontalScrollbar))
+    if (node)
     {
+        ImVec2 win_size = ImGui::GetWindowSize();
+        if (!ImGui::Begin("Node Inspector", show, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_HorizontalScrollbar))
+        {
+            ImGui::End();
+            return;
+        }
+
+        auto config = InstanceConfig::instance();
+        auto& io = ImGui::GetIO();
+        ImGui::GetCurrentWindow()->BeginOrderWithinParent = 1;
+        ImGui::SetWindowPos(ImVec2(10, win_size.y - 350 - 25));
+        ImGui::SetWindowSize(ImVec2(256, 350));
+
+        ImGui::Text(((std::string)("Node: " + node->name)).c_str());
+        if (ImGui::BeginTabBar("TabBar 0", 0))
+        {
+            AddInputPinsTab(node);
+            node->node_funcs->UpdateNodeInspector();
+            ImGui::EndTabBar();
+        }
         ImGui::End();
-        return;
     }
+}
 
+void AddPlaceholder(std::string ph_name, PinType pinType)
+{
     auto config = InstanceConfig::instance();
-    auto& io = ImGui::GetIO();
-    ImGui::GetCurrentWindow()->BeginOrderWithinParent = 1;
-    ImGui::SetWindowPos(ImVec2(10, win_size.y - 350 - 25));
-    ImGui::SetWindowSize(ImVec2(256, 350));
-
-    ImGui::Text(((std::string)("Node: " + node->name)).c_str());
-    if (ImGui::BeginTabBar("TabBar 0", 0))
+    if (pinType == PinType::String)
     {
-        AddInputPinsTab(node);
-        node->node_funcs->UpdateNodeInspector();
-        ImGui::EndTabBar();
+        std::shared_ptr<PlaceholderValue<std::string>> ph = std::make_shared< PlaceholderValue<std::string>>(ph_name, pinType, "");;
+        config->InsertNewPlaceholder(ph_name, ph);
     }
-
-    ImGui::End();
+    else if (pinType == PinType::Bool)
+    {
+        std::shared_ptr<PlaceholderValue<bool>> ph = std::make_shared< PlaceholderValue<bool>>(ph_name, pinType, false);;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
+    else if (pinType == PinType::Float)
+    {
+        std::shared_ptr<PlaceholderValue<float>> ph = std::make_shared< PlaceholderValue<float>>(ph_name, pinType, 0);;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
+    else if (pinType == PinType::Int)
+    {
+        std::shared_ptr<PlaceholderValue<int>> ph = std::make_shared< PlaceholderValue<int>>(ph_name, pinType, 0);;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
+    else if (pinType == PinType::Vector3)
+    {
+        std::shared_ptr<PlaceholderValue<glm::vec3>> ph = std::make_shared< PlaceholderValue<glm::vec3>>(ph_name, pinType, glm::vec3(0.0));;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
+    else if (pinType == PinType::Vector4)
+    {
+        std::shared_ptr<PlaceholderValue<glm::vec4>> ph = std::make_shared< PlaceholderValue<glm::vec4>>(ph_name, pinType, glm::vec4(0.0));;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
+    else if (pinType == PinType::Matrix4x4)
+    {
+        std::shared_ptr<PlaceholderValue<glm::mat4>> ph = std::make_shared< PlaceholderValue<glm::mat4>>(ph_name, pinType, glm::mat4(1.0));;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
+    else if (pinType == PinType::TextureObject)
+    {
+        std::shared_ptr<PlaceholderValue<std::shared_ptr<TextureObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<TextureObject>>>(ph_name, pinType, nullptr);;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
+    else if (pinType == PinType::ProgramObject)
+    {
+        std::shared_ptr<PlaceholderValue<std::shared_ptr<ProgramObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ProgramObject>>>(ph_name, pinType, nullptr);;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
+    else if (pinType == PinType::VertexShaderObject)
+    {
+        std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ShaderObject>>>(ph_name, pinType, nullptr);;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
+    else if (pinType == PinType::FragmentShaderObject)
+    {
+        std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ShaderObject>>>(ph_name, pinType, nullptr);;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
+    else if (pinType == PinType::MeshObject)
+    {
+        std::shared_ptr<PlaceholderValue<std::shared_ptr<MeshObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<MeshObject>>>(ph_name, pinType, nullptr);;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
 }
 
 void ShowCreatePlaceholderWindow(bool* show = nullptr)
@@ -597,78 +671,8 @@ void ShowCreatePlaceholderWindow(bool* show = nullptr)
         if (config->IsPlaceholderNameUsed(create_placeholder_name) == false)
         {
             PinType pinType = StringToPinType(create_placeholder_type_combo);
-            if (pinType == PinType::String)
-            {
-                std::shared_ptr<PlaceholderValue<std::string>> ph = std::make_shared< PlaceholderValue<std::string>>(create_placeholder_name, pinType, "");;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::Bool)
-            {
-                std::shared_ptr<PlaceholderValue<bool>> ph = std::make_shared< PlaceholderValue<bool>>(create_placeholder_name, pinType, false);;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::Float)
-            {
-                std::shared_ptr<PlaceholderValue<float>> ph = std::make_shared< PlaceholderValue<float>>(create_placeholder_name, pinType, 0);;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::Int)
-            {
-                std::shared_ptr<PlaceholderValue<int>> ph = std::make_shared< PlaceholderValue<int>>(create_placeholder_name, pinType, 0);;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::Vector3)
-            {
-                std::shared_ptr<PlaceholderValue<glm::vec3>> ph = std::make_shared< PlaceholderValue<glm::vec3>>(create_placeholder_name, pinType, glm::vec3(0.0));;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::Vector4)
-            {
-                std::shared_ptr<PlaceholderValue<glm::vec4>> ph = std::make_shared< PlaceholderValue<glm::vec4>>(create_placeholder_name, pinType, glm::vec4(0.0));;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::Matrix4x4)
-            {
-                std::shared_ptr<PlaceholderValue<glm::mat4>> ph = std::make_shared< PlaceholderValue<glm::mat4>>(create_placeholder_name, pinType, glm::mat4(1.0));;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::TextureObject)
-            {
-                std::shared_ptr<PlaceholderValue<std::shared_ptr<TextureObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<TextureObject>>>(create_placeholder_name, pinType, nullptr);;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::ProgramObject)
-            {
-                std::shared_ptr<PlaceholderValue<std::shared_ptr<ProgramObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ProgramObject>>>(create_placeholder_name, pinType, nullptr);;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::VertexShaderObject)
-            {
-                std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ShaderObject>>>(create_placeholder_name, pinType, nullptr);;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::FragmentShaderObject)
-            {
-                std::shared_ptr<PlaceholderValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<ShaderObject>>>(create_placeholder_name, pinType, nullptr);;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
-            else if (pinType == PinType::MeshObject)
-            {
-                std::shared_ptr<PlaceholderValue<std::shared_ptr<MeshObject>>> ph = std::make_shared< PlaceholderValue<std::shared_ptr<MeshObject>>>(create_placeholder_name, pinType, nullptr);;
-                config->InsertNewPlaceholder(create_placeholder_name, ph);
-                editor_config->showCreatePlaceholderWindow = false;
-            }
+            AddPlaceholder(create_placeholder_name, pinType);
+            editor_config->showCreatePlaceholderWindow = false;
         }
     }
     if (ImGui::Button("Cancel"))
@@ -906,6 +910,80 @@ void ResetInstance()
         ed::DeleteNode(config->s_Nodes.at(node_i)->id);
     }
     config->ClearPlaceholders();
+
+    config->s_Nodes.clear();
+    std::shared_ptr<Node> node = GlMainLoop(config->s_Nodes);      
+    ed::SetNodePosition(node->id, ImVec2(0, 0));
+    BuildNodes(config->s_Nodes);
+}
+
+void ShowOpenInstanceWindow()
+{
+    auto editor_config = EditorConfig::instance();
+    auto config = InstanceConfig::instance();
+
+    ImGui::OpenPopup("Open File");
+    if (file_dialog.showFileDialog("Open File", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN, ImVec2(700, 310), ".ngl"))
+    {
+        ResetInstance();
+        std::string nglData;
+        std::ifstream file(file_dialog.selected_path, std::ios::in);
+
+        if (!file.good()) {
+            std::cout << "Can't read file " << file_dialog.selected_path.c_str() << std::endl;
+            std::terminate();
+        }
+
+        file.seekg(0, std::ios::end);
+        nglData.resize((unsigned int)file.tellg());
+        file.seekg(0, std::ios::beg);
+        file.read(&nglData[0], nglData.size());
+        file.close();
+
+        rapidjson::Document d;
+        d.Parse(nglData.c_str());
+        rapidjson::Value& ph_arr_val = d["placeholders"];
+        for (auto& ph_arr : ph_arr_val.GetArray())
+        {
+            std::string ph_name = std::string(ph_arr.GetArray()[0].GetString());
+            PinType ph_type = StringToPinType(std::string(ph_arr.GetArray()[1].GetString()));
+            AddPlaceholder(ph_name, ph_type);
+        }
+
+        rapidjson::Value& nodes_dict = d["nodes"];
+        for (auto& m : nodes_dict.GetObject2())
+        {
+            std::string n_key = std::string(m.name.GetString());
+            rapidjson::Value node_obj = m.value.GetObject2();
+            if (n_key.rfind(config->s_Nodes.at(0)->name, 0) == 0)
+            {
+                float pos_x = node_obj["pos"].GetArray()[0].GetFloat();
+                float pos_y = node_obj["pos"].GetArray()[1].GetFloat();
+                ed::SetNodePosition(config->s_Nodes.at(0)->id, ImVec2(pos_x, pos_y));
+                config->s_Nodes.at(0)->node_funcs->LoadNodeData(node_obj);
+            }
+            else
+            {
+                std::shared_ptr<Node> loaded_node = LoadNodeFromJSON(config->s_Nodes, n_key);
+                if (loaded_node)
+                {
+                    float pos_x = node_obj["pos"].GetArray()[0].GetFloat();
+                    float pos_y = node_obj["pos"].GetArray()[1].GetFloat();
+                    ed::SetNodePosition(loaded_node->id, ImVec2(pos_x, pos_y));
+                    loaded_node->node_funcs->LoadNodeData(node_obj);
+                }
+            }
+        }
+
+        editor_config->showOpenInstanceWindow = false;
+    }
+    else
+    {
+        if (file_dialog.is_cancel)
+        {
+            editor_config->showOpenInstanceWindow = false;
+        }
+    }
 }
 
 void ShowSaveInstanceWindow()
@@ -997,6 +1075,8 @@ void ShowWindows()
     auto editor_config = EditorConfig::instance();
     if (editor_config->showSaveInstanceWindow)
         ShowSaveInstanceWindow();
+    if (editor_config->showOpenInstanceWindow)
+        ShowOpenInstanceWindow();
 
     if (showStyleEditor)
         ShowStyleEditor(&showStyleEditor);
@@ -1045,6 +1125,7 @@ void ShowWindows()
         delete_placeholder_combo = "";
     }
 }
+#pragma endregion
 
 void CreateMenuBar()
 {
@@ -1060,7 +1141,7 @@ void CreateMenuBar()
             }
             if (ImGui::MenuItem("Open"))
             {
-                
+                editor_config->showOpenInstanceWindow = true;
             }
             if (ImGui::MenuItem("Save"))
             {
