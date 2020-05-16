@@ -903,14 +903,25 @@ void ResetInstance()
     auto config = InstanceConfig::instance();
     for (int link_i = 0; link_i < config->s_Links.size(); link_i++)
     {
+        if (config->s_Links.at(link_i)->startPin)
+            config->s_Links.at(link_i)->startPin->links.clear();
+        if (config->s_Links.at(link_i)->endPin)
+            config->s_Links.at(link_i)->endPin->links.clear();
+        config->s_Links.at(link_i)->startPin = nullptr;
+        config->s_Links.at(link_i)->endPin = nullptr;
         ed::DeleteLink(config->s_Links.at(link_i)->id);
     }
     for (int node_i = 0; node_i < config->s_Nodes.size(); node_i++)
     {
+        config->s_Nodes.at(node_i)->node_funcs->Delete();
+        config->s_Nodes.at(node_i)->inputs.clear();
+        config->s_Nodes.at(node_i)->outputs.clear();
+        config->s_Nodes.at(node_i)->node_funcs = nullptr;
         ed::DeleteNode(config->s_Nodes.at(node_i)->id);
     }
     config->ClearPlaceholders();
 
+    config->s_Links.clear();
     config->s_Nodes.clear();
     std::shared_ptr<Node> node = GlMainLoop(config->s_Nodes);      
     ed::SetNodePosition(node->id, ImVec2(0, 0));
@@ -1734,7 +1745,8 @@ void Application_Frame()
                         }
                         if (node_found)
                         {
-                            config->s_Nodes.at(node_index)->node_funcs->Delete();
+                            if (config->s_Nodes.at(node_index)->node_funcs)
+                                config->s_Nodes.at(node_index)->node_funcs->Delete();
                             config->s_Nodes.at(node_index)->inputs.clear();
                             config->s_Nodes.at(node_index)->outputs.clear();
                             config->s_Nodes.at(node_index)->node_funcs = nullptr;

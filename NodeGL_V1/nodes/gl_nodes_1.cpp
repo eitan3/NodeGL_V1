@@ -77,9 +77,11 @@ void GlMainLoop_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& w
 
 void GlMainLoop_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
+    DeleteFrameBuffer();
     std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("name"))->default_value = std::string(node_obj["name"].GetString());
     std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("width"))->default_value = node_obj["width"].GetUint();
     std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value = node_obj["height"].GetUint();
+    SetupFrameBuffer();
 }
 
 void GlMainLoop_Func::SetupFrameBuffer()
@@ -330,9 +332,11 @@ void GlRenderToTexture_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuf
 
 void GlRenderToTexture_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
+    DeleteFrameBuffer();
     std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("name"))->default_value = std::string(node_obj["name"].GetString());
     std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("width"))->default_value = node_obj["width"].GetUint();
     std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value = node_obj["height"].GetUint();
+    SetupFrameBuffer();
 }
 
 void GlRenderToTexture_Func::SetupFrameBuffer()
