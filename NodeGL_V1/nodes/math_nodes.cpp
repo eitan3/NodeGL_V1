@@ -1319,9 +1319,16 @@ void AndNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writ
     writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("x_2"))->default_value);
 }
 
+void AndNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetBool();
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetBool();
+}
+
+std::string andNodeName = "And ( && )";
 std::shared_ptr<Node> AndNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "And ( && )", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), andNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("x_1", new PinValue<bool>("x_1", 0, GetNextId(), "X 1", PinType::Bool, false)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("x_2", new PinValue<bool>("x_2", 1, GetNextId(), "X 2", PinType::Bool, false)));
@@ -1363,9 +1370,16 @@ void OrNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& write
     writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("x_2"))->default_value);
 }
 
+void OrNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetBool();
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("x_2"))->default_value = node_obj["x_2"].GetBool();
+}
+
+std::string orNodeName = "Or ( || )";
 std::shared_ptr<Node> OrNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Or ( || )", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), orNodeName.c_str(), true));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("x_1", new PinValue<bool>("x_1", 0, GetNextId(), "X 1", PinType::Bool, false)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("x_2", new PinValue<bool>("x_2", 1, GetNextId(), "X 2", PinType::Bool, false)));
@@ -1404,6 +1418,12 @@ void NotNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writ
     writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("in"))->default_value);
 }
 
+void NotNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("in"))->default_value = node_obj["in"].GetBool();
+}
+
+std::string notNodeName = "Not ( ! )";
 std::shared_ptr<Node> NotNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
     s_Nodes.emplace_back(new Node(GetNextId(), "Not ( ! )", true));
@@ -1512,6 +1532,15 @@ std::shared_ptr<Node> MathNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_N
     }
     else if (loaded_node == nullptr && node_key.rfind(greaterEqualNodeName, 0) == 0) {
         loaded_node = GreaterEqualNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(andNodeName, 0) == 0) {
+        loaded_node = AndNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(orNodeName, 0) == 0) {
+        loaded_node = OrNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(notNodeName, 0) == 0) {
+        loaded_node = NotNode(s_Nodes);
     }
     return loaded_node;
 }

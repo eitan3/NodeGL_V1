@@ -21,8 +21,9 @@ public:
     void UpdateNodeUI();
     void UpdateNodeInspector();
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 
+    void CompileShader();
     void ShowShaderEditorWindow(bool* show = nullptr);
     void ShowFileBrowserWindow(bool* show = nullptr);
 
@@ -32,6 +33,7 @@ public:
     bool showShaderEditorWindow;
     bool showFileBrowserWindow;
     const char* current_shader_type = NULL;
+    bool is_compiled;
 
     std::shared_ptr<ShaderObject> shader_obj;
 };
@@ -50,7 +52,7 @@ public:
     void UpdateNodeUI();
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 
     void CreateProgram(GLuint vertex_shader, GLuint fragment_shader);
 
@@ -64,5 +66,6 @@ std::shared_ptr<Node> CreateProgram(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 void ShadersNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+std::shared_ptr<Node> ShadersNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 
 #endif

@@ -23,9 +23,15 @@ void PrintString_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& 
     writer.String(std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("value"))->default_value.c_str());
 }
 
+void PrintString_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("value"))->default_value = std::string(node_obj["value"].GetString());
+}
+
+std::string printStringName = "Print String";
 std::shared_ptr<Node> PrintString(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Print String"));
+    s_Nodes.emplace_back(new Node(GetNextId(), printStringName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("value", new PinValue<std::string>("value", 1, GetNextId(), "String", PinType::String, "")));
@@ -175,9 +181,27 @@ void ConvertTo_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& wr
     writer.String(PinTypeToString(parent_node->outputs.at("out")->type).c_str());
 }
 
+void ConvertTo_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    PinType x1_type = StringToPinType(std::string(node_obj["in_type"].GetString()));
+    PinType out_type = StringToPinType(std::string(node_obj["out_type"].GetString()));
+    UtilsChangePinType(parent_node, PinKind::Input, "in", x1_type);
+    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type);
+
+    if (parent_node->inputs.at("in")->type == PinType::Float)
+        std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value = node_obj["in_value"].GetFloat();
+    else if (parent_node->inputs.at("in")->type == PinType::Int)
+        std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("in"))->default_value = node_obj["in_value"].GetInt();
+    else if (parent_node->inputs.at("in")->type == PinType::Bool)
+        std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("in"))->default_value = node_obj["in_value"].GetBool();
+    else if (parent_node->inputs.at("in")->type == PinType::String)
+        std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("in"))->default_value = std::string(node_obj["in_value"].GetString());
+}
+
+std::string convertToName = "Convert To";
 std::shared_ptr<Node> ConvertTo(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Convert To", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), convertToName.c_str(), true));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("in", new PinValue<float>("in", 0, GetNextId(), "In", PinType::Float, 0)));
     s_Nodes.back()->inputs.at("in")->isTemplate = true;
     s_Nodes.back()->inputs.at("in")->template_allowed_types.push_back(PinType::Bool);
@@ -338,9 +362,25 @@ void SetPlaceholder_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer
     }
 }
 
+void SetPlaceholder_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    if (node_obj.HasMember("placeholder_name"))
+    {
+        auto config = InstanceConfig::instance();
+        std::string ph_name = std::string(node_obj["placeholder_name"].GetString());
+        std::shared_ptr<BasePlaceholder> ph = config->GetPlaceholder(ph_name);
+        parent_node->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 1, GetNextId(), "Value", PinType::String, "")));
+        BuildNode(parent_node);
+        UtilsChangePinType(parent_node, PinKind::Input, "placeholder_pin", ph->type);
+        ph->nodesID_vec.push_back(parent_node->id);
+        placeholder = ph;
+    }
+}
+
+std::string setPlaceholderName = "Set Placeholder";
 std::shared_ptr<Node> SetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Set Placeholder"));
+    s_Nodes.emplace_back(new Node(GetNextId(), setPlaceholderName.c_str()));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
     //s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 1, GetNextId(), "Value", PinType::String, "")));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("next", new BasePin("next", 0, GetNextId(), "Next", PinType::Flow)));
@@ -513,9 +553,25 @@ void GetPlaceholder_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer
     }
 }
 
+void GetPlaceholder_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    if (node_obj.HasMember("placeholder_name"))
+    {
+        auto config = InstanceConfig::instance();
+        std::string ph_name = std::string(node_obj["placeholder_name"].GetString());
+        std::shared_ptr<BasePlaceholder> ph = config->GetPlaceholder(ph_name);
+        parent_node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 0, GetNextId(), "Value", PinType::String, "")));
+        BuildNode(parent_node);
+        UtilsChangePinType(parent_node, PinKind::Output, "placeholder_pin", ph->type);
+        ph->nodesID_vec.push_back(parent_node->id);
+        placeholder = ph;
+    }
+}
+
+std::string getPlaceholderName = "Get Placeholder";
 std::shared_ptr<Node> GetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Get Placeholder", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), getPlaceholderName.c_str(), true));
     //s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 0, GetNextId(), "Value", PinType::String, "")));
 
     s_Nodes.back()->is_get_placeholder = true;
@@ -579,9 +635,14 @@ void SpoutSender_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& 
 {
 }
 
+void SpoutSender_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+}
+
+std::string spoutSenderNodeName = "Spout Sender";
 std::shared_ptr<Node> SpoutSenderNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Spout Sender"));
+    s_Nodes.emplace_back(new Node(GetNextId(), spoutSenderNodeName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>>>("texture", new PinValue<std::shared_ptr<TextureObject>>("texture", 1, GetNextId(), "Texture", PinType::TextureObject, nullptr)));
@@ -601,12 +662,12 @@ std::shared_ptr<Node> SpoutSenderNode(std::vector<std::shared_ptr<Node>>& s_Node
 
 
 
-void MakeFloat3_Func::Delete()
+void MakeVector3_Func::Delete()
 {
     parent_node = nullptr;
 }
 
-void MakeFloat3_Func::NoFlowUpdatePinsValues()
+void MakeVector3_Func::NoFlowUpdatePinsValues()
 {
     float pin_0_value = GetInputPinValue<float>(parent_node, "x");
     float pin_1_value = GetInputPinValue<float>(parent_node, "y");
@@ -615,7 +676,7 @@ void MakeFloat3_Func::NoFlowUpdatePinsValues()
     output_pin->value = glm::vec3(pin_0_value, pin_1_value, pin_2_value);
 }
 
-void MakeFloat3_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void MakeVector3_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Key("x");
     writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x"))->default_value);
@@ -625,16 +686,24 @@ void MakeFloat3_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& w
     writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("z"))->default_value);
 }
 
-std::shared_ptr<Node> MakeFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+void MakeVector3_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Make Float 3", true));
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x"))->default_value = node_obj["x"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("y"))->default_value = node_obj["y"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("z"))->default_value = node_obj["z"].GetFloat();
+}
+
+std::string makeVector3NodeName = "Make Vector 3";
+std::shared_ptr<Node> MakeVector3Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), makeVector3NodeName.c_str(), true));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x", new PinValue<float>("x", 0, GetNextId(), "X", PinType::Float, 0)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("y", new PinValue<float>("y", 1, GetNextId(), "Y", PinType::Float, 0)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("z", new PinValue<float>("z", 2, GetNextId(), "Z", PinType::Float, 0)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("out", new PinValue<glm::vec3>("out", 0, GetNextId(), "Out", PinType::Vector3, glm::vec3(0))));
 
-    s_Nodes.back()->node_funcs = std::make_shared<MakeFloat3_Func>();
-    std::dynamic_pointer_cast<MakeFloat3_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+    s_Nodes.back()->node_funcs = std::make_shared<MakeVector3_Func>();
+    std::dynamic_pointer_cast<MakeVector3_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
 
     s_Nodes.back()->node_funcs->Initialize();
 
@@ -647,12 +716,12 @@ std::shared_ptr<Node> MakeFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes
 
 
 
-void MakeFloat4_Func::Delete()
+void MakeVector4_Func::Delete()
 {
     parent_node = nullptr;
 }
 
-void MakeFloat4_Func::NoFlowUpdatePinsValues()
+void MakeVector4_Func::NoFlowUpdatePinsValues()
 {
     float pin_0_value = GetInputPinValue<float>(parent_node, "x");
     float pin_1_value = GetInputPinValue<float>(parent_node, "y");
@@ -662,7 +731,7 @@ void MakeFloat4_Func::NoFlowUpdatePinsValues()
     output_pin->value = glm::vec4(pin_0_value, pin_1_value, pin_2_value, pin_3_value);
 }
 
-void MakeFloat4_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void MakeVector4_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Key("x");
     writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x"))->default_value);
@@ -674,17 +743,26 @@ void MakeFloat4_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& w
     writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("w"))->default_value);
 }
 
-std::shared_ptr<Node> MakeFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+void MakeVector4_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Make Float 4", true));
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x"))->default_value = node_obj["x"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("y"))->default_value = node_obj["y"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("z"))->default_value = node_obj["z"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("w"))->default_value = node_obj["w"].GetFloat();
+}
+
+std::string makeVector4NodeName = "Make Vector 4";
+std::shared_ptr<Node> MakeVector4Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), makeVector4NodeName.c_str(), true));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x", new PinValue<float>("x", 0, GetNextId(), "X", PinType::Float, 0)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("y", new PinValue<float>("y", 1, GetNextId(), "Y", PinType::Float, 0)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("z", new PinValue<float>("z", 2, GetNextId(), "Z", PinType::Float, 0)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("w", new PinValue<float>("w", 3, GetNextId(), "W", PinType::Float, 0)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec4>>>("out", new PinValue<glm::vec4>("out", 0, GetNextId(), "Out", PinType::Vector4, glm::vec4(0))));
 
-    s_Nodes.back()->node_funcs = std::make_shared<MakeFloat4_Func>();
-    std::dynamic_pointer_cast<MakeFloat4_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+    s_Nodes.back()->node_funcs = std::make_shared<MakeVector4_Func>();
+    std::dynamic_pointer_cast<MakeVector4_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
 
     s_Nodes.back()->node_funcs->Initialize();
 
@@ -697,12 +775,12 @@ std::shared_ptr<Node> MakeFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes
 
 
 
-void BreakFloat3_Func::Delete()
+void BreakVector3_Func::Delete()
 {
     parent_node = nullptr;
 }
 
-void BreakFloat3_Func::NoFlowUpdatePinsValues()
+void BreakVector3_Func::NoFlowUpdatePinsValues()
 {
     glm::vec3 pin_0_value = GetInputPinValue<glm::vec3>(parent_node, "in");
     std::shared_ptr<PinValue<float>> output_pin_1 = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("x"));
@@ -713,7 +791,7 @@ void BreakFloat3_Func::NoFlowUpdatePinsValues()
     output_pin_3->value = pin_0_value.z;
 }
 
-void BreakFloat3_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void BreakVector3_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     glm::vec3 pin_0_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in"))->default_value;
     writer.Key("x");
@@ -724,16 +802,25 @@ void BreakFloat3_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& 
     writer.Double(pin_0_value.z);
 }
 
-std::shared_ptr<Node> BreakFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+void BreakVector3_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Break Float 3", true));
+    float x = node_obj["x"].GetFloat();
+    float y = node_obj["y"].GetFloat();
+    float z = node_obj["z"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in"))->default_value = glm::vec3(x, y, z);
+}
+
+std::string breakVector3NodeName = "Break Vector 3";
+std::shared_ptr<Node> BreakVector3Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), breakVector3NodeName.c_str(), true));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("in", new PinValue<glm::vec3>("in", 0, GetNextId(), "In", PinType::Vector3, glm::vec3(0))));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x", new PinValue<float>("x", 0, GetNextId(), "X", PinType::Float, 0)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("y", new PinValue<float>("y", 1, GetNextId(), "Y", PinType::Float, 0)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("z", new PinValue<float>("z", 2, GetNextId(), "Z", PinType::Float, 0)));
 
-    s_Nodes.back()->node_funcs = std::make_shared<BreakFloat3_Func>();
-    std::dynamic_pointer_cast<BreakFloat3_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+    s_Nodes.back()->node_funcs = std::make_shared<BreakVector3_Func>();
+    std::dynamic_pointer_cast<BreakVector3_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
 
     s_Nodes.back()->node_funcs->Initialize();
 
@@ -746,12 +833,12 @@ std::shared_ptr<Node> BreakFloat3Node(std::vector<std::shared_ptr<Node>>& s_Node
 
 
 
-void BreakFloat4_Func::Delete()
+void BreakVector4_Func::Delete()
 {
     parent_node = nullptr;
 }
 
-void BreakFloat4_Func::NoFlowUpdatePinsValues()
+void BreakVector4_Func::NoFlowUpdatePinsValues()
 {
     glm::vec4 pin_0_value = GetInputPinValue<glm::vec4>(parent_node, "in");
     std::shared_ptr<PinValue<float>> output_pin_1 = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("x"));
@@ -764,7 +851,7 @@ void BreakFloat4_Func::NoFlowUpdatePinsValues()
     output_pin_4->value = pin_0_value.w;
 }
 
-void BreakFloat4_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+void BreakVector4_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     glm::vec4 pin_0_value = std::dynamic_pointer_cast<PinValue<glm::vec4>>(parent_node->inputs.at("in"))->default_value;
     writer.Key("x");
@@ -777,17 +864,27 @@ void BreakFloat4_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& 
     writer.Double(pin_0_value.w);
 }
 
-std::shared_ptr<Node> BreakFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+void BreakVector4_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Break Float 4", true));
+    float x = node_obj["x"].GetFloat();
+    float y = node_obj["y"].GetFloat();
+    float z = node_obj["z"].GetFloat();
+    float w = node_obj["w"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<glm::vec4>>(parent_node->inputs.at("in"))->default_value = glm::vec4(x, y, z, w);
+}
+
+std::string breakVector4NodeName = "Break Vector 4";
+std::shared_ptr<Node> BreakVector4Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), "Break Vector 4", true));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec4>>>("in", new PinValue<glm::vec4>("in", 0, GetNextId(), "In", PinType::Vector4, glm::vec4(0))));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("x", new PinValue<float>("x", 0, GetNextId(), "X", PinType::Float, 0)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("y", new PinValue<float>("y", 1, GetNextId(), "Y", PinType::Float, 0)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("z", new PinValue<float>("z", 2, GetNextId(), "Z", PinType::Float, 0)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("w", new PinValue<float>("w", 3, GetNextId(), "W", PinType::Float, 0)));
 
-    s_Nodes.back()->node_funcs = std::make_shared<BreakFloat4_Func>();
-    std::dynamic_pointer_cast<BreakFloat4_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+    s_Nodes.back()->node_funcs = std::make_shared<BreakVector4_Func>();
+    std::dynamic_pointer_cast<BreakVector4_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
 
     s_Nodes.back()->node_funcs->Initialize();
 
@@ -821,19 +918,52 @@ void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::vector<std::string> keywords_5{ "Spout", "Sender" };
     search_nodes_vector.push_back(SearchNodeObj("Spout Sender", keywords_5, func_5));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_6 = MakeFloat3Node;
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_6 = MakeVector3Node;
     std::vector<std::string> keywords_6{ "Make", "Float", "3" };
     search_nodes_vector.push_back(SearchNodeObj("Make Float 3", keywords_6, func_6));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_7 = MakeFloat4Node;
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_7 = MakeVector4Node;
     std::vector<std::string> keywords_7{ "Make", "Float", "4" };
     search_nodes_vector.push_back(SearchNodeObj("Make Float 4", keywords_7, func_7));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_8 = BreakFloat3Node;
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_8 = BreakVector3Node;
     std::vector<std::string> keywords_8{ "Break", "Float", "3" };
     search_nodes_vector.push_back(SearchNodeObj("Break Float 3", keywords_8, func_8));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_9 = BreakFloat4Node;
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_9 = BreakVector4Node;
     std::vector<std::string> keywords_9{ "Break", "Float", "4" };
     search_nodes_vector.push_back(SearchNodeObj("Break Float 4", keywords_9, func_9));
+}
+
+std::shared_ptr<Node> NodesUtilsLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
+{
+    std::shared_ptr<Node> loaded_node = nullptr;
+    if (loaded_node == nullptr && node_key.rfind(printStringName, 0) == 0) {
+        loaded_node = PrintString(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(convertToName, 0) == 0) {
+        loaded_node = ConvertTo(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(setPlaceholderName, 0) == 0) {
+        loaded_node = SetPlaceholder(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(getPlaceholderName, 0) == 0) {
+        loaded_node = GetPlaceholder(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(spoutSenderNodeName, 0) == 0) {
+        loaded_node = SpoutSenderNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(makeVector3NodeName, 0) == 0) {
+        loaded_node = MakeVector3Node(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(makeVector4NodeName, 0) == 0) {
+        loaded_node = MakeVector4Node(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(breakVector3NodeName, 0) == 0) {
+        loaded_node = BreakVector3Node(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(breakVector4NodeName, 0) == 0) {
+        loaded_node = BreakVector4Node(s_Nodes);
+    }
+    return loaded_node;
 }

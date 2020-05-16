@@ -18,7 +18,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> PrintString(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -34,7 +34,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> ConvertTo(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -50,7 +50,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector();
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 
     std::shared_ptr<BasePlaceholder> placeholder;
 };
@@ -68,7 +68,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector();
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 
     std::shared_ptr<BasePlaceholder> placeholder;
     PinType placeholder_type;
@@ -88,7 +88,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 
     SpoutSender spoutsender;
     bool bInitialized;
@@ -101,7 +101,7 @@ std::shared_ptr<Node> SpoutSenderNode(std::vector<std::shared_ptr<Node>>& s_Node
 
 
 
-class MakeFloat3_Func : public NodeFunctions {
+class MakeVector3_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -110,14 +110,14 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
-std::shared_ptr<Node> MakeFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> MakeVector3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
-class MakeFloat4_Func : public NodeFunctions {
+class MakeVector4_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -126,14 +126,14 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
-std::shared_ptr<Node> MakeFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> MakeVector4Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
-class BreakFloat3_Func : public NodeFunctions {
+class BreakVector3_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -142,14 +142,14 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
-std::shared_ptr<Node> BreakFloat3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> BreakVector3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
-class BreakFloat4_Func : public NodeFunctions {
+class BreakVector4_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -158,13 +158,14 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
-std::shared_ptr<Node> BreakFloat4Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> BreakVector4Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
 void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+std::shared_ptr<Node> NodesUtilsLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 
 #endif

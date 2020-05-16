@@ -21,5 +21,9 @@ std::shared_ptr<Node> LoadNodeFromJSON(std::vector<std::shared_ptr<Node>>& s_Nod
 		loaded_node = GlNodes1_LoadSetup(s_Nodes, node_key);
 	if (loaded_node == nullptr)
 		loaded_node = MathNodesLoadSetup(s_Nodes, node_key);
+	if (loaded_node == nullptr)
+		loaded_node = ShadersNodesLoadSetup(s_Nodes, node_key);
+	if (loaded_node == nullptr)
+		loaded_node = NodesUtilsLoadSetup(s_Nodes, node_key);
 	return loaded_node;
 }

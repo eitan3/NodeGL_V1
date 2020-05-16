@@ -7,6 +7,7 @@ void CreateSahder_Func::Initialize()
     showFileBrowserWindow = false;
     shader_obj = nullptr;
     editor.SetPalette(TextEditor::GetDarkPalette());
+    is_compiled = false;
 }
 
 void CreateSahder_Func::Delete()
@@ -86,53 +87,7 @@ void CreateSahder_Func::ShowShaderEditorWindow(bool* show)
     ImGui::BeginHorizontal((prefix + "_buttons_panel").c_str(), ImVec2(paneWidth, 0), 1.0f);
     if (ImGui::Button("Compile"))
     {
-        DeleteShader();
-        TextEditor::ErrorMarkers errors = TextEditor::ErrorMarkers();
-        editor.SetErrorMarkers(errors);
-
-        int compile_result = 0;
-        GLuint shader_id = 0;
-        if (current_shader_type == shaders_types[0])
-            shader_id = glCreateShader(GL_VERTEX_SHADER);
-        if (current_shader_type == shaders_types[1])
-            shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-        char* shader_code_ptr = (char*)editor.GetText().c_str();
-        int   shader_code_size = editor.GetText().size();
-
-        glShaderSource(shader_id, 1, &shader_code_ptr, &shader_code_size);
-        glCompileShader(shader_id);
-        glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_result);
-
-        //daca exista erori output la consola
-        if (compile_result == GL_FALSE)
-        {
-            int info_log_length = 0;
-            glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &info_log_length);
-            std::vector<char> shader_log(info_log_length);
-            glGetShaderInfoLog(shader_id, info_log_length, NULL, &shader_log[0]);
-            std::string log_error(shader_log.begin(), shader_log.end());
-            TextEditor::ErrorMarkers errors = TextEditor::ErrorMarkers();
-            for (int line_i = 0; line_i < editor.GetTotalLines(); line_i++)
-                errors.insert(std::pair<int, std::string>(line_i + 1, log_error));
-            editor.SetErrorMarkers(errors);
-            glDeleteShader(shader_id);
-        }
-        else
-        {
-            if (current_shader_type == shaders_types[0])
-            {
-                std::shared_ptr<ShaderObject> new_obj = std::make_shared<ShaderObject>(object_prefix, shader_id, editor.GetText(), PinType::VertexShaderObject);
-                parent_node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("shader_out", new PinValue<std::shared_ptr<ShaderObject>>("shader_out", 0, GetNextId(), "Vertex Shader Object", PinType::VertexShaderObject, new_obj)));
-                shader_obj = new_obj;
-            }
-            else if (current_shader_type == shaders_types[1])
-            {
-                std::shared_ptr<ShaderObject> new_obj = std::make_shared<ShaderObject>(object_prefix, shader_id, editor.GetText(), PinType::FragmentShaderObject);
-                parent_node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("shader_out", new PinValue<std::shared_ptr<ShaderObject>>("shader_out", 0, GetNextId(), "Fragment Shader Object", PinType::FragmentShaderObject, new_obj)));
-                shader_obj = new_obj;
-            }
-            BuildNode(parent_node);
-        }
+        CompileShader();
     }
     if (ImGui::Button("Load"))
     {
@@ -169,6 +124,59 @@ void CreateSahder_Func::ShowShaderEditorWindow(bool* show)
     editor.Render("##TextEditor");
 
     ImGui::End();
+}
+
+void CreateSahder_Func::CompileShader()
+{
+    DeleteShader();
+    TextEditor::ErrorMarkers errors = TextEditor::ErrorMarkers();
+    editor.SetErrorMarkers(errors);
+
+    int compile_result = 0;
+    GLuint shader_id = 0;
+    if (current_shader_type == shaders_types[0])
+        shader_id = glCreateShader(GL_VERTEX_SHADER);
+    if (current_shader_type == shaders_types[1])
+        shader_id = glCreateShader(GL_FRAGMENT_SHADER);
+    char* shader_code_ptr = (char*)editor.GetText().c_str();
+    int   shader_code_size = editor.GetText().size();
+
+    glShaderSource(shader_id, 1, &shader_code_ptr, &shader_code_size);
+    glCompileShader(shader_id);
+    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_result);
+
+    //daca exista erori output la consola
+    if (compile_result == GL_FALSE)
+    {
+        int info_log_length = 0;
+        glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &info_log_length);
+        std::vector<char> shader_log(info_log_length);
+        glGetShaderInfoLog(shader_id, info_log_length, NULL, &shader_log[0]);
+        std::string log_error(shader_log.begin(), shader_log.end());
+        TextEditor::ErrorMarkers errors = TextEditor::ErrorMarkers();
+        for (int line_i = 0; line_i < editor.GetTotalLines(); line_i++)
+            errors.insert(std::pair<int, std::string>(line_i + 1, log_error));
+        editor.SetErrorMarkers(errors);
+        glDeleteShader(shader_id);
+        is_compiled = false;
+    }
+    else
+    {
+        if (current_shader_type == shaders_types[0])
+        {
+            std::shared_ptr<ShaderObject> new_obj = std::make_shared<ShaderObject>(object_prefix, shader_id, editor.GetText(), PinType::VertexShaderObject);
+            parent_node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("shader_out", new PinValue<std::shared_ptr<ShaderObject>>("shader_out", 0, GetNextId(), "Vertex Shader Object", PinType::VertexShaderObject, new_obj)));
+            shader_obj = new_obj;
+        }
+        else if (current_shader_type == shaders_types[1])
+        {
+            std::shared_ptr<ShaderObject> new_obj = std::make_shared<ShaderObject>(object_prefix, shader_id, editor.GetText(), PinType::FragmentShaderObject);
+            parent_node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("shader_out", new PinValue<std::shared_ptr<ShaderObject>>("shader_out", 0, GetNextId(), "Fragment Shader Object", PinType::FragmentShaderObject, new_obj)));
+            shader_obj = new_obj;
+        }
+        is_compiled = true;
+        BuildNode(parent_node);
+    }
 }
 
 void CreateSahder_Func::UpdateNodeUI()
@@ -210,11 +218,39 @@ void CreateSahder_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>&
     writer.String(current_shader_type);
     writer.Key("shader_source");
     writer.String(editor.GetText().c_str());
+    writer.Key("is_compiled");
+    writer.Bool(is_compiled);
 }
 
+void CreateSahder_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("name"))->default_value = std::string(node_obj["name"].GetString());
+    current_shader_type = node_obj["current_shader_type"].GetString();
+    editor.SetText(std::string(node_obj["shader_source"].GetString()));
+    bool tmp_is_compiled = node_obj["is_compiled"].GetBool();
+
+    bool is_found = false;
+    int index = 0;
+    for (int n = 0; n < IM_ARRAYSIZE(shaders_types) && is_found == false; n++)
+    {
+        is_found = std::string(current_shader_type) == std::string(shaders_types[n]);
+        index = n;
+    }
+    if (is_found)
+        current_shader_type = (char*)shaders_types[index];
+    else
+        current_shader_type = (char*)shaders_types[0];
+
+    if (tmp_is_compiled)
+    {
+        CompileShader();
+    }
+}
+
+std::string createSahderName = "Create Shader";
 std::shared_ptr<Node> CreateSahder(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Create Shader", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), createSahderName.c_str(), true));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("name", new PinValue<std::string>("name", 0, GetNextId(), "Shader Name", PinType::String, "ShaderObject_" + std::to_string(s_Nodes.back()->id.Get()))));
     s_Nodes.back()->inputs.at("name")->always_expose = false;
 
@@ -306,6 +342,11 @@ void CreateProgram_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>
     writer.String(std::dynamic_pointer_cast<PinValue < std::string >> (parent_node->inputs.at("name"))->default_value.c_str());
 }
 
+void CreateProgram_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("name"))->default_value = std::string(node_obj["name"].GetString());
+}
+
 void CreateProgram_Func::CreateProgram(GLuint vertex_shader, GLuint fragment_shader)
 {
     DeleteProgram();
@@ -338,9 +379,10 @@ void CreateProgram_Func::CreateProgram(GLuint vertex_shader, GLuint fragment_sha
     }
 }
 
+std::string createProgramName = "Create Program";
 std::shared_ptr<Node> CreateProgram(std::vector<std::shared_ptr<Node>>& s_Nodes)
 {
-    s_Nodes.emplace_back(new Node(GetNextId(), "Create Program", true));
+    s_Nodes.emplace_back(new Node(GetNextId(), createProgramName.c_str(), true));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("name", new PinValue<std::string>("name", 0, GetNextId(), "Program Name", PinType::String, "ProgramObject_" + std::to_string(s_Nodes.back()->id.Get()))));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("vs", new PinValue<std::shared_ptr<ShaderObject>>("vs", 1, GetNextId(), "Vertex Shader", PinType::VertexShaderObject, nullptr)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>>>("fs", new PinValue<std::shared_ptr<ShaderObject>>("fs", 2, GetNextId(), "Fragment Shader", PinType::FragmentShaderObject, nullptr)));
@@ -370,4 +412,16 @@ void ShadersNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = CreateProgram;
     std::vector<std::string> keywords_2{ "Create", "Program" };
     search_nodes_vector.push_back(SearchNodeObj("Create Program", keywords_2, func_2));
+}
+
+std::shared_ptr<Node> ShadersNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
+{
+    std::shared_ptr<Node> loaded_node = nullptr;
+    if (loaded_node == nullptr && node_key.rfind(createProgramName, 0) == 0) {
+        loaded_node = CreateProgram(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(createSahderName, 0) == 0) {
+        loaded_node = CreateSahder(s_Nodes);
+    }
+    return loaded_node;
 }

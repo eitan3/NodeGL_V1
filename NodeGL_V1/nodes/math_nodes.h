@@ -175,7 +175,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> AndNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -191,7 +191,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> OrNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -207,7 +207,7 @@ public:
     void UpdateNodeUI() {};
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void LoadNodeData(rapidjson::Value& node_obj);
 };
 
 std::shared_ptr<Node> NotNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
