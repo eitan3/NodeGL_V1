@@ -950,6 +950,7 @@ void ShowOpenInstanceWindow()
             AddPlaceholder(ph_name, ph_type);
         }
 
+        std::map < std::string, std::shared_ptr<Node>> json_to_node_mapper;
         rapidjson::Value& nodes_dict = d["nodes"];
         for (auto& m : nodes_dict.GetObject2())
         {
@@ -961,6 +962,7 @@ void ShowOpenInstanceWindow()
                 float pos_y = node_obj["pos"].GetArray()[1].GetFloat();
                 ed::SetNodePosition(config->s_Nodes.at(0)->id, ImVec2(pos_x, pos_y));
                 config->s_Nodes.at(0)->node_funcs->LoadNodeData(node_obj);
+                json_to_node_mapper.insert(std::pair<std::string, std::shared_ptr<Node>>(n_key, config->s_Nodes.at(0)));
             }
             else
             {
@@ -971,10 +973,28 @@ void ShowOpenInstanceWindow()
                     float pos_y = node_obj["pos"].GetArray()[1].GetFloat();
                     ed::SetNodePosition(loaded_node->id, ImVec2(pos_x, pos_y));
                     loaded_node->node_funcs->LoadNodeData(node_obj);
+                    json_to_node_mapper.insert(std::pair<std::string, std::shared_ptr<Node>>(n_key, loaded_node));
                 }
             }
         }
 
+        rapidjson::Value& links_arr_val = d["links"];
+        for (auto& links_arr : links_arr_val.GetArray())
+        {
+            rapidjson::Value link_obj = links_arr.GetObject2();
+
+            std::shared_ptr<Node> startNode = json_to_node_mapper.at(std::string(link_obj["start_node"].GetString()));
+            std::shared_ptr<Node> endNode = json_to_node_mapper.at(std::string(link_obj["end_node"].GetString()));
+            std::shared_ptr<BasePin> startPin = startNode->outputs.at(link_obj["start_pin"].GetString());
+            std::shared_ptr<BasePin> endPin = endNode->inputs.at(link_obj["end_pin"].GetString());
+
+            config->s_Links.emplace_back(new Link(GetNextId(), startPin->id, endPin->id, startPin, endPin));
+            config->s_Links.back()->color = GetIconColor(startPin->type);
+            startPin->links.push_back(config->s_Links.back());
+            endPin->links.push_back(config->s_Links.back());
+        }
+
+        json_to_node_mapper.clear();
         editor_config->showOpenInstanceWindow = false;
     }
     else

@@ -565,6 +565,7 @@ void GetPlaceholder_Func::LoadNodeData(rapidjson::Value& node_obj)
         UtilsChangePinType(parent_node, PinKind::Output, "placeholder_pin", ph->type);
         ph->nodesID_vec.push_back(parent_node->id);
         placeholder = ph;
+        placeholder_type = ph->type;
     }
 }
 
