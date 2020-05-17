@@ -2,6 +2,7 @@
 #ifndef UTILS_NODES_H
 #define UTILS_NODES_H
 
+#include <glm/gtc/type_ptr.hpp>
 #include "node_function_interface.h"
 #include "../nodes_builder.h"
 #include "../utils.h"
@@ -46,7 +47,7 @@ public:
     void Initialize();
     void Run();
     void Delete();
-    void NoFlowUpdatePinsValues();
+    void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
     void UpdateNodeInspector();
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);

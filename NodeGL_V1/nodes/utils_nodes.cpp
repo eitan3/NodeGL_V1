@@ -324,10 +324,6 @@ void SetPlaceholder_Func::Delete()
     parent_node = nullptr;
 }
 
-void SetPlaceholder_Func::NoFlowUpdatePinsValues()
-{
-}
-
 void SetPlaceholder_Func::UpdateNodeInspector()
 {
     auto editor_config = EditorConfig::instance();
@@ -359,6 +355,56 @@ void SetPlaceholder_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer
     {
         writer.Key("placeholder_name");
         writer.String(placeholder->name.c_str());
+
+        writer.Key("placeholder_value");
+        if (parent_node->inputs.at("placeholder_pin")->type == PinType::String)
+        {
+            std::string placeholder_value = std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("placeholder_pin"))->default_value;
+            writer.String(placeholder_value.c_str());
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Int)
+        {
+            int placeholder_value = std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("placeholder_pin"))->default_value;
+            writer.Int(placeholder_value);
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Float)
+        {
+            float placeholder_value = std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("placeholder_pin"))->default_value;
+            writer.Double(placeholder_value);
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Bool)
+        {
+            bool placeholder_value = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("placeholder_pin"))->default_value;
+            writer.Bool(placeholder_value);
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Vector3)
+        {
+            glm::vec3 placeholder_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("placeholder_pin"))->default_value;
+            writer.StartArray();
+            writer.Double(placeholder_value.x);
+            writer.Double(placeholder_value.y);
+            writer.Double(placeholder_value.z);
+            writer.EndArray();
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Vector4)
+        {
+            glm::vec4 placeholder_value = std::dynamic_pointer_cast<PinValue<glm::vec4>>(parent_node->inputs.at("placeholder_pin"))->default_value;
+            writer.StartArray();
+            writer.Double(placeholder_value.x);
+            writer.Double(placeholder_value.y);
+            writer.Double(placeholder_value.z);
+            writer.Double(placeholder_value.w);
+            writer.EndArray();
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Matrix4x4)
+        {
+            writer.StartArray();
+            glm::mat4 placeholder_value = std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->inputs.at("placeholder_pin"))->default_value;
+            const float* pSource = (const float*)glm::value_ptr(placeholder_value);
+            for (int i = 0; i < 16; ++i)
+                writer.Double(pSource[i]);
+            writer.EndArray();
+        }
     }
 }
 
@@ -374,6 +420,44 @@ void SetPlaceholder_Func::LoadNodeData(rapidjson::Value& node_obj)
         UtilsChangePinType(parent_node, PinKind::Input, "placeholder_pin", ph->type);
         ph->nodesID_vec.push_back(parent_node->id);
         placeholder = ph;
+
+        if (parent_node->inputs.at("placeholder_pin")->type == PinType::String)
+        {
+            std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("placeholder_pin"))->default_value = std::string(node_obj["placeholder_value"].GetString());
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Int)
+        {
+            std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("placeholder_pin"))->default_value = node_obj["placeholder_value"].GetInt();
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Float)
+        {
+            std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("placeholder_pin"))->default_value = node_obj["placeholder_value"].GetFloat();
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Bool)
+        {
+            std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("placeholder_pin"))->default_value = node_obj["placeholder_value"].GetBool();
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Vector3)
+        {
+            glm::vec3 load_val = glm::vec3(node_obj["placeholder_value"].GetArray()[0].GetFloat(), 
+                node_obj["placeholder_value"].GetArray()[1].GetFloat(), 
+                node_obj["placeholder_value"].GetArray()[2].GetFloat());
+            std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("placeholder_pin"))->default_value = load_val;
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Vector4)
+        {
+            glm::vec4 load_val = glm::vec4(node_obj["placeholder_value"].GetArray()[0].GetFloat(),
+                node_obj["placeholder_value"].GetArray()[1].GetFloat(),
+                node_obj["placeholder_value"].GetArray()[2].GetFloat(),
+                node_obj["placeholder_value"].GetArray()[3].GetFloat());
+            std::dynamic_pointer_cast<PinValue<glm::vec4>>(parent_node->inputs.at("placeholder_pin"))->default_value = load_val;
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Matrix4x4)
+        {
+            float* pSource = (float*)glm::value_ptr(std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->inputs.at("placeholder_pin"))->default_value);
+            for (int i = 0; i < 16; ++i)
+                pSource[i] = node_obj["placeholder_value"].GetArray()[i].GetFloat();
+        }
     }
 }
 
