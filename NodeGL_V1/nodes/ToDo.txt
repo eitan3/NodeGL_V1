@@ -1,6 +1,6 @@
-Make functions for objects (like meshes or program object, lets start with create bind function)
 Reorganize nodes files, split to nodes types and variables (scalars, vector3, vector4, matrix)
 Better Search
+Make functions for objects (like meshes or program object, lets start with create bind function)
 Finish Mesh Object
 Create Cube Mesh Object
 Create Camera Object
