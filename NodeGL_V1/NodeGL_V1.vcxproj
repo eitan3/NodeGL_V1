@@ -151,6 +151,7 @@
     <ClCompile Include="imgui_utils.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="nodes\animations_nodes_1.cpp" />
+    <ClCompile Include="nodes\matrices_nodes.cpp" />
     <ClCompile Include="nodes\nodes_collection.cpp" />
     <ClCompile Include="nodes\dummy_nodes.cpp" />
     <ClCompile Include="nodes\flow_nodes.cpp" />
@@ -180,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nodes\animations_nodes_1.h" />
+    <ClInclude Include="nodes\matrices_nodes.h" />
     <ClInclude Include="project_enums.h" />
     <ClInclude Include="project_classes.h" />
     <ClInclude Include="EditorConfig.h" />

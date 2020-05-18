@@ -9,6 +9,7 @@
 #include "flow_nodes.h"
 #include "math_nodes.h"
 #include "animations_nodes_1.h"
+#include "matrices_nodes.h";
 
 void CollectSearchNodes(std::vector<SearchNodeObj>& search_nodes_vector);
 
