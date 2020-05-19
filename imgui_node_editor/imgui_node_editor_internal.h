@@ -1279,6 +1279,8 @@ public:
     void MarkNodeToRestoreState(Node* node);
     void RestoreNodeState(Node* node);
 
+    void SetZoom(float zoom);
+    void SetScroll(ImVec2 scroll);
     void ClearSelection();
     void SelectObject(Object* object);
     void DeselectObject(Object* object);

@@ -326,6 +326,8 @@ namespace ax {
         int  GetActionContextLinks(LinkId* links, int size);
         void EndShortcut();
 
+        void SetZoom(float zoom);
+        void SetScroll(ImVec2 scroll);
         float GetCurrentZoom();
 
         NodeId GetDoubleClickedNode();

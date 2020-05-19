@@ -451,19 +451,30 @@ void LookAtNode_Func::NoFlowUpdatePinsValues()
     glm::vec3 position = GetInputPinValue<glm::vec3>(parent_node, "position");
     float yaw = GetInputPinValue<float>(parent_node, "yaw");
     float pitch = GetInputPinValue<float>(parent_node, "pitch");
+    bool is_degrees = GetInputPinValue<bool>(parent_node, "is_degrees");
 
-    if (position != p_position || yaw != p_yaw || pitch != p_pitch || first_run)
+    if (position != p_position || yaw != p_yaw || pitch != p_pitch || is_degrees != p_is_degrees || first_run)
     {
         first_run = false;
         p_position = position;
         p_yaw = yaw;
         p_pitch = pitch;
+        p_is_degrees = is_degrees;
         glm::vec3 up = glm::vec3(0.0, 1.0, 0.0);
 
         glm::vec3 front;
-        front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        front.y = sin(glm::radians(pitch));
-        front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        if (is_degrees)
+        {
+            front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+            front.y = sin(glm::radians(pitch));
+            front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        }
+        else
+        {
+            front.x = cos(yaw) * cos(pitch);
+            front.y = sin(pitch);
+            front.z = sin(yaw) * cos(pitch);
+        }
         front = glm::normalize(front);
 
         glm::mat4 lookAt = glm::lookAt(position, position + front, up);
@@ -495,6 +506,7 @@ std::shared_ptr<Node> LookAtNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("position", new PinValue<glm::vec3>("position", 0, GetNextId(), "Position", PinType::Vector3, glm::vec3(0, 0, 0))));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("yaw", new PinValue<float>("yaw", 1, GetNextId(), "Yaw", PinType::Float, 0)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("pitch", new PinValue<float>("pitch", 2, GetNextId(), "Pitch", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("is_degrees", new PinValue<bool>("is_degrees", 3, GetNextId(), "Is Degrees ?", PinType::Bool, true)));
 
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::mat4>>>("proj", new PinValue<glm::mat4>("proj", 0, GetNextId(), "Projection", PinType::Matrix4x4, glm::mat4(1.0))));
 

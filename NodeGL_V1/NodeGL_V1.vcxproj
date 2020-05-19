@@ -157,8 +157,11 @@
     <ClCompile Include="nodes\flow_nodes.cpp" />
     <ClCompile Include="nodes\gl_nodes_1.cpp" />
     <ClCompile Include="nodes\math_nodes.cpp" />
+    <ClCompile Include="nodes\relational_logical_nodes.cpp" />
     <ClCompile Include="nodes\shaders_nodes.cpp" />
     <ClCompile Include="nodes\utils_nodes.cpp" />
+    <ClCompile Include="nodes\vec3_nodes.cpp" />
+    <ClCompile Include="nodes\vec4_nodes.cpp" />
     <ClCompile Include="nodes_builder.cpp" />
     <ClCompile Include="objects\framebuffer_object.cpp" />
     <ClCompile Include="objects\mesh_object.cpp" />
@@ -182,6 +185,9 @@
   <ItemGroup>
     <ClInclude Include="nodes\animations_nodes_1.h" />
     <ClInclude Include="nodes\matrices_nodes.h" />
+    <ClInclude Include="nodes\relational_logical_nodes.h" />
+    <ClInclude Include="nodes\vec3_nodes.h" />
+    <ClInclude Include="nodes\vec4_nodes.h" />
     <ClInclude Include="project_enums.h" />
     <ClInclude Include="project_classes.h" />
     <ClInclude Include="EditorConfig.h" />

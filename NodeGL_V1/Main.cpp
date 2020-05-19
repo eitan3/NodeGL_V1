@@ -128,6 +128,40 @@ void UpdateTouch()
 
 
 #pragma region Init, Finalize, And Apllication_GetName
+
+void ResetInstance()
+{
+    auto config = InstanceConfig::instance();
+    for (int link_i = 0; link_i < config->s_Links.size(); link_i++)
+    {
+        if (config->s_Links.at(link_i)->startPin)
+            config->s_Links.at(link_i)->startPin->links.clear();
+        if (config->s_Links.at(link_i)->endPin)
+            config->s_Links.at(link_i)->endPin->links.clear();
+        config->s_Links.at(link_i)->startPin = nullptr;
+        config->s_Links.at(link_i)->endPin = nullptr;
+        ed::DeleteLink(config->s_Links.at(link_i)->id);
+    }
+    for (int node_i = 0; node_i < config->s_Nodes.size(); node_i++)
+    {
+        config->s_Nodes.at(node_i)->node_funcs->Delete();
+        config->s_Nodes.at(node_i)->inputs.clear();
+        config->s_Nodes.at(node_i)->outputs.clear();
+        config->s_Nodes.at(node_i)->node_funcs = nullptr;
+        ed::DeleteNode(config->s_Nodes.at(node_i)->id);
+    }
+    config->ClearPlaceholders();
+
+    config->s_Links.clear();
+    config->s_Nodes.clear();
+    std::shared_ptr<Node> node = GlMainLoop(config->s_Nodes);
+    ed::SetNodePosition(node->id, ImVec2(0, 0));
+    BuildNodes(config->s_Nodes);
+
+    ed::SetZoom(1.0);
+    ed::SetScroll(ImVec2(0.0, 0.0));
+}
+
 const char* Application_GetName()
 {
     return "NodeGL V1";
@@ -179,6 +213,8 @@ void Application_Initialize()
     ed::NavigateToContent();
     search_node_str.reserve(128);
     CollectSearchNodes(search_nodes_vector);
+
+    ResetInstance();
 }
 
 void Application_Finalize()
@@ -896,36 +932,6 @@ void ShowDeletePlaceholderWindow(bool* show = nullptr)
 
     ImGui::EndHorizontal();
     ImGui::End();
-}
-
-void ResetInstance()
-{
-    auto config = InstanceConfig::instance();
-    for (int link_i = 0; link_i < config->s_Links.size(); link_i++)
-    {
-        if (config->s_Links.at(link_i)->startPin)
-            config->s_Links.at(link_i)->startPin->links.clear();
-        if (config->s_Links.at(link_i)->endPin)
-            config->s_Links.at(link_i)->endPin->links.clear();
-        config->s_Links.at(link_i)->startPin = nullptr;
-        config->s_Links.at(link_i)->endPin = nullptr;
-        ed::DeleteLink(config->s_Links.at(link_i)->id);
-    }
-    for (int node_i = 0; node_i < config->s_Nodes.size(); node_i++)
-    {
-        config->s_Nodes.at(node_i)->node_funcs->Delete();
-        config->s_Nodes.at(node_i)->inputs.clear();
-        config->s_Nodes.at(node_i)->outputs.clear();
-        config->s_Nodes.at(node_i)->node_funcs = nullptr;
-        ed::DeleteNode(config->s_Nodes.at(node_i)->id);
-    }
-    config->ClearPlaceholders();
-
-    config->s_Links.clear();
-    config->s_Nodes.clear();
-    std::shared_ptr<Node> node = GlMainLoop(config->s_Nodes);      
-    ed::SetNodePosition(node->id, ImVec2(0, 0));
-    BuildNodes(config->s_Nodes);
 }
 
 void ShowOpenInstanceWindow()

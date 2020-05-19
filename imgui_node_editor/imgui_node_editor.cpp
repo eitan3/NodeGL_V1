@@ -1538,6 +1538,16 @@ void ed::EditorContext::RestoreNodeState(Node* node)
     node->m_GroupBounds.Floor();
 }
 
+void ax::NodeEditor::Detail::EditorContext::SetZoom(float zoom)
+{
+    m_NavigateAction.m_Zoom = zoom;
+}
+
+void ax::NodeEditor::Detail::EditorContext::SetScroll(ImVec2 scroll)
+{
+    m_NavigateAction.m_Scroll = scroll;
+}
+
 void ed::EditorContext::ClearSelection()
 {
     m_SelectedObjects.clear();
@@ -2380,10 +2390,10 @@ std::string ed::Settings::Serialize()
     for (auto& id : m_Selection)
         selection.push_back(serializeObjectId(id));
 
-    auto& view = result["view"];
+    /*auto& view = result["view"];
     view["scroll"]["x"] = m_ViewScroll.x;
     view["scroll"]["y"] = m_ViewScroll.y;
-    view["zoom"]   = m_ViewZoom;
+    view["zoom"]   = m_ViewZoom;*/
 
     return result.dump();
 }
@@ -2465,7 +2475,7 @@ bool ed::Settings::Parse(const std::string& string, Settings& settings)
         }
     }
 
-    auto& viewValue = settingsValue["view"];
+    /*auto& viewValue = settingsValue["view"];
     if (viewValue.is_object())
     {
         auto& viewScrollValue = viewValue["scroll"];
@@ -2475,7 +2485,7 @@ bool ed::Settings::Parse(const std::string& string, Settings& settings)
             result.m_ViewScroll = ImVec2(0, 0);
 
         result.m_ViewZoom = viewZoomValue.is_number() ? static_cast<float>(viewZoomValue.get<double>()) : 1.0f;
-    }
+    }*/
 
     settings = std::move(result);
 

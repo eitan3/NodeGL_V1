@@ -586,6 +586,16 @@ void ax::NodeEditor::EndShortcut()
     return s_Editor->GetShortcut().End();
 }
 
+void ax::NodeEditor::SetZoom(float zoom)
+{
+    s_Editor->SetZoom(zoom);
+}
+
+void ax::NodeEditor::SetScroll(ImVec2 scroll)
+{
+    s_Editor->SetScroll(scroll);
+}
+
 float ax::NodeEditor::GetCurrentZoom()
 {
     return s_Editor->GetView().InvScale;

@@ -126,6 +126,15 @@
     <ClCompile Include="nodes\matrices_nodes.cpp">
       <Filter>Source Files\nodes</Filter>
     </ClCompile>
+    <ClCompile Include="nodes\relational_logical_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="nodes\vec3_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="nodes\vec4_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_utils.h">
@@ -237,6 +246,15 @@
       <Filter>Header Files\nodes</Filter>
     </ClInclude>
     <ClInclude Include="nodes\matrices_nodes.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\relational_logical_nodes.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\vec3_nodes.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\vec4_nodes.h">
       <Filter>Header Files\nodes</Filter>
     </ClInclude>
   </ItemGroup>

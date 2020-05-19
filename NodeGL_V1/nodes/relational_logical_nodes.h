@@ -1,18 +1,14 @@
 #pragma once
-#ifndef MATRICES_NODES_H
-#define MATRICES_NODES_H
+#ifndef RELATIONAL_LOGICAL_NODES_H
+#define RELATIONAL_LOGICAL_NODES_H
 
 #include "node_function_interface.h"
 #include "../nodes_builder.h"
 #include "../utils.h"
-#include "../InstanceConfig.h"
-
-#include <gl/gl3w.h>
-#include <GLFW/glfw3.h>
-#include <glm/gtc/type_ptr.hpp>
 
 
-class Mat4IdentityNode_Func : public NodeFunctions {
+// Relational Operations
+class EqualNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -24,12 +20,11 @@ public:
     void LoadNodeData(rapidjson::Value& node_obj);
 };
 
-std::shared_ptr<Node> Mat4IdentityNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> EqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
-
-class Mat4TranslateNode_Func : public NodeFunctions {
+class NotEqualNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -41,12 +36,11 @@ public:
     void LoadNodeData(rapidjson::Value& node_obj);
 };
 
-std::shared_ptr<Node> Mat4TranslateNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> NotEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
-
-class Mat4RotateNode_Func : public NodeFunctions {
+class LessNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -58,12 +52,11 @@ public:
     void LoadNodeData(rapidjson::Value& node_obj);
 };
 
-std::shared_ptr<Node> Mat4RotateNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> LessNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
-
-class Mat4ScaleNode_Func : public NodeFunctions {
+class LessEqualNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -75,12 +68,11 @@ public:
     void LoadNodeData(rapidjson::Value& node_obj);
 };
 
-std::shared_ptr<Node> Mat4ScaleNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> LessEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
-
-class OrthoProjNode_Func : public NodeFunctions {
+class GreaterNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -90,21 +82,13 @@ public:
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
     void LoadNodeData(rapidjson::Value& node_obj);
-
-    float p_left;
-    float p_right;
-    float p_bottom;
-    float p_top;
-    float p_zNear;
-    float p_zFar;
 };
 
-std::shared_ptr<Node> OrthoProjNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> GreaterNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
-
-class PerspectiveProjNode_Func : public NodeFunctions {
+class GreaterEqualNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -114,20 +98,14 @@ public:
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
     void LoadNodeData(rapidjson::Value& node_obj);
-
-    float p_fovy;
-    float p_width;
-    float p_height;
-    float p_zNear;
-    float p_zFar;
 };
 
-std::shared_ptr<Node> PerspectiveProjNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> GreaterEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
-
-class LookAtNode_Func : public NodeFunctions {
+// Logical Operations
+class AndNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
     void Run() {};
@@ -137,20 +115,45 @@ public:
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
     void LoadNodeData(rapidjson::Value& node_obj);
-
-    glm::vec3 p_position;
-    float p_yaw;
-    float p_pitch;
-    bool p_is_degrees;
-    bool first_run = true;
 };
 
-std::shared_ptr<Node> LookAtNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+std::shared_ptr<Node> AndNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
+class OrNode_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
 
-void MatricesNodes_SearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
-std::shared_ptr<Node> MatricesNodes_LoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
+std::shared_ptr<Node> OrNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
-#endif
+
+
+class NotNode_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
+
+std::shared_ptr<Node> NotNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+void RelLogNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
+std::shared_ptr<Node> RelLogNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
+
+#endif 
