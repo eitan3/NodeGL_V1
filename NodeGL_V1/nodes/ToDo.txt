@@ -1,4 +1,3 @@
-Better Search
 Make functions for objects (like meshes or program object, lets start with create bind function)
 Finish Mesh Object
 Create Cube Mesh Object
