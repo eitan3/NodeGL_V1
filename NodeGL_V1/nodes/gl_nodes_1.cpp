@@ -420,11 +420,11 @@ void GlNodes1_SearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = GlClearNode;
     std::vector<std::string> keywords_1{ "glClear", "Gl", "gl", "Clear" };
-    search_nodes_vector.push_back(SearchNodeObj("GL Clear", keywords_1, func_1));
+    search_nodes_vector.push_back(SearchNodeObj("GL Clear", "OpenGL Nodes", keywords_1, func_1));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = GlRenderToTexture;
     std::vector<std::string> keywords_2{ "glRenderToTexture", "Gl", "gl", "Render", "To", "Texture" };
-    search_nodes_vector.push_back(SearchNodeObj("GL Render To Texture", keywords_2, func_2));
+    search_nodes_vector.push_back(SearchNodeObj("GL Render To Texture", "OpenGL Nodes", keywords_2, func_2));
 }
 
 std::shared_ptr<Node> GlNodes1_LoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)

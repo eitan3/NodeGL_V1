@@ -407,11 +407,11 @@ void ShadersNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = CreateSahder;
     std::vector<std::string> keywords_1{ "Create", "Shader" };
-    search_nodes_vector.push_back(SearchNodeObj("Create Shader", keywords_1, func_1));
+    search_nodes_vector.push_back(SearchNodeObj("Create Shader", "Shaders Nodes", keywords_1, func_1));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = CreateProgram;
     std::vector<std::string> keywords_2{ "Create", "Program" };
-    search_nodes_vector.push_back(SearchNodeObj("Create Program", keywords_2, func_2));
+    search_nodes_vector.push_back(SearchNodeObj("Create Program", "Shaders Nodes", keywords_2, func_2));
 }
 
 std::shared_ptr<Node> ShadersNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)

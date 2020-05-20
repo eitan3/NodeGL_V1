@@ -163,6 +163,7 @@
     <ClCompile Include="nodes\vec3_nodes.cpp" />
     <ClCompile Include="nodes\vec4_nodes.cpp" />
     <ClCompile Include="nodes_builder.cpp" />
+    <ClCompile Include="node_search_popup.cpp" />
     <ClCompile Include="objects\framebuffer_object.cpp" />
     <ClCompile Include="objects\mesh_object.cpp" />
     <ClCompile Include="objects\program_object.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="nodes\relational_logical_nodes.h" />
     <ClInclude Include="nodes\vec3_nodes.h" />
     <ClInclude Include="nodes\vec4_nodes.h" />
+    <ClInclude Include="node_search_popup.h" />
     <ClInclude Include="project_enums.h" />
     <ClInclude Include="project_classes.h" />
     <ClInclude Include="EditorConfig.h" />

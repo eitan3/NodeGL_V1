@@ -266,19 +266,19 @@ void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = SequenceNode;
     std::vector<std::string> keywords_1{ "Flow", "Sequence" };
-    search_nodes_vector.push_back(SearchNodeObj("Sequence", keywords_1, func_1));
+    search_nodes_vector.push_back(SearchNodeObj("Sequence", "Flow Nodes", keywords_1, func_1));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = BranchNode;
     std::vector<std::string> keywords_2{ "Flow", "Branch", "If" };
-    search_nodes_vector.push_back(SearchNodeObj("Branch", keywords_2, func_2));
+    search_nodes_vector.push_back(SearchNodeObj("Branch", "Flow Nodes", keywords_2, func_2));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = WhileLoopNode;
     std::vector<std::string> keywords_3{ "Flow", "While", "Loop" };
-    search_nodes_vector.push_back(SearchNodeObj("While Loop", keywords_3, func_3));
+    search_nodes_vector.push_back(SearchNodeObj("While Loop", "Flow Nodes", keywords_3, func_3));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = ForLoopNode;
     std::vector<std::string> keywords_4{ "Flow", "For", "Loop" };
-    search_nodes_vector.push_back(SearchNodeObj("For Loop", keywords_4, func_4));
+    search_nodes_vector.push_back(SearchNodeObj("For Loop", "Flow Nodes", keywords_4, func_4));
 }
 
 std::shared_ptr<Node> FlowNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)

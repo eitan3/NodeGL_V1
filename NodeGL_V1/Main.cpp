@@ -29,6 +29,7 @@
 #include "utils.h"
 #include "id_generator.h"
 #include "nodes_builder.h"
+#include "node_search_popup.h"
 #include "nodes/nodes_collection.h"
 
 // To add GL Main Loop
@@ -43,6 +44,8 @@ using ax::Widgets::IconType;
 // Set main variables
 ed::EditorContext* m_Editor = nullptr;
 imgui_addons::ImGuiFileBrowser file_dialog;
+ImVec2 mousePosBeforeSearch;
+std::shared_ptr<imgui_addons::NodeSearchPopup> nodeSearchPopup;
 
 // Varialbes for editor
 const int            s_PinIconSize = 24;
@@ -80,8 +83,6 @@ std::string delete_placeholder_combo;
 
 // Variables for seraching nodes on right click
 std::vector<SearchNodeObj> search_nodes_vector;
-std::string search_node_str = "";
-bool reset_search_node = false;
 
 // String variable to indicate which pin type we selected with templates pin
 std::string template_pin_type_selected_item;
@@ -211,8 +212,9 @@ void Application_Initialize()
 
     BuildNodes(config->s_Nodes);
     ed::NavigateToContent();
-    search_node_str.reserve(128);
     CollectSearchNodes(search_nodes_vector);
+    nodeSearchPopup = std::make_shared<imgui_addons::NodeSearchPopup>();
+    nodeSearchPopup->BuildNodeMap(search_nodes_vector);
 
     ResetInstance();
 }
@@ -237,7 +239,9 @@ void Application_Finalize()
         ed::DestroyEditor(m_Editor);
         m_Editor = nullptr;
     }
+    nodeSearchPopup = nullptr;
 }
+
 #pragma endregion
 
 #pragma region Type Color and Pin Icone
@@ -1107,6 +1111,33 @@ void ShowSaveInstanceWindow()
     }
 }
 
+void ShowNodeSearchWindow()
+{
+    // ;
+    auto editor_config = EditorConfig::instance();
+    auto config = InstanceConfig::instance();
+
+    ImGui::OpenPopup("Node Search");
+    if (nodeSearchPopup->showSearchDialog("Node Search", ImVec2(700, 310)))
+    {
+        std::shared_ptr<Node> node = nodeSearchPopup->selected_node_obj.func(config->s_Nodes);
+        if (node)
+        {
+            ed::SetNodePosition(node->id, mousePosBeforeSearch);
+        }
+        createNewNode = false;
+        editor_config->showNodeSearchWindow = false;
+    }
+    else
+    {
+        if (nodeSearchPopup->close_window)
+        {
+            createNewNode = false;
+            editor_config->showNodeSearchWindow = false;
+        }
+    }
+}
+
 void ShowWindows()
 {
     auto editor_config = EditorConfig::instance();
@@ -1114,6 +1145,9 @@ void ShowWindows()
         ShowSaveInstanceWindow();
     if (editor_config->showOpenInstanceWindow)
         ShowOpenInstanceWindow();
+
+    if (editor_config->showNodeSearchWindow)
+        ShowNodeSearchWindow();
 
     if (showStyleEditor)
         ShowStyleEditor(&showStyleEditor);
@@ -1287,6 +1321,7 @@ void Application_Frame()
 
     auto& io = ImGui::GetIO();
     auto config = InstanceConfig::instance();
+    auto editor_config = EditorConfig::instance();
 
     ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 
@@ -1691,10 +1726,8 @@ void Application_Frame()
                             createNewNode = true;
                             newNodeLinkPin = FindPin(pinId, config->s_Nodes);
                             newLinkPin = nullptr;
-                            ed::Suspend();
-                            ImGui::OpenPopup("Create New Node");
-                            reset_search_node = true;
-                            ed::Resume();
+                            mousePosBeforeSearch = ImGui::GetMousePos();
+                            editor_config->showNodeSearchWindow = true;
                         }
                     }
                 }
@@ -1767,8 +1800,6 @@ void Application_Frame()
         ImGui::SetCursorScreenPos(cursorTopLeft);
     }
 
-
-    auto openPopupPosition = ImGui::GetMousePos();
     ed::Suspend();
     if (ed::ShowNodeContextMenu(&contextNodeId))
         ImGui::OpenPopup("Node Context Menu");
@@ -1778,8 +1809,8 @@ void Application_Frame()
         ImGui::OpenPopup("Link Context Menu");
     else if (ed::ShowBackgroundContextMenu())
     {
-        ImGui::OpenPopup("Create New Node");
-        reset_search_node = true;
+        editor_config->showNodeSearchWindow = true;
+        mousePosBeforeSearch = ImGui::GetMousePos();
         newNodeLinkPin = nullptr;
     }
     ed::Resume();
@@ -1861,99 +1892,6 @@ void Application_Frame()
     }
 
     ImGui::SetNextWindowSize(ImVec2(0, 350));
-    if (ImGui::BeginPopup("Create New Node", ImGuiWindowFlags_AlwaysVerticalScrollbar))
-    {
-        ImGui::PushItemWidth(100.0f);
-        if (reset_search_node)
-        {
-            search_node_str = "";
-            search_node_str.reserve(128);
-        }
-        reset_search_node = false;
-        ImGui::InputText("##edit", (char*)search_node_str.data(), search_node_str.capacity() + 1);
-        ImGui::PopItemWidth();
-
-        search_node_str = std::string(search_node_str.c_str());
-        search_node_str.reserve(128);
-        std::string s_tmp = std::string(search_node_str.c_str());
-        std::vector<std::string> search_input_split = split_string(s_tmp, ' ');
-
-        std::shared_ptr<Node> node = nullptr;
-        for (int node_i = 0; node_i < search_nodes_vector.size(); node_i++)
-        {
-            if (search_input_split.size() == 0)
-            {
-                if (search_nodes_vector.at(node_i).show_in_global_search)
-                    if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
-                        node = search_nodes_vector.at(node_i).func(config->s_Nodes);
-            }
-            else if (search_nodes_vector.at(node_i).title.rfind(search_node_str, 0) == 0)
-            {
-                if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
-                    node = search_nodes_vector.at(node_i).func(config->s_Nodes);
-            }
-            else if (search_input_split.size() == 1)
-            {
-                bool added = false;
-                if (search_nodes_vector.at(node_i).title.rfind(search_input_split.at(0), 0) == 0)
-                {
-                    added = true;
-                    if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
-                        node = search_nodes_vector.at(node_i).func(config->s_Nodes);
-                }
-                if (added == false)
-                {
-                    for (int kw_i = 0; kw_i < search_nodes_vector.at(node_i).keywords.size() && added == false; kw_i++)
-                    {
-                        if (search_nodes_vector.at(node_i).keywords.at(kw_i).rfind(search_input_split.at(0), 0) == 0)
-                        {
-                            added = true;
-                            if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
-                                node = search_nodes_vector.at(node_i).func(config->s_Nodes);
-                        }
-                    }
-                }
-            }
-            else if (search_input_split.size() > 1)
-            {
-                bool match = true;
-                for (int si_i = 0; si_i < search_input_split.size() - 1 && match; si_i++)
-                {
-                    if (std::find(search_nodes_vector.at(node_i).keywords.begin(), search_nodes_vector.at(node_i).keywords.end(), search_input_split.at(si_i)) != search_nodes_vector.at(node_i).keywords.end()) {
-                        match = true;
-                    }
-                    else {
-                        match = false;
-                    }
-
-                }
-                if (match)
-                {
-                    bool added = false;
-                    for (int kw_i = 0; kw_i < search_nodes_vector.at(node_i).keywords.size() && added == false; kw_i++)
-                    {
-                        if (search_nodes_vector.at(node_i).keywords.at(kw_i).rfind(search_input_split.at(search_input_split.size() - 1), 0) == 0)
-                        {
-                            added = true;
-                            if (ImGui::MenuItem(search_nodes_vector.at(node_i).title.c_str()))
-                                node = search_nodes_vector.at(node_i).func(config->s_Nodes);
-                        }
-                    }
-                }
-            }
-        }
-        
-        ImGui::Separator();
-
-        if (node)
-        {
-            createNewNode = false;
-            ed::SetNodePosition(node->id, openPopupPosition);
-        }
-        ImGui::EndPopup();
-    }
-    else
-        createNewNode = false;
 
     if (ImGui::BeginPopup("Link Context Menu"))
     {

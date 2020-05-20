@@ -252,7 +252,7 @@ void AnimNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = EaseAnimationhNode;
     std::vector<std::string> keywords_1{ "Ease", "Animation" };
-    search_nodes_vector.push_back(SearchNodeObj("Ease Animation", keywords_1, func_1, true));
+    search_nodes_vector.push_back(SearchNodeObj("Ease Animation", "Animations", keywords_1, func_1, true));
 }
 
 std::shared_ptr<Node> AnimNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)

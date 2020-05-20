@@ -28,6 +28,7 @@ public:
 	bool showSelectPlaceholderWindow = false;
 	bool showRenamePlaceholderWindow = false;
 	bool showDeletePlaceholderWindow = false;
+	bool showNodeSearchWindow = false;
 };
 
 #endif

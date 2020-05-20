@@ -751,23 +751,23 @@ void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = ConvertTo;
     std::vector<std::string> keywords_1{ "Convert", "To" };
-    search_nodes_vector.push_back(SearchNodeObj("Convert To", keywords_1, func_1));
+    search_nodes_vector.push_back(SearchNodeObj("Convert To", "Utils Nodes", keywords_1, func_1));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = PrintString;
     std::vector<std::string> keywords_2{ "Print", "String" };
-    search_nodes_vector.push_back(SearchNodeObj("Print String", keywords_2, func_2));
+    search_nodes_vector.push_back(SearchNodeObj("Print String", "Utils Nodes", keywords_2, func_2));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = SetPlaceholder;
     std::vector<std::string> keywords_3{ "Set", "Placeholder" };
-    search_nodes_vector.push_back(SearchNodeObj("Set Placeholder", keywords_3, func_3));
+    search_nodes_vector.push_back(SearchNodeObj("Set Placeholder", "Utils Nodes", keywords_3, func_3));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = GetPlaceholder;
     std::vector<std::string> keywords_4{ "Get", "Placeholder" };
-    search_nodes_vector.push_back(SearchNodeObj("Get Placeholder", keywords_4, func_4));
+    search_nodes_vector.push_back(SearchNodeObj("Get Placeholder", "Utils Nodes", keywords_4, func_4));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = SpoutSenderNode;
     std::vector<std::string> keywords_5{ "Spout", "Sender" };
-    search_nodes_vector.push_back(SearchNodeObj("Spout Sender", keywords_5, func_5));
+    search_nodes_vector.push_back(SearchNodeObj("Spout Sender", "In/Out Nodes", keywords_5, func_5));
 }
 
 std::shared_ptr<Node> NodesUtilsLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)

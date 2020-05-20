@@ -611,19 +611,19 @@ void MathNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = MathPlusNode;
     std::vector<std::string> keywords_1{ "+", "Plus", "Operator", "Math" };
-    search_nodes_vector.push_back(SearchNodeObj("+ Operator", keywords_1, func_1));
+    search_nodes_vector.push_back(SearchNodeObj("+ Operator", "Math (Scalar)", keywords_1, func_1));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = MathMinusNode;
     std::vector<std::string> keywords_2{ "-", "Minus", "Operator", "Math" };
-    search_nodes_vector.push_back(SearchNodeObj("- Operator", keywords_2, func_2));
+    search_nodes_vector.push_back(SearchNodeObj("- Operator", "Math (Scalar)", keywords_2, func_2));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = MathMultiplyNode;
     std::vector<std::string> keywords_3{ "*", "Multiply", "Operator", "Math" };
-    search_nodes_vector.push_back(SearchNodeObj("* Operator", keywords_3, func_3));
+    search_nodes_vector.push_back(SearchNodeObj("* Operator", "Math (Scalar)", keywords_3, func_3));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = MathDivideNode;
     std::vector<std::string> keywords_4{ "/", "Divide", "Operator", "Math" };
-    search_nodes_vector.push_back(SearchNodeObj("/ Operator", keywords_4, func_4));
+    search_nodes_vector.push_back(SearchNodeObj("/ Operator", "Math (Scalar)", keywords_4, func_4));
 }
 
 std::shared_ptr<Node> MathNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)

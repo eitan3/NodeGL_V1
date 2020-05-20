@@ -842,39 +842,39 @@ void RelLogNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = EqualNode;
     std::vector<std::string> keywords_5{ "Equal", "Binary", "Operator", "==" };
-    search_nodes_vector.push_back(SearchNodeObj("Equal ( == )", keywords_5, func_5));
+    search_nodes_vector.push_back(SearchNodeObj("Equal ( == )", "Operators Nodes", keywords_5, func_5));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_6 = NotEqualNode;
     std::vector<std::string> keywords_6{ "Not", "Equal", "Binary", "Operator", "!=" };
-    search_nodes_vector.push_back(SearchNodeObj("Not Equal ( != )", keywords_6, func_6));
+    search_nodes_vector.push_back(SearchNodeObj("Not Equal ( != )", "Operators Nodes", keywords_6, func_6));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_7 = LessNode;
     std::vector<std::string> keywords_7{ "Less", "Binary", "Operator", "<" };
-    search_nodes_vector.push_back(SearchNodeObj("Less ( < )", keywords_7, func_7));
+    search_nodes_vector.push_back(SearchNodeObj("Less ( < )", "Operators Nodes", keywords_7, func_7));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_8 = LessEqualNode;
     std::vector<std::string> keywords_8{ "Less", "Equal", "Binary", "Operator", "<=" };
-    search_nodes_vector.push_back(SearchNodeObj("Less Equal ( <= )", keywords_8, func_8));
+    search_nodes_vector.push_back(SearchNodeObj("Less Equal ( <= )", "Operators Nodes", keywords_8, func_8));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_9 = GreaterNode;
     std::vector<std::string> keywords_9{ "Greater", "Binary", "Operator", ">" };
-    search_nodes_vector.push_back(SearchNodeObj("Greater ( > )", keywords_9, func_9));
+    search_nodes_vector.push_back(SearchNodeObj("Greater ( > )", "Operators Nodes", keywords_9, func_9));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_10 = GreaterEqualNode;
     std::vector<std::string> keywords_10{ "Greater", "Equal", "Binary", "Operator", ">=" };
-    search_nodes_vector.push_back(SearchNodeObj("Greater Equal ( >= )", keywords_10, func_10));
+    search_nodes_vector.push_back(SearchNodeObj("Greater Equal ( >= )", "Operators Nodes", keywords_10, func_10));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_11 = AndNode;
     std::vector<std::string> keywords_11{ "And", "Binary", "Operator", "&&" };
-    search_nodes_vector.push_back(SearchNodeObj("And ( && )", keywords_11, func_11));
+    search_nodes_vector.push_back(SearchNodeObj("And ( && )", "Operators Nodes", keywords_11, func_11));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_12 = OrNode;
     std::vector<std::string> keywords_12{ "Or", "Binary", "Operator", "||" };
-    search_nodes_vector.push_back(SearchNodeObj("Or ( || )", keywords_12, func_12));
+    search_nodes_vector.push_back(SearchNodeObj("Or ( || )", "Operators Nodes", keywords_12, func_12));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_13 = NotNode;
     std::vector<std::string> keywords_13{ "Not", "Binary", "Operator", "!" };
-    search_nodes_vector.push_back(SearchNodeObj("Not ( ! )", keywords_13, func_13));
+    search_nodes_vector.push_back(SearchNodeObj("Not ( ! )", "Operators Nodes", keywords_13, func_13));
 }
 
 std::shared_ptr<Node> RelLogNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)

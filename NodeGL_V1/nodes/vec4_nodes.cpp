@@ -127,11 +127,11 @@ void Vec4NodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = MakeVector4Node;
     std::vector<std::string> keywords_1{ "Make", "Vector", "4" };
-    search_nodes_vector.push_back(SearchNodeObj("Make Float 4", keywords_1, func_1));
+    search_nodes_vector.push_back(SearchNodeObj("Make Vector 4", "Vector 4", keywords_1, func_1));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = BreakVector4Node;
     std::vector<std::string> keywords_2{ "Break", "Vector", "4" };
-    search_nodes_vector.push_back(SearchNodeObj("Break Float 4", keywords_2, func_2));
+    search_nodes_vector.push_back(SearchNodeObj("Break Vector 4", "Vector 4", keywords_2, func_2));
 }
 
 std::shared_ptr<Node> Vec4NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)

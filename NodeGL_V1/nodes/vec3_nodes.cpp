@@ -116,11 +116,11 @@ void Vec3NodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = MakeVector3Node;
     std::vector<std::string> keywords_1{ "Make", "Vector", "3" };
-    search_nodes_vector.push_back(SearchNodeObj("Make Vector 3", keywords_1, func_1));
+    search_nodes_vector.push_back(SearchNodeObj("Make Vector 3", "Vector 3", keywords_1, func_1));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = BreakVector3Node;
     std::vector<std::string> keywords_2{ "Break", "Vector", "3" };
-    search_nodes_vector.push_back(SearchNodeObj("Break Vector 3", keywords_2, func_2));
+    search_nodes_vector.push_back(SearchNodeObj("Break Vector 3", "Vector 3", keywords_2, func_2));
 }
 
 std::shared_ptr<Node> Vec3NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)

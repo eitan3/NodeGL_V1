@@ -528,31 +528,31 @@ void MatricesNodes_SearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = Mat4IdentityNode;
     std::vector<std::string> keywords_1{ "Matrix4", "Identity", "Math" };
-    search_nodes_vector.push_back(SearchNodeObj("Mat 4 - Identity", keywords_1, func_1));
+    search_nodes_vector.push_back(SearchNodeObj("Mat 4 - Identity", "Matrix 4x4", keywords_1, func_1));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = Mat4TranslateNode;
     std::vector<std::string> keywords_2{ "Matrix4", "Translate", "Math" };
-    search_nodes_vector.push_back(SearchNodeObj("Mat 4 - Translate", keywords_2, func_2));
+    search_nodes_vector.push_back(SearchNodeObj("Mat 4 - Translate", "Matrix 4x4", keywords_2, func_2));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = Mat4ScaleNode;
     std::vector<std::string> keywords_3{ "Matrix4", "Scale", "Math" };
-    search_nodes_vector.push_back(SearchNodeObj("Mat 4 - Scale", keywords_3, func_3));
+    search_nodes_vector.push_back(SearchNodeObj("Mat 4 - Scale", "Matrix 4x4", keywords_3, func_3));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = Mat4RotateNode;
     std::vector<std::string> keywords_4{ "Matrix4", "Rotate", "Math" };
-    search_nodes_vector.push_back(SearchNodeObj("Mat 4 - Rotate", keywords_4, func_4));
+    search_nodes_vector.push_back(SearchNodeObj("Mat 4 - Rotate", "Matrix 4x4", keywords_4, func_4));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = OrthoProjNode;
     std::vector<std::string> keywords_5{ "Orthographic", "Projection", "Matrix4" };
-    search_nodes_vector.push_back(SearchNodeObj("Orthographic Projection", keywords_5, func_5));
+    search_nodes_vector.push_back(SearchNodeObj("Orthographic Projection", "Matrix 4x4", keywords_5, func_5));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_6 = PerspectiveProjNode;
     std::vector<std::string> keywords_6{ "Perspective", "Projection", "Matrix4" };
-    search_nodes_vector.push_back(SearchNodeObj("Perspective Projection", keywords_6, func_6));
+    search_nodes_vector.push_back(SearchNodeObj("Perspective Projection", "Matrix 4x4", keywords_6, func_6));
 
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_7 = LookAtNode;
     std::vector<std::string> keywords_7{ "Look", "At", "Matrix4" };
-    search_nodes_vector.push_back(SearchNodeObj("Look At Matrix", keywords_7, func_7));
+    search_nodes_vector.push_back(SearchNodeObj("Look At Matrix", "Matrix 4x4", keywords_7, func_7));
 }
 
 std::shared_ptr<Node> MatricesNodes_LoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
