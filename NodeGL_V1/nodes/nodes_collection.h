@@ -10,6 +10,7 @@
 #include "relational_logical_nodes.h"
 #include "math_nodes.h"
 #include "animations_nodes_1.h"
+#include "vec2_nodes.h"
 #include "vec3_nodes.h"
 #include "vec4_nodes.h"
 #include "matrices_nodes.h";

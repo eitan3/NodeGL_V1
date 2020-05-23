@@ -255,6 +255,7 @@ ImColor GetIconColor(PinType type)
     case PinType::Int:      return ImColor(68, 201, 156);
     case PinType::Float:    return ImColor(147, 226, 74);
     case PinType::String:   return ImColor(124, 21, 153);
+    case PinType::Vector2:   return ImColor(174, 90, 69);
     case PinType::Vector3:   return ImColor(1, 91, 60);
     case PinType::Vector4:   return ImColor(107, 32, 124);
     case PinType::Matrix4x4:   return ImColor(223, 234, 149);
@@ -280,6 +281,7 @@ void DrawPinIcon(std::shared_ptr<BasePin> pin, bool connected, int alpha)
         case PinType::Int:      iconType = IconType::Circle; break;
         case PinType::Float:    iconType = IconType::Circle; break;
         case PinType::String:   iconType = IconType::Circle; break;
+        case PinType::Vector2:   iconType = IconType::Circle; break;
         case PinType::Vector3:   iconType = IconType::Circle; break;
         case PinType::Vector4:   iconType = IconType::Circle; break;
         case PinType::Matrix4x4:   iconType = IconType::Circle; break;
@@ -620,6 +622,11 @@ void AddPlaceholder(std::string ph_name, PinType pinType)
         std::shared_ptr<PlaceholderValue<int>> ph = std::make_shared< PlaceholderValue<int>>(ph_name, pinType, 0);;
         config->InsertNewPlaceholder(ph_name, ph);
     }
+    else if (pinType == PinType::Vector2)
+    {
+        std::shared_ptr<PlaceholderValue<glm::vec2>> ph = std::make_shared< PlaceholderValue<glm::vec2>>(ph_name, pinType, glm::vec2(0.0));;
+        config->InsertNewPlaceholder(ph_name, ph);
+    }
     else if (pinType == PinType::Vector3)
     {
         std::shared_ptr<PlaceholderValue<glm::vec3>> ph = std::make_shared< PlaceholderValue<glm::vec3>>(ph_name, pinType, glm::vec3(0.0));;
@@ -684,9 +691,9 @@ void ShowCreatePlaceholderWindow(bool* show = nullptr)
     ImGui::BeginHorizontal("##placeholder_type", ImVec2(paneWidth, 0), 1.0f);
     ImGui::TextUnformatted("Placeholder Type");
     std::string items[] = { PinTypeToString(PinType::String), PinTypeToString(PinType::Bool), PinTypeToString(PinType::Float), PinTypeToString(PinType::Int), 
-        PinTypeToString(PinType::Vector3), PinTypeToString(PinType::Vector4), PinTypeToString(PinType::Matrix4x4), PinTypeToString(PinType::TextureObject), 
-        PinTypeToString(PinType::ProgramObject), PinTypeToString(PinType::VertexShaderObject), PinTypeToString(PinType::FragmentShaderObject), 
-        PinTypeToString(PinType::MeshObject) };
+        PinTypeToString(PinType::Vector2), PinTypeToString(PinType::Vector3), PinTypeToString(PinType::Vector4), PinTypeToString(PinType::Matrix4x4), 
+        PinTypeToString(PinType::TextureObject), PinTypeToString(PinType::ProgramObject), PinTypeToString(PinType::VertexShaderObject), 
+        PinTypeToString(PinType::FragmentShaderObject), PinTypeToString(PinType::MeshObject) };
     if (create_placeholder_type_combo == "")
         create_placeholder_type_combo = items[0];
     if (ImGui::BeginCombo("##placeholder_type_combo", create_placeholder_type_combo.data())) // The second parameter is the label previewed before opening the combo.
@@ -954,6 +961,8 @@ void ShowOpenInstanceWindow()
             std::cout << "Can't read file " << file_dialog.selected_path.c_str() << std::endl;
             std::terminate();
         }
+        config->project_name = file_dialog.selected_fn;
+        config->project_path = file_dialog.selected_path;
 
         file.seekg(0, std::ios::end);
         nglData.resize((unsigned int)file.tellg());
@@ -972,6 +981,7 @@ void ShowOpenInstanceWindow()
         }
 
         std::map < std::string, std::shared_ptr<Node>> json_to_node_mapper;
+        d.Parse(nglData.c_str());
         rapidjson::Value& nodes_dict = d["nodes"];
         for (auto& m : nodes_dict.GetObject2())
         {
@@ -983,6 +993,8 @@ void ShowOpenInstanceWindow()
                 float pos_y = node_obj["pos"].GetArray()[1].GetFloat();
                 ed::SetNodePosition(config->s_Nodes.at(0)->id, ImVec2(pos_x, pos_y));
                 config->s_Nodes.at(0)->node_funcs->LoadNodeData(node_obj);
+                config->s_Nodes.at(0)->node_funcs->UpdateNodeUI();
+                config->s_Nodes.at(0)->node_funcs->NoFlowUpdatePinsValues();
                 json_to_node_mapper.insert(std::pair<std::string, std::shared_ptr<Node>>(n_key, config->s_Nodes.at(0)));
             }
             else
@@ -994,25 +1006,99 @@ void ShowOpenInstanceWindow()
                     float pos_y = node_obj["pos"].GetArray()[1].GetFloat();
                     ed::SetNodePosition(loaded_node->id, ImVec2(pos_x, pos_y));
                     loaded_node->node_funcs->LoadNodeData(node_obj);
+                    loaded_node->node_funcs->UpdateNodeUI();
+                    loaded_node->node_funcs->NoFlowUpdatePinsValues();
                     json_to_node_mapper.insert(std::pair<std::string, std::shared_ptr<Node>>(n_key, loaded_node));
                 }
             }
         }
 
-        rapidjson::Value& links_arr_val = d["links"];
-        for (auto& links_arr : links_arr_val.GetArray())
+        for (auto& node : config->s_Nodes)
         {
-            rapidjson::Value link_obj = links_arr.GetObject2();
+            node->node_funcs->UpdateNodeUI();
+            node->node_funcs->NoFlowUpdatePinsValues();
+        }
 
-            std::shared_ptr<Node> startNode = json_to_node_mapper.at(std::string(link_obj["start_node"].GetString()));
-            std::shared_ptr<Node> endNode = json_to_node_mapper.at(std::string(link_obj["end_node"].GetString()));
-            std::shared_ptr<BasePin> startPin = startNode->outputs.at(link_obj["start_pin"].GetString());
-            std::shared_ptr<BasePin> endPin = endNode->inputs.at(link_obj["end_pin"].GetString());
+        d.Parse(nglData.c_str());
+        rapidjson::Value& links_arr_val = d["links"];
+        std::vector<std::string> loaded_nodes;
+        int num_of_tries = 0;
+        while (loaded_nodes.size() != links_arr_val.GetArray().Size() && num_of_tries < 1000)
+        {
+            d.Parse(nglData.c_str());
+            links_arr_val = d["links"];
+            for (auto& links_arr : links_arr_val.GetArray())
+            {
+                rapidjson::Value link_obj = links_arr.GetObject2();
+                std::string start_node_name = std::string(link_obj["start_node"].GetString());
+                std::string end_node_name = std::string(link_obj["end_node"].GetString());
+                if (json_to_node_mapper.count(start_node_name) > 0 && json_to_node_mapper.count(end_node_name) > 0)
+                {
+                    std::shared_ptr<Node> startNode = json_to_node_mapper.at(start_node_name);
+                    std::shared_ptr<Node> endNode = json_to_node_mapper.at(end_node_name);
+                    if (startNode && endNode)
+                    {
+                        startNode->node_funcs->UpdateNodeUI();
+                        startNode->node_funcs->NoFlowUpdatePinsValues();
+                        endNode->node_funcs->UpdateNodeUI();
+                        endNode->node_funcs->NoFlowUpdatePinsValues();
+                        std::string start_pin_name = link_obj["start_pin"].GetString();
+                        std::string end_pin_name = link_obj["end_pin"].GetString();
+                        if (startNode->outputs.count(start_pin_name) > 0 && endNode->inputs.count(end_pin_name) > 0)
+                        {
+                            std::shared_ptr<BasePin> startPin = startNode->outputs.at(link_obj["start_pin"].GetString());
+                            std::shared_ptr<BasePin> endPin = endNode->inputs.at(link_obj["end_pin"].GetString());
+                            if (startPin && endPin)
+                            {
+                                std::string link_str_id = start_node_name + end_node_name + start_pin_name + end_pin_name;
+                                if (std::find(loaded_nodes.begin(), loaded_nodes.end(), link_str_id) == loaded_nodes.end())
+                                {
+                                    config->s_Links.emplace_back(new Link(GetNextId(), startPin->id, endPin->id, startPin, endPin));
+                                    config->s_Links.back()->color = GetIconColor(startPin->type);
+                                    startPin->links.push_back(config->s_Links.back());
+                                    endPin->links.push_back(config->s_Links.back());
+                                    loaded_nodes.push_back(link_str_id);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-            config->s_Links.emplace_back(new Link(GetNextId(), startPin->id, endPin->id, startPin, endPin));
-            config->s_Links.back()->color = GetIconColor(startPin->type);
-            startPin->links.push_back(config->s_Links.back());
-            endPin->links.push_back(config->s_Links.back());
+            for (auto& node : config->s_Nodes)
+            {
+                node->node_funcs->UpdateNodeUI();
+                node->node_funcs->NoFlowUpdatePinsValues();
+            }
+            Application_GL_Frame();
+            num_of_tries++;
+        }
+
+        for (auto& node : config->s_Nodes)
+        {
+            node->node_funcs->UpdateNodeUI();
+            node->node_funcs->NoFlowUpdatePinsValues();
+        }
+        Application_GL_Frame();
+        d.Parse(nglData.c_str());
+        nodes_dict = d["nodes"];
+        for (auto& m : nodes_dict.GetObject2())
+        {
+            std::string n_key = std::string(m.name.GetString());
+            rapidjson::Value node_obj = m.value.GetObject2();
+
+            rapidjson::Value& inputs_data = node_obj["inputs_data"];
+            for (auto& pin_data : inputs_data.GetObject2())
+            {
+                std::string pin_name = std::string(pin_data.name.GetString());
+                json_to_node_mapper.at(n_key)->inputs.at(pin_name)->exposed = pin_data.value.GetBool();
+            }
+            rapidjson::Value& outputs_data = node_obj["outputs_data"];
+            for (auto& pin_data : outputs_data.GetObject2())
+            {
+                std::string pin_name = std::string(pin_data.name.GetString());
+                json_to_node_mapper.at(n_key)->outputs.at(pin_name)->exposed = pin_data.value.GetBool();
+            }
         }
 
         json_to_node_mapper.clear();
@@ -1035,6 +1121,15 @@ void ShowSaveInstanceWindow()
     ImGui::OpenPopup("Save File");
     if (file_dialog.showFileDialog("Save File", imgui_addons::ImGuiFileBrowser::DialogMode::SAVE, ImVec2(700, 310), ".ngl"))
     {
+        std::string file_path = file_dialog.selected_path;
+        if (!file_path.ends_with(file_dialog.ext))
+            file_path = file_path + file_dialog.ext;
+        std::string file_name = file_dialog.selected_path;
+        if (!file_name.ends_with(file_dialog.ext))
+            file_name = file_name + file_dialog.ext;
+        config->project_name = file_name;
+        config->project_path = file_path;
+
         rapidjson::StringBuffer s;
         rapidjson::Writer<rapidjson::StringBuffer> writer(s);
 
@@ -1068,6 +1163,28 @@ void ShowSaveInstanceWindow()
             writer.Double(pos.y);
             writer.EndArray();
 
+            writer.Key("inputs_data");
+            writer.StartObject();
+            std::vector<std::string> sort_pins = SortPins(node->inputs);
+            for (int pi = 0; pi < sort_pins.size(); pi++)
+            {
+                std::shared_ptr<BasePin> input = node->inputs.at(sort_pins.at(pi));
+                writer.Key(input->pin_key.c_str());
+                writer.Bool(input->exposed);
+            }
+            writer.EndObject();
+
+            writer.Key("outputs_data");
+            writer.StartObject();
+            sort_pins = SortPins(node->outputs);
+            for (int pi = 0; pi < sort_pins.size(); pi++)
+            {
+                std::shared_ptr<BasePin> output = node->outputs.at(sort_pins.at(pi));
+                writer.Key(output->pin_key.c_str());
+                writer.Bool(output->exposed);
+            }
+            writer.EndObject();
+
             node->node_funcs->SaveNodeData(writer);
 
             writer.EndObject();
@@ -1094,10 +1211,7 @@ void ShowSaveInstanceWindow()
 
         writer.EndObject();
 
-        std::string file_name = file_dialog.selected_path;
-        if (!file_name.ends_with(file_dialog.ext))
-            file_name = file_name + file_dialog.ext;
-        std::ofstream out(file_name);
+        std::ofstream out(file_path);
         out << s.GetString();
         out.close();
         editor_config->showSaveInstanceWindow = false;
@@ -1452,6 +1566,35 @@ void Application_Frame()
                     }
                     ImGui::Spring(0);
                 }
+                else if (input->type == PinType::Vector2)
+                {
+                    std::shared_ptr<PinValue<glm::vec2>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec2>>(input);
+                    ImGui::PushItemWidth(125.0f);
+                    if (input_pin_value->links.size() > 0)
+                    {
+                        float float2[2] = { input_pin_value->value.x, input_pin_value->value.y };
+                        ImGui::InputFloat2("##edit", float2);
+                        input_pin_value->value = glm::vec2(float2[0], float2[1]);
+                    }
+                    else
+                    {
+                        float float2[2] = { input_pin_value->default_value.x, input_pin_value->default_value.y };
+                        ImGui::InputFloat2("##edit", float2);
+                        input_pin_value->default_value = glm::vec2(float2[0], float2[1]);
+                    }
+                    ImGui::PopItemWidth();
+                    if (ImGui::IsItemActive() && !wasActive)
+                    {
+                        ed::EnableShortcuts(false);
+                        wasActive = true;
+                    }
+                    else if (!ImGui::IsItemActive() && wasActive)
+                    {
+                        ed::EnableShortcuts(true);
+                        wasActive = false;
+                    }
+                    ImGui::Spring(0);
+                }
                 else if (input->type == PinType::Vector3)
                 {
                     std::shared_ptr<PinValue<glm::vec3>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(input);
@@ -1726,7 +1869,7 @@ void Application_Frame()
                             createNewNode = true;
                             newNodeLinkPin = FindPin(pinId, config->s_Nodes);
                             newLinkPin = nullptr;
-                            mousePosBeforeSearch = ImGui::GetMousePos();
+                            mousePosBeforeSearch = ed::ScreenToCanvas(ImGui::GetMousePos());
                             editor_config->showNodeSearchWindow = true;
                         }
                     }
@@ -1810,7 +1953,7 @@ void Application_Frame()
     else if (ed::ShowBackgroundContextMenu())
     {
         editor_config->showNodeSearchWindow = true;
-        mousePosBeforeSearch = ImGui::GetMousePos();
+        mousePosBeforeSearch = ed::ScreenToCanvas(ImGui::GetMousePos());
         newNodeLinkPin = nullptr;
     }
     ed::Resume();

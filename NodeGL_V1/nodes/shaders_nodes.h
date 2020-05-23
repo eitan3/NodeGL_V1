@@ -6,10 +6,12 @@
 #include <TextEditor.h>
 #include <fstream>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 #include "node_function_interface.h"
 #include "../nodes_builder.h"
 #include "../utils.h"
 #include "../objects/shader_object.h"
+#include "../InstanceConfig.h"
 
 class CreateSahder_Func : public NodeFunctions {
 public:
@@ -54,13 +56,59 @@ public:
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
     void LoadNodeData(rapidjson::Value& node_obj);
 
-    void CreateProgram(GLuint vertex_shader, GLuint fragment_shader);
+    void CreateProgram(std::shared_ptr<ShaderObject> vertex_shader, std::shared_ptr<ShaderObject> fragment_shader);
 
     std::string object_prefix;
     std::shared_ptr<ProgramObject> program_obj;
 };
 
 std::shared_ptr<Node> CreateProgram(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class BindProgram_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run();
+    void Delete();
+    void NoFlowUpdatePinsValues() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) {};
+    void LoadNodeData(rapidjson::Value& node_obj) {};
+
+    std::string object_prefix;
+    std::shared_ptr<ProgramObject> program_obj;
+};
+
+std::shared_ptr<Node> BindProgramNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class SetProgramUniformNode_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run();
+    void Delete();
+    void NoFlowUpdatePinsValues() {};
+    void UpdateNodeUI();
+    void UpdateNodeInspector();
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+
+    void ProgramChanged();
+    void UniformChanged();
+    void DeletePin();
+
+    bool continue_loading = false;
+
+    GLuint prev_program;
+    std::string current_uniform = "";
+    PinType uniform_type = PinType::Float;
+    std::shared_ptr<BasePlaceholder> tmp_loaded_value;
+};
+
+std::shared_ptr<Node> SetProgramUniformNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 

@@ -7,13 +7,17 @@ enum class PinType
 {
     Unknown,
     Flow,
+    String,
+
     Bool,
     Int,
     Float,
-    String,
+
+    Vector2,
     Vector3,
     Vector4,
     Matrix4x4,
+
     ProgramObject,
     VertexShaderObject,
     FragmentShaderObject,

@@ -223,12 +223,17 @@ public:
 		return v;
 	}
 
+	std::string project_name;
+	std::string project_path;
+
 	std::vector< std::shared_ptr<Node>> s_Nodes;
 	std::vector<std::shared_ptr<Link>> s_Links;
 
 	std::string current_framebuffer = "";
+	GLuint current_program = 0;
 
 	std::stack<std::string> framebuffer_stack;
+	std::stack<GLuint> programs_stack;
 
 private:
 	std::map<std::string, std::shared_ptr<BasePlaceholder>> placeholders_map;

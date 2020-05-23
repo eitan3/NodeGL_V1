@@ -1,11 +1,8 @@
-Make functions for objects (like meshes or program object, lets start with create bind function)
 Finish Mesh Object
 Create Cube Mesh Object
+Create Render Mesh
 Create Camera Object
 Create Sin, Cos, To Degrees, To Radians, Cross Product, Normalize, Matrix Transform, Optimize matrix nodes (with prev values)
-Create Bind function for program
-Create SetUniform function for program
-Create Render Mesh
 Reorganize nodes files, split to nodes types and variables (scalars, vector3, vector4, matrix)
 Fix ImGui naming. use ## (you can check in imgui.ini which windows doesn't use it)
 

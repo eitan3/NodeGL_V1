@@ -138,6 +138,9 @@
     <ClCompile Include="node_search_popup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="nodes\vec2_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_utils.h">
@@ -262,6 +265,9 @@
     </ClInclude>
     <ClInclude Include="node_search_popup.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\vec2_nodes.h">
+      <Filter>Header Files\nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

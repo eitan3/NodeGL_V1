@@ -160,6 +160,7 @@
     <ClCompile Include="nodes\relational_logical_nodes.cpp" />
     <ClCompile Include="nodes\shaders_nodes.cpp" />
     <ClCompile Include="nodes\utils_nodes.cpp" />
+    <ClCompile Include="nodes\vec2_nodes.cpp" />
     <ClCompile Include="nodes\vec3_nodes.cpp" />
     <ClCompile Include="nodes\vec4_nodes.cpp" />
     <ClCompile Include="nodes_builder.cpp" />
@@ -187,6 +188,7 @@
     <ClInclude Include="nodes\animations_nodes_1.h" />
     <ClInclude Include="nodes\matrices_nodes.h" />
     <ClInclude Include="nodes\relational_logical_nodes.h" />
+    <ClInclude Include="nodes\vec2_nodes.h" />
     <ClInclude Include="nodes\vec3_nodes.h" />
     <ClInclude Include="nodes\vec4_nodes.h" />
     <ClInclude Include="node_search_popup.h" />
