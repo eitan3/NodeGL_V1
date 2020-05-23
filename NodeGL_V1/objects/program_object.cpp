@@ -54,10 +54,9 @@ void ProgramObject::FindUniforms()
 	{
 		glGetActiveUniform(object_id, (GLuint)i, bufSize, &length, &size, &type, name);
 		PinType pin_type;
-		// printf("Uniform #%d Type: %u Name: %s\n", i, type, name);
 		if (type == GL_BOOL)
 		{
-			// printf("Uniform #%d Type: Bool Name: %s\n", i, name);
+			printf("Uniform #%d Type: Bool Name: %s\n", i, name);
 			uniforms_arr.push_back(UniformInfo(std::string(name), PinType::Bool));
 		}
 		else if (type == GL_INT)
@@ -83,6 +82,10 @@ void ProgramObject::FindUniforms()
 		else if (type == GL_FLOAT_MAT4)
 		{
 			uniforms_arr.push_back(UniformInfo(std::string(name), PinType::Matrix4x4));
+		}
+		else
+		{
+			printf("Uniform #%d Type: %u Name: %s\n", i, type, name);
 		}
 	}
 

@@ -1,6 +1,7 @@
 Finish Mesh Object
 Create Cube Mesh Object
 Create Render Mesh
+Add 'Texture Uniform' as texture object
 Create Camera Object
 Create Sin, Cos, To Degrees, To Radians, Cross Product, Normalize, Matrix Transform, Optimize matrix nodes (with prev values)
 Reorganize nodes files, split to nodes types and variables (scalars, vector3, vector4, matrix)
