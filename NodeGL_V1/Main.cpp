@@ -155,6 +155,7 @@ void ResetInstance()
 
     config->s_Links.clear();
     config->s_Nodes.clear();
+    config->ResetConfig();
     std::shared_ptr<Node> node = GlMainLoop(config->s_Nodes);
     ed::SetNodePosition(node->id, ImVec2(0, 0));
     BuildNodes(config->s_Nodes);

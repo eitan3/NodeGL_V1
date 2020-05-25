@@ -708,6 +708,30 @@ std::shared_ptr<Node> GetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes
 
 
 
+void CommentNode_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+std::string commentNodeName = "Comment Node";
+std::shared_ptr<Node> CommentNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), commentNodeName.c_str()));
+    s_Nodes.back()->type = NodeType::Comment;
+    s_Nodes.back()->size = ImVec2(300, 200);
+
+    s_Nodes.back()->node_funcs = std::make_shared<CommentNode_Func>();
+    std::dynamic_pointer_cast<CommentNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
 
 void SpoutSender_Func::Initialize()
 {
@@ -800,9 +824,13 @@ void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::vector<std::string> keywords_4{ "Get", "Placeholder" };
     search_nodes_vector.push_back(SearchNodeObj("Get Placeholder", "Utils Nodes", keywords_4, func_4));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = SpoutSenderNode;
-    std::vector<std::string> keywords_5{ "Spout", "Sender" };
-    search_nodes_vector.push_back(SearchNodeObj("Spout Sender", "In/Out Nodes", keywords_5, func_5));
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = CommentNode;
+    std::vector<std::string> keywords_5{ "Comment" };
+    search_nodes_vector.push_back(SearchNodeObj("Comment", "Utils Nodes", keywords_5, func_5));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_6 = SpoutSenderNode;
+    std::vector<std::string> keywords_6{ "Spout", "Sender" };
+    search_nodes_vector.push_back(SearchNodeObj("Spout Sender", "In/Out Nodes", keywords_6, func_6));
 }
 
 std::shared_ptr<Node> NodesUtilsLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
@@ -819,6 +847,9 @@ std::shared_ptr<Node> NodesUtilsLoadSetup(std::vector<std::shared_ptr<Node>>& s_
     }
     else if (loaded_node == nullptr && node_key.rfind(getPlaceholderName, 0) == 0) {
         loaded_node = GetPlaceholder(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(commentNodeName, 0) == 0) {
+        loaded_node = CommentNode(s_Nodes);
     }
     else if (loaded_node == nullptr && node_key.rfind(spoutSenderNodeName, 0) == 0) {
         loaded_node = SpoutSenderNode(s_Nodes);

@@ -152,6 +152,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="nodes\animations_nodes_1.cpp" />
     <ClCompile Include="nodes\matrices_nodes.cpp" />
+    <ClCompile Include="nodes\meshes_nodes.cpp" />
     <ClCompile Include="nodes\nodes_collection.cpp" />
     <ClCompile Include="nodes\dummy_nodes.cpp" />
     <ClCompile Include="nodes\flow_nodes.cpp" />
@@ -187,6 +188,7 @@
   <ItemGroup>
     <ClInclude Include="nodes\animations_nodes_1.h" />
     <ClInclude Include="nodes\matrices_nodes.h" />
+    <ClInclude Include="nodes\meshes_nodes.h" />
     <ClInclude Include="nodes\relational_logical_nodes.h" />
     <ClInclude Include="nodes\vec2_nodes.h" />
     <ClInclude Include="nodes\vec3_nodes.h" />

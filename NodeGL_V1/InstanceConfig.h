@@ -30,6 +30,19 @@ public:
 		return s;
 	}
 
+	void ResetConfig()
+	{
+		project_name = "";
+		project_path = "";
+
+		current_framebuffer = "";
+		current_program = 0;
+		current_vao = 0;
+
+		framebuffer_stack = std::stack<std::string>();
+		programs_stack = std::stack<GLuint>();
+	}
+
 	bool IsPlaceholderNameUsed(std::string key)
 	{
 		if (placeholders_map.count(key) > 0)
@@ -231,6 +244,7 @@ public:
 
 	std::string current_framebuffer = "";
 	GLuint current_program = 0;
+	GLuint current_vao = 0;
 
 	std::stack<std::string> framebuffer_stack;
 	std::stack<GLuint> programs_stack;

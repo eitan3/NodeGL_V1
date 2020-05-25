@@ -2,6 +2,9 @@
 
 MeshObject::MeshObject(std::string object_name, std::vector<Vertex> vertices, std::vector<unsigned int> indices)
 {
+    VBO = 0;
+    EBO = 0;
+    VAO = 0;
 	this->object_name = object_name;
 	this->vertices = vertices;
 	this->indices = indices;
@@ -36,6 +39,11 @@ void MeshObject::DeleteVectors()
 unsigned int MeshObject::GetVAO()
 {
 	return VAO;
+}
+
+unsigned int MeshObject::GetIndicesSize()
+{
+    return indices.size();
 }
 
 void MeshObject::SetupMesh()

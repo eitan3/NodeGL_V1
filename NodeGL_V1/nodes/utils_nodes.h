@@ -102,6 +102,22 @@ std::shared_ptr<Node> SpoutSenderNode(std::vector<std::shared_ptr<Node>>& s_Node
 
 
 
+class CommentNode_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) {};
+    void LoadNodeData(rapidjson::Value& node_obj) {};
+};
+
+std::shared_ptr<Node> CommentNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
 void NodesUtilsSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
 std::shared_ptr<Node> NodesUtilsLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 

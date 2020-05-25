@@ -22,6 +22,15 @@ struct Vertex {
     glm::vec3 Tangent;
     // bitangent
     glm::vec3 Bitangent;
+
+    Vertex(glm::vec3 pos, glm::vec2 tex_coord, glm::vec3 normal, glm::vec3 tangent, glm::vec3 bitangent)
+    {
+        Position = pos;
+        TexCoords = tex_coord;
+        Normal = normal;
+        Tangent = tangent;
+        Bitangent = bitangent;
+    }
 };
 
 class MeshObject
@@ -33,12 +42,14 @@ public:
     void DeleteVectors();
 
     unsigned int GetVAO();
+    unsigned int GetIndicesSize();
 
     void SetupMesh();
 
+    std::string object_name;
+
 private:
     // mesh Data
-    std::string object_name;
     std::vector<Vertex>       vertices;
     std::vector<unsigned int> indices;
     unsigned int VAO, VBO, EBO;

@@ -141,6 +141,9 @@
     <ClCompile Include="nodes\vec2_nodes.cpp">
       <Filter>Source Files\nodes</Filter>
     </ClCompile>
+    <ClCompile Include="nodes\meshes_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_utils.h">
@@ -267,6 +270,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="nodes\vec2_nodes.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\meshes_nodes.h">
       <Filter>Header Files\nodes</Filter>
     </ClInclude>
   </ItemGroup>

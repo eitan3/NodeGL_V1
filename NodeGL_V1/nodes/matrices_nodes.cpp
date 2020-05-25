@@ -387,7 +387,7 @@ void PerspectiveProjNode_Func::NoFlowUpdatePinsValues()
         p_zFar = zFar;
 
         float aspect = width / height;
-        glm::mat4 proj = glm::perspective(fovy, aspect, zNear, zFar);
+        glm::mat4 proj = glm::perspective(glm::radians(fovy), aspect, zNear, zFar);
         std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("proj"))->value = proj;
     }
 }
@@ -460,7 +460,6 @@ void LookAtNode_Func::NoFlowUpdatePinsValues()
         p_yaw = yaw;
         p_pitch = pitch;
         p_is_degrees = is_degrees;
-        glm::vec3 up = glm::vec3(0.0, 1.0, 0.0);
 
         glm::vec3 front;
         if (is_degrees)
@@ -476,27 +475,42 @@ void LookAtNode_Func::NoFlowUpdatePinsValues()
             front.z = sin(yaw) * cos(pitch);
         }
         front = glm::normalize(front);
+        glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.0, 1.0, 0.0)));
+        glm::vec3 up = glm::normalize(glm::cross(right, front));
 
         glm::mat4 lookAt = glm::lookAt(position, position + front, up);
-        std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("proj"))->value = lookAt;
+        std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("out"))->value = lookAt;
     }
 }
 
 void LookAtNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
-    writer.Key("fovy");
-    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("fovy"))->default_value);
+    glm::vec3 position_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("position"))->default_value;
+    writer.Key("x");
+    writer.Double(position_value.x);
+    writer.Key("y");
+    writer.Double(position_value.y);
+    writer.Key("z");
+    writer.Double(position_value.z);
+
     writer.Key("yaw");
     writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("yaw"))->default_value);
     writer.Key("pitch");
     writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("pitch"))->default_value);
+    writer.Key("is_degrees");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("is_degrees"))->default_value);
 }
 
 void LookAtNode_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
-    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("fovy"))->default_value = node_obj["fovy"].GetFloat();
+    float x = node_obj["x"].GetFloat();
+    float y = node_obj["y"].GetFloat();
+    float z = node_obj["z"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("position"))->default_value = glm::vec3(x, y, z);
+
     std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("yaw"))->default_value = node_obj["yaw"].GetFloat();
     std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("pitch"))->default_value = node_obj["pitch"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("is_degrees"))->default_value = node_obj["is_degrees"].GetBool();
 }
 
 std::string lookAtNodeName = "Look At Matrix";
@@ -508,7 +522,7 @@ std::shared_ptr<Node> LookAtNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("pitch", new PinValue<float>("pitch", 2, GetNextId(), "Pitch", PinType::Float, 0)));
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("is_degrees", new PinValue<bool>("is_degrees", 3, GetNextId(), "Is Degrees ?", PinType::Bool, true)));
 
-    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::mat4>>>("proj", new PinValue<glm::mat4>("proj", 0, GetNextId(), "Projection", PinType::Matrix4x4, glm::mat4(1.0))));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::mat4>>>("out", new PinValue<glm::mat4>("out", 0, GetNextId(), "Matrix", PinType::Matrix4x4, glm::mat4(1.0))));
 
     s_Nodes.back()->node_funcs = std::make_shared<LookAtNode_Func>();
     std::dynamic_pointer_cast<LookAtNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
