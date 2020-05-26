@@ -83,6 +83,11 @@ void ProgramObject::FindUniforms()
 		{
 			uniforms_arr.push_back(UniformInfo(std::string(name), PinType::Matrix4x4));
 		}
+		else if (type == GL_SAMPLER_2D)
+		{
+			uniforms_arr.push_back(UniformInfo(std::string(name), PinType::TextureObject));
+			num_textures++;
+		}
 		else
 		{
 			printf("Uniform #%d Type: %u Name: %s\n", i, type, name);

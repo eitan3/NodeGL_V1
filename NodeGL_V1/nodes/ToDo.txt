@@ -1,5 +1,5 @@
-Add 'Texture Uniform' as texture object
 Add multisample option for Framebuffer
+Add "Bind Program With Uniforms" Node
 Create Sin, Cos, To Degrees, To Radians, Cross Product, Normalize, Matrix Transform, Optimize matrix nodes (with prev values)
 Reorganize nodes files, split to nodes types and variables (scalars, vector3, vector4, matrix)
 Fix ImGui naming. use ## (you can check in imgui.ini which windows doesn't use it)

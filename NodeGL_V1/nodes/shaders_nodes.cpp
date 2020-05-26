@@ -430,6 +430,7 @@ void BindProgram_Func::Run()
         
         glUseProgram(in_program->object_id);
         RunNextNodeFunc(parent_node, "in_bind");
+        in_program->current_texture = 0;
 
         GLuint prev_prog = config->programs_stack.top();
         config->programs_stack.pop();
@@ -509,7 +510,7 @@ void SetProgramUniformNode_Func::Run()
                 glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
                 std::cout << glGetError() << ", " << get_values[0] << std::endl;*/
             }
-            if (parent_node->inputs.at("uni_pin")->type == PinType::Vector2)
+            else if (parent_node->inputs.at("uni_pin")->type == PinType::Vector2)
             {
                 glm::vec2 uni_value = GetInputPinValue<glm::vec2>(parent_node, "uni_pin");
                 glUniform2fv(glGetUniformLocation(in_program->object_id, current_uniform.c_str()), 1, glm::value_ptr(uni_value));
@@ -547,6 +548,17 @@ void SetProgramUniformNode_Func::Run()
                 for (int i = 0; i < 16; i++)
                     std::cout << ", " << get_values[i];
                 std::cout << std::endl;*/
+            }
+            else if (parent_node->inputs.at("uni_pin")->type == PinType::TextureObject)
+            {
+                std::shared_ptr<TextureObject> uni_value = GetInputPinValue<std::shared_ptr<TextureObject>>(parent_node, "uni_pin");
+                if (uni_value)
+                {
+                    glActiveTexture(GL_TEXTURE0 + in_program->current_texture);
+                    glBindTexture(GL_TEXTURE_2D, uni_value->object_id);
+                    glUniform1i(glGetUniformLocation(in_program->object_id, current_uniform.c_str()), in_program->current_texture);
+                    in_program->current_texture++;
+                }
             }
         }
     }

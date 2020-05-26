@@ -37,6 +37,9 @@ public:
     std::shared_ptr<ShaderObject> vs;
     std::shared_ptr<ShaderObject> fs;
     std::vector< UniformInfo> uniforms_arr;
+
+    int num_textures = 0;
+    int current_texture = 0;
 };
 
 #endif
