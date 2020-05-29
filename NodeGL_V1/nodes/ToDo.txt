@@ -1,15 +1,16 @@
-Add multisample option for Framebuffer
+Add "Triggered By" argument to Run function, than implement "reset anim" trigger in ease animation
+
 Add "Bind Program With Uniforms" Node
-Create Sin, Cos, To Degrees, To Radians, Cross Product, Normalize, Matrix Transform, Optimize matrix nodes (with prev values)
-Reorganize nodes files, split to nodes types and variables (scalars, vector3, vector4, matrix)
-Fix ImGui naming. use ## (you can check in imgui.ini which windows doesn't use it)
-Add Functions
-Create Camera Object
+Add Resources (import textures meshes and so on)
+Add Arrays
+Create multiple render to texture and other nodes when looping
 
+Reset static id counter
 Need to freeze the editor when other window open up
-Make better search node popup
-Recreate https://cables.gl/p/j8R1Q7
+Fix ImGui naming. use ## (you can check in imgui.ini which windows doesn't use it)
+Add multisample option for Framebuffer
+Add Functions
+Create Camera Object (?)
 
-PBR Rendering & Simple
-Draw functions (inside mesh object as a function, I think.. need to plan it)
+Recreate https://cables.gl/p/j8R1Q7
 Blend Textures (draw fullscreen rectangle and draw 2 textures with blend)

@@ -261,6 +261,70 @@ std::shared_ptr<Node> ForLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
+void RunEveryXSeconds_Func::Run()
+{
+    auto& io = ImGui::GetIO();
+    float in_seconds = GetInputPinValue<float>(parent_node, "seconds");
+    bool run_anim_end = false;
+
+    if (prev_seconds != in_seconds)
+    {
+        prev_seconds = in_seconds;
+        timer = 0;
+    }
+
+    timer += io.DeltaTime;
+    if (timer > in_seconds)
+    {
+        timer -= in_seconds;
+        run_anim_end = true;
+    }
+    if (run_anim_end)
+        RunNextNodeFunc(parent_node, "complete");
+    RunNextNodeFunc(parent_node, "always");
+}
+
+void RunEveryXSeconds_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void RunEveryXSeconds_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("seconds");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("seconds"))->default_value);
+}
+
+void RunEveryXSeconds_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("seconds"))->default_value = node_obj["seconds"].GetFloat();
+}
+
+std::string runEveryXSecondsNodeName = "Run Every X Seconds";
+std::shared_ptr<Node> RunEveryXSecondsNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), runEveryXSecondsNodeName.c_str()));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("seconds", new PinValue<float>("seconds", 1, GetNextId(), "Seconds", PinType::Float, 1)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("complete", new BasePin("complete", 0, GetNextId(), "Every X Second", PinType::Flow)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("always", new BasePin("always", 1, GetNextId(), "Always", PinType::Flow)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<RunEveryXSeconds_Func>();
+    std::dynamic_pointer_cast<RunEveryXSeconds_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+
 
 void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
@@ -279,6 +343,10 @@ void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = ForLoopNode;
     std::vector<std::string> keywords_4{ "Flow", "For", "Loop" };
     search_nodes_vector.push_back(SearchNodeObj("For Loop", "Flow Nodes", keywords_4, func_4));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = RunEveryXSecondsNode;
+    std::vector<std::string> keywords_5{ "Run", "Every", "Seconds" };
+    search_nodes_vector.push_back(SearchNodeObj("Run Every X Seconds", "Flow Nodes", keywords_5, func_5));
 }
 
 std::shared_ptr<Node> FlowNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
@@ -295,6 +363,9 @@ std::shared_ptr<Node> FlowNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_N
     }
     else if (loaded_node == nullptr && node_key.rfind(forLoopNodeName, 0) == 0) {
         loaded_node = ForLoopNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(runEveryXSecondsNodeName, 0) == 0) {
+        loaded_node = RunEveryXSecondsNode(s_Nodes);
     }
     return loaded_node;
 }

@@ -39,6 +39,22 @@ std::shared_ptr<Node> BreakVector4Node(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 
+class Vector4Normalize_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
+
+std::shared_ptr<Node> Vector4NormalizeNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
 void Vec4NodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
 std::shared_ptr<Node> Vec4NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 

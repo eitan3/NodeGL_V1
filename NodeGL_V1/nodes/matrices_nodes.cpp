@@ -47,10 +47,15 @@ void Mat4TranslateNode_Func::NoFlowUpdatePinsValues()
     glm::mat4 in_mat = GetInputPinValue<glm::mat4>(parent_node, "in_mat4");
     glm::vec3 in_pos = GetInputPinValue<glm::vec3>(parent_node, "in_pos");
     
-    glm::mat4 transform = glm::mat4(1.0);
-    transform = glm::translate(transform, in_pos);
+    if (in_mat != prev_in_mat || in_pos != prev_pos)
+    {
+        prev_in_mat = in_mat;
+        prev_pos = in_pos;
+        glm::mat4 translate = glm::mat4(1.0);
+        translate = glm::translate(translate, in_pos);
 
-    std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("out"))->value = transform * in_mat;
+        std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("out"))->value = translate * in_mat;
+    }
 }
 
 void Mat4TranslateNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
@@ -116,27 +121,38 @@ void Mat4RotateNode_Func::Delete()
 void Mat4RotateNode_Func::NoFlowUpdatePinsValues()
 {
     glm::mat4 in_mat = GetInputPinValue<glm::mat4>(parent_node, "in_mat4");
+    
     glm::vec3 in_rot_angles = GetInputPinValue<glm::vec3>(parent_node, "in_rot_angles");
     bool is_degrees = GetInputPinValue<bool>(parent_node, "is_degrees");
     bool rotate_x = GetInputPinValue<bool>(parent_node, "rotate_x");
     bool rotate_y = GetInputPinValue<bool>(parent_node, "rotate_y");
     bool rotate_z = GetInputPinValue<bool>(parent_node, "rotate_z");
-    if (is_degrees)
+    if (in_mat != prev_in_mat || in_rot_angles != prev_rot_angles || 
+        is_degrees != prev_is_degrees || rotate_x != prev_rotate_x || rotate_y != prev_rotate_y || rotate_z != prev_rotate_z)
     {
-        in_rot_angles.x = glm::radians(in_rot_angles.x);
-        in_rot_angles.y = glm::radians(in_rot_angles.y);
-        in_rot_angles.z = glm::radians(in_rot_angles.z);
+        prev_in_mat = in_mat;
+        prev_rot_angles = in_rot_angles;
+        prev_is_degrees = is_degrees;
+        prev_rotate_x = rotate_x;
+        prev_rotate_y = rotate_y;
+        prev_rotate_z = rotate_z;
+        if (is_degrees)
+        {
+            in_rot_angles.x = glm::radians(in_rot_angles.x);
+            in_rot_angles.y = glm::radians(in_rot_angles.y);
+            in_rot_angles.z = glm::radians(in_rot_angles.z);
+        }
+
+        glm::mat4 rotate = glm::mat4(1.0);
+        if (rotate_x)
+            rotate = glm::rotate(rotate, in_rot_angles.x, glm::vec3(1, 0, 0));
+        if (rotate_y)
+            rotate = glm::rotate(rotate, in_rot_angles.y, glm::vec3(0, 1, 0));
+        if (rotate_z)
+            rotate = glm::rotate(rotate, in_rot_angles.z, glm::vec3(0, 0, 1));
+
+        std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("out"))->value = rotate * in_mat;
     }
-
-    glm::mat4 rotate = glm::mat4(1.0);
-    if (rotate_x)
-        rotate = glm::rotate(rotate, in_rot_angles.x, glm::vec3(1, 0, 0));
-    if (rotate_y)
-        rotate = glm::rotate(rotate, in_rot_angles.y, glm::vec3(0, 1, 0));
-    if (rotate_z)
-        rotate = glm::rotate(rotate, in_rot_angles.z, glm::vec3(0, 0, 1));
-
-    std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("out"))->value = rotate * in_mat;
 }
 
 void Mat4RotateNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
@@ -223,10 +239,15 @@ void Mat4ScaleNode_Func::NoFlowUpdatePinsValues()
     glm::mat4 in_mat = GetInputPinValue<glm::mat4>(parent_node, "in_mat4");
     glm::vec3 in_scale = GetInputPinValue<glm::vec3>(parent_node, "in_scale");
     
-    glm::mat4 scale = glm::mat4(1.0);
-    scale = glm::scale(scale, in_scale);
+    if (in_mat != prev_in_mat || in_scale != prev_scale)
+    {
+        prev_in_mat = in_mat;
+        prev_scale = in_scale;
+        glm::mat4 scale = glm::mat4(1.0);
+        scale = glm::scale(scale, in_scale);
 
-    std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("out"))->value = scale * in_mat;
+        std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("out"))->value = scale * in_mat;
+    }
 }
 
 void Mat4ScaleNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
@@ -272,6 +293,183 @@ std::shared_ptr<Node> Mat4ScaleNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
     s_Nodes.back()->node_funcs = std::make_shared<Mat4ScaleNode_Func>();
     std::dynamic_pointer_cast<Mat4ScaleNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+void Mat4TransformNode_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void Mat4TransformNode_Func::NoFlowUpdatePinsValues()
+{
+    glm::mat4 in_mat = GetInputPinValue<glm::mat4>(parent_node, "in_mat4");
+
+    bool a_translate = GetInputPinValue<bool>(parent_node, "a_translate");
+    glm::vec3 in_pos = GetInputPinValue<glm::vec3>(parent_node, "in_pos");
+
+    glm::vec3 in_rot_angles = GetInputPinValue<glm::vec3>(parent_node, "in_rot_angles");
+    bool is_degrees = GetInputPinValue<bool>(parent_node, "is_degrees");
+    bool rotate_x = GetInputPinValue<bool>(parent_node, "rotate_x");
+    bool rotate_y = GetInputPinValue<bool>(parent_node, "rotate_y");
+    bool rotate_z = GetInputPinValue<bool>(parent_node, "rotate_z");
+
+    bool a_scale = GetInputPinValue<bool>(parent_node, "a_scale");
+    glm::vec3 in_scale = GetInputPinValue<glm::vec3>(parent_node, "in_scale");
+    
+    if (in_mat != prev_in_mat || a_translate != prev_a_translate || in_pos != prev_pos ||
+        in_rot_angles != prev_rot_angles || is_degrees != prev_is_degrees || rotate_x != prev_rotate_x || rotate_y != prev_rotate_y || rotate_z != prev_rotate_z || 
+        a_scale != prev_a_scale || in_scale != prev_scale)
+    {
+        prev_in_mat = in_mat;
+        prev_a_translate = a_translate;
+        prev_pos = in_pos;
+        prev_rot_angles = in_rot_angles;
+        prev_is_degrees = is_degrees;
+        prev_rotate_x = rotate_x;
+        prev_rotate_y = rotate_y;
+        prev_rotate_z = rotate_z;
+        prev_a_scale = a_scale;
+        prev_scale = in_scale;
+
+        glm::mat4 translate = glm::mat4(1.0);
+        if (a_translate)
+            translate = glm::translate(translate, in_pos);
+
+        if (is_degrees)
+        {
+            in_rot_angles.x = glm::radians(in_rot_angles.x);
+            in_rot_angles.y = glm::radians(in_rot_angles.y);
+            in_rot_angles.z = glm::radians(in_rot_angles.z);
+        }
+
+        glm::mat4 rotate = glm::mat4(1.0);
+        if (rotate_x)
+            rotate = glm::rotate(rotate, in_rot_angles.x, glm::vec3(1, 0, 0));
+        if (rotate_y)
+            rotate = glm::rotate(rotate, in_rot_angles.y, glm::vec3(0, 1, 0));
+        if (rotate_z)
+            rotate = glm::rotate(rotate, in_rot_angles.z, glm::vec3(0, 0, 1));
+
+        glm::mat4 scale = glm::mat4(1.0);
+        if (a_scale)
+            scale = glm::scale(scale, in_scale);
+
+        std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->outputs.at("out"))->value = translate * rotate * scale * in_mat;
+    }
+
+}
+
+void Mat4TransformNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("in_mat4");
+    writer.StartArray();
+    glm::mat4 in_mat = std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->inputs.at("in_mat4"))->default_value;
+    const float* pSource = (const float*)glm::value_ptr(in_mat);
+    for (int i = 0; i < 16; ++i)
+        writer.Double(pSource[i]);
+    writer.EndArray();
+
+    writer.Key("a_translate");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("a_translate"))->default_value);
+    writer.Key("in_pos");
+    writer.StartArray();
+    glm::vec3 in_pos = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_pos"))->default_value;
+    writer.Double(in_pos.x);
+    writer.Double(in_pos.y);
+    writer.Double(in_pos.z);
+    writer.EndArray();
+
+    writer.Key("in_rot_angles");
+    writer.StartArray();
+    glm::vec3 in_rot_angles = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_rot_angles"))->default_value;
+    writer.Double(in_rot_angles.x);
+    writer.Double(in_rot_angles.y);
+    writer.Double(in_rot_angles.z);
+    writer.EndArray();
+    writer.Key("is_degrees");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("is_degrees"))->default_value);
+    writer.Key("rotate_x");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("rotate_x"))->default_value);
+    writer.Key("rotate_y");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("rotate_y"))->default_value);
+    writer.Key("rotate_z");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("rotate_z"))->default_value);
+
+    writer.Key("a_scale");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("a_scale"))->default_value);
+    writer.Key("in_scale");
+    writer.StartArray();
+    glm::vec3 in_scale = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_scale"))->default_value;
+    writer.Double(in_scale.x);
+    writer.Double(in_scale.y);
+    writer.Double(in_scale.z);
+    writer.EndArray();
+}
+
+void Mat4TransformNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    float* pSource = (float*)glm::value_ptr(std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->inputs.at("in_mat4"))->default_value);
+    for (int i = 0; i < 16; ++i)
+        pSource[i] = node_obj["in_mat4"].GetArray()[i].GetFloat();
+
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("a_translate"))->default_value = node_obj["a_translate"].GetBool();
+    glm::vec3 loaded_pos;
+    loaded_pos.x = node_obj["in_pos"].GetArray()[0].GetFloat();
+    loaded_pos.y = node_obj["in_pos"].GetArray()[1].GetFloat();
+    loaded_pos.z = node_obj["in_pos"].GetArray()[2].GetFloat();
+    std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_pos"))->default_value = loaded_pos;
+
+    glm::vec3 loaded_rot;
+    loaded_rot.x = node_obj["in_rot_angles"].GetArray()[0].GetFloat();
+    loaded_rot.y = node_obj["in_rot_angles"].GetArray()[1].GetFloat();
+    loaded_rot.z = node_obj["in_rot_angles"].GetArray()[2].GetFloat();
+    std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_rot_angles"))->default_value = loaded_rot;
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("is_degrees"))->default_value = node_obj["is_degrees"].GetBool();
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("rotate_x"))->default_value = node_obj["rotate_x"].GetBool();
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("rotate_y"))->default_value = node_obj["rotate_y"].GetBool();
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("rotate_z"))->default_value = node_obj["rotate_z"].GetBool();
+
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("a_scale"))->default_value = node_obj["a_scale"].GetBool();
+    glm::vec3 loaded_scale;
+    loaded_scale.x = node_obj["in_scale"].GetArray()[0].GetFloat();
+    loaded_scale.y = node_obj["in_scale"].GetArray()[1].GetFloat();
+    loaded_scale.z = node_obj["in_scale"].GetArray()[2].GetFloat();
+    std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_scale"))->default_value = loaded_scale;
+}
+
+std::string mat4TransformNodeName = "Matrix 4 - Transform";
+std::shared_ptr<Node> Mat4TransformNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), mat4TransformNodeName.c_str(), true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::mat4>>>("in_mat4", new PinValue<glm::mat4>("in_mat4", 0, GetNextId(), "In Matrix", PinType::Matrix4x4, glm::mat4(1.0))));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("a_translate", new PinValue<bool>("a_translate", 1, GetNextId(), "Active Translate", PinType::Bool, false)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("in_pos", new PinValue<glm::vec3>("in_pos", 2, GetNextId(), "In Position", PinType::Vector3, glm::vec3(0, 0, 0))));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("in_rot_angles", new PinValue<glm::vec3>("in_rot_angles", 3, GetNextId(), "In Rotation", PinType::Vector3, glm::vec3(0, 0, 0))));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("is_degrees", new PinValue<bool>("is_degrees", 4, GetNextId(), "Use Degrees?", PinType::Bool, true)));
+    s_Nodes.back()->inputs.at("is_degrees")->always_expose = false;
+    s_Nodes.back()->inputs.at("is_degrees")->exposed = false;
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("rotate_x", new PinValue<bool>("rotate_x", 5, GetNextId(), "Rotate X Axis", PinType::Bool, false)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("rotate_y", new PinValue<bool>("rotate_y", 6, GetNextId(), "Rotate Y Axis", PinType::Bool, false)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("rotate_z", new PinValue<bool>("rotate_z", 7, GetNextId(), "Rotate Z Axis", PinType::Bool, false)));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("a_scale", new PinValue<bool>("a_scale", 8, GetNextId(), "Active Scale", PinType::Bool, false)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("in_scale", new PinValue<glm::vec3>("in_scale", 9, GetNextId(), "In Scale", PinType::Vector3, glm::vec3(0, 0, 0))));
+
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::mat4>>>("out", new PinValue<glm::mat4>("out", 0, GetNextId(), "Out", PinType::Matrix4x4, glm::mat4(1.0))));
+
+    s_Nodes.back()->node_funcs = std::make_shared<Mat4TransformNode_Func>();
+    std::dynamic_pointer_cast<Mat4TransformNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
 
     s_Nodes.back()->node_funcs->Initialize();
 
@@ -453,9 +651,8 @@ void LookAtNode_Func::NoFlowUpdatePinsValues()
     float pitch = GetInputPinValue<float>(parent_node, "pitch");
     bool is_degrees = GetInputPinValue<bool>(parent_node, "is_degrees");
 
-    if (position != p_position || yaw != p_yaw || pitch != p_pitch || is_degrees != p_is_degrees || first_run)
+    if (position != p_position || yaw != p_yaw || pitch != p_pitch || is_degrees != p_is_degrees)
     {
-        first_run = false;
         p_position = position;
         p_yaw = yaw;
         p_pitch = pitch;
@@ -556,17 +753,21 @@ void MatricesNodes_SearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::vector<std::string> keywords_4{ "Matrix4", "Rotate", "Math" };
     search_nodes_vector.push_back(SearchNodeObj("Mat 4 - Rotate", "Matrix 4x4", keywords_4, func_4));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = OrthoProjNode;
-    std::vector<std::string> keywords_5{ "Orthographic", "Projection", "Matrix4" };
-    search_nodes_vector.push_back(SearchNodeObj("Orthographic Projection", "Matrix 4x4", keywords_5, func_5));
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = Mat4TransformNode;
+    std::vector<std::string> keywords_5{ "Matrix4", "Transform", "Math" };
+    search_nodes_vector.push_back(SearchNodeObj("Mat 4 - Transform", "Matrix 4x4", keywords_5, func_5));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_6 = PerspectiveProjNode;
-    std::vector<std::string> keywords_6{ "Perspective", "Projection", "Matrix4" };
-    search_nodes_vector.push_back(SearchNodeObj("Perspective Projection", "Matrix 4x4", keywords_6, func_6));
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_6 = OrthoProjNode;
+    std::vector<std::string> keywords_6{ "Orthographic", "Projection", "Matrix4" };
+    search_nodes_vector.push_back(SearchNodeObj("Orthographic Projection", "Matrix 4x4", keywords_6, func_6));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_7 = LookAtNode;
-    std::vector<std::string> keywords_7{ "Look", "At", "Matrix4" };
-    search_nodes_vector.push_back(SearchNodeObj("Look At Matrix", "Matrix 4x4", keywords_7, func_7));
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_7 = PerspectiveProjNode;
+    std::vector<std::string> keywords_7{ "Perspective", "Projection", "Matrix4" };
+    search_nodes_vector.push_back(SearchNodeObj("Perspective Projection", "Matrix 4x4", keywords_7, func_7));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_8 = LookAtNode;
+    std::vector<std::string> keywords_8{ "Look", "At", "Matrix4" };
+    search_nodes_vector.push_back(SearchNodeObj("Look At Matrix", "Matrix 4x4", keywords_8, func_8));
 }
 
 std::shared_ptr<Node> MatricesNodes_LoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
@@ -583,6 +784,9 @@ std::shared_ptr<Node> MatricesNodes_LoadSetup(std::vector<std::shared_ptr<Node>>
     }
     else if (loaded_node == nullptr && node_key.rfind(mat4RotateNodeName, 0) == 0) {
         loaded_node = Mat4RotateNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(mat4TransformNodeName, 0) == 0) {
+        loaded_node = Mat4TransformNode(s_Nodes);
     }
     else if (loaded_node == nullptr && node_key.rfind(orthoProjNodeName, 0) == 0) {
         loaded_node = OrthoProjNode(s_Nodes);

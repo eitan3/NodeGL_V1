@@ -39,6 +39,38 @@ std::shared_ptr<Node> BreakVector3Node(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 
+class Vector3Cross_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
+
+std::shared_ptr<Node> Vector3CrossNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class Vector3Normalize_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
+
+std::shared_ptr<Node> Vector3NormalizeNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
 void Vec3NodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
 std::shared_ptr<Node> Vec3NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 

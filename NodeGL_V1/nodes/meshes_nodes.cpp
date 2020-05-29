@@ -45,10 +45,34 @@ void CreateCubeNode_Func::NoFlowUpdatePinsValues()
 
 void CreateCubeNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
+    writer.Key("min_x");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("min_x"))->default_value);
+    writer.Key("min_y");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("min_y"))->default_value);
+    writer.Key("min_z");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("min_z"))->default_value);
+    writer.Key("max_x");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("max_x"))->default_value);
+    writer.Key("max_y");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("max_y"))->default_value);
+    writer.Key("max_z");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("max_z"))->default_value);
+    writer.Key("calc_normal");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("calc_normal"))->default_value);
+    writer.Key("calc_tangents");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("calc_tangents"))->default_value);
 }
 
 void CreateCubeNode_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("min_x"))->default_value = node_obj["min_x"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("min_y"))->default_value = node_obj["min_y"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("min_z"))->default_value = node_obj["min_z"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("max_x"))->default_value = node_obj["max_x"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("max_y"))->default_value = node_obj["max_y"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("max_z"))->default_value = node_obj["max_z"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("calc_normal"))->default_value = node_obj["calc_normal"].GetBool();
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("calc_tangents"))->default_value = node_obj["calc_tangents"].GetBool();
 }
 
 void CreateCubeNode_Func::SetupMesh()
@@ -64,53 +88,48 @@ void CreateCubeNode_Func::SetupMesh()
     }
     
     std::vector<Vertex> vertices;
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
     vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
     vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
     vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-
     vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+
     vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
     vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
     vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
     vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-
     vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
     vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
     vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
     vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
     vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-
     vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
     std::vector<unsigned int> indices;
     for (int i = 0; i < vertices.size(); i++)
@@ -153,9 +172,9 @@ std::shared_ptr<Node> CreateCubeNode(std::vector<std::shared_ptr<Node>>& s_Nodes
     s_Nodes.back()->inputs.at("max_y")->always_expose = false;
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("max_z", new PinValue<float>("max_z", 6, GetNextId(), "Max Z Boundary", PinType::Float, 1)));
     s_Nodes.back()->inputs.at("max_z")->always_expose = false;
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("calc_normal", new PinValue<bool>("calc_normal", 7, GetNextId(), "Calculate Normals", PinType::Bool, false)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("calc_normal", new PinValue<bool>("calc_normal", 7, GetNextId(), "Calculate Normals", PinType::Bool, true)));
     s_Nodes.back()->inputs.at("calc_normal")->always_expose = false;
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("calc_tangents", new PinValue<bool>("calc_tangents", 8, GetNextId(), "Calculate Tangents", PinType::Bool, false)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("calc_tangents", new PinValue<bool>("calc_tangents", 8, GetNextId(), "Calculate Tangents", PinType::Bool, true)));
     s_Nodes.back()->inputs.at("calc_tangents")->always_expose = false;
     
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<MeshObject>>>>("out", new PinValue<std::shared_ptr<MeshObject>>("out", 0, GetNextId(), "Mesh", PinType::MeshObject, nullptr)));

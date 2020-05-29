@@ -1,10 +1,21 @@
 #include "gl_nodes_1.h"
 
+const char* filtering_params[] = { "GL_LINEAR", "GL_NEAREST" };
+const char* warp_params[] = { "GL_CLAMP_TO_EDGE", "GL_REPEAT", "GL_MIRRORED_REPEAT", "GL_CLAMP_TO_BORDER" };
+
 void GlMainLoop_Func::Initialize()
 {
     object_prefix = GetInputPinValue<std::string>(parent_node, "name");
     output_width = GetInputPinValue<int>(parent_node, "width");
     output_height = GetInputPinValue<int>(parent_node, "height");
+    current_min_param = (char*)filtering_params[0];
+    current_mag_param = (char*)filtering_params[0];
+    current_wrap_s = (char*)warp_params[0];
+    current_wrap_t = (char*)warp_params[0];
+    prev_current_min_param = (char*)filtering_params[0];
+    prev_current_mag_param = (char*)filtering_params[0];
+    prev_current_wrap_s = (char*)warp_params[0];
+    prev_current_wrap_t = (char*)warp_params[0];
     SetupFrameBuffer();
 }
 
@@ -15,10 +26,15 @@ void GlMainLoop_Func::Run()
         auto config = InstanceConfig::instance();
         int new_width = GetInputPinValue<int>(parent_node, "width");
         int new_height = GetInputPinValue<int>(parent_node, "height");
-        if (new_width != output_width || new_height != output_height)
+        if (new_width != output_width || new_height != output_height || current_min_param != prev_current_min_param || 
+            current_mag_param != prev_current_mag_param || current_wrap_s != prev_current_wrap_s || current_wrap_t != prev_current_wrap_t)
         {
             output_width = new_width;
             output_height = new_height;
+            prev_current_min_param = current_min_param;
+            prev_current_mag_param = current_mag_param;
+            prev_current_wrap_s = current_wrap_s;
+            prev_current_wrap_t = current_wrap_t;
             DeleteFrameBuffer();
             SetupFrameBuffer();
         }
@@ -45,13 +61,13 @@ void GlMainLoop_Func::Run()
         // Bind framebuffer
         config->current_framebuffer = object_prefix;
         GLuint new_framebuffer_id = config->GetFrameBuffer(config->current_framebuffer)->object_id;
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, new_framebuffer_id);
+        glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer_id);
 
         // Run next node
         RunNextNodeFunc(parent_node, "next");
 
         // Unbind frambebuffer and return to previous viewport
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, prev_viewport[2], prev_viewport[3]);
         parent_node->info = "Texture name: '" + object_prefix + "'";
     }
@@ -67,6 +83,82 @@ void GlMainLoop_Func::Delete()
     parent_node = nullptr;
 }
 
+void GlMainLoop_Func::UpdateNodeInspector()
+{
+    if (ImGui::BeginTabItem("Texture Settings"))
+    {
+        auto paneWidth = ImGui::GetContentRegionAvailWidth();
+        if (current_min_param == NULL)
+            current_min_param = (char*)filtering_params[0];
+        if (current_mag_param == NULL)
+            current_mag_param = (char*)filtering_params[0];
+
+        ImGui::TextUnformatted("Min Filter: ");
+        ImGui::BeginHorizontal("##texture_min_filter_config_panel_1", ImVec2(paneWidth, 0), 1.0f);
+        if (ImGui::BeginCombo("##min_filter_combo", current_min_param)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(filtering_params); n++)
+            {
+                bool is_selected = std::string(current_min_param) == std::string(filtering_params[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(filtering_params[n], is_selected))
+                    current_min_param = (char*)filtering_params[n];
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::EndHorizontal();
+
+        ImGui::TextUnformatted("Mag Filter: ");
+        ImGui::BeginHorizontal("##texture_mag_filter_config_panel_1", ImVec2(paneWidth, 0), 1.0f);
+        if (ImGui::BeginCombo("##mag_filter_combo", current_mag_param)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(filtering_params); n++)
+            {
+                bool is_selected = std::string(current_mag_param) == std::string(filtering_params[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(filtering_params[n], is_selected))
+                    current_mag_param = (char*)filtering_params[n];
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::EndHorizontal();
+
+        ImGui::TextUnformatted("Wrap S: ");
+        ImGui::BeginHorizontal("##texture_wrap_s_config_panel_1", ImVec2(paneWidth, 0), 1.0f);
+        if (ImGui::BeginCombo("##wrap_s_combo", current_wrap_s)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(warp_params); n++)
+            {
+                bool is_selected = std::string(current_wrap_s) == std::string(warp_params[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(warp_params[n], is_selected))
+                    current_wrap_s = (char*)warp_params[n];
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::EndHorizontal();
+
+        ImGui::TextUnformatted("Wrap t: ");
+        ImGui::BeginHorizontal("##texture_wrap_t_config_panel_1", ImVec2(paneWidth, 0), 1.0f);
+        if (ImGui::BeginCombo("##wrap_t_combo", current_wrap_t)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(warp_params); n++)
+            {
+                bool is_selected = std::string(current_wrap_t) == std::string(warp_params[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(warp_params[n], is_selected))
+                    current_wrap_t = (char*)warp_params[n];
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::EndHorizontal();
+    }
+}
+
 void GlMainLoop_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Key("name");
@@ -75,6 +167,14 @@ void GlMainLoop_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& w
     writer.Uint(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("width"))->default_value);
     writer.Key("height");
     writer.Uint(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value);
+    writer.Key("current_min_param");
+    writer.String(current_min_param);
+    writer.Key("current_mag_param");
+    writer.String(current_mag_param);
+    writer.Key("current_wrap_s");
+    writer.String(current_wrap_s);
+    writer.Key("current_wrap_t");
+    writer.String(current_wrap_t);
 }
 
 void GlMainLoop_Func::LoadNodeData(rapidjson::Value& node_obj)
@@ -83,6 +183,71 @@ void GlMainLoop_Func::LoadNodeData(rapidjson::Value& node_obj)
     std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("name"))->default_value = std::string(node_obj["name"].GetString());
     std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("width"))->default_value = node_obj["width"].GetUint();
     std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value = node_obj["height"].GetUint();
+
+    bool is_found = false;
+    int index = 0;
+    if (node_obj["current_min_param"].IsNull() == false)
+    {
+        current_min_param = (char*)node_obj["current_min_param"].GetString();
+        for (int n = 0; n < IM_ARRAYSIZE(filtering_params) && is_found == false; n++)
+        {
+            is_found = std::string(current_min_param) == std::string(filtering_params[n]);
+            index = n;
+        }
+    }
+    if (is_found)
+        current_min_param = (char*)filtering_params[index];
+    else
+        current_min_param = (char*)filtering_params[0];
+
+    is_found = false;
+    index = 0;
+    if (node_obj["current_mag_param"].IsNull() == false)
+    {
+        current_mag_param = (char*)node_obj["current_mag_param"].GetString();
+        for (int n = 0; n < IM_ARRAYSIZE(filtering_params) && is_found == false; n++)
+        {
+            is_found = std::string(current_mag_param) == std::string(filtering_params[n]);
+            index = n;
+        }
+    }
+    if (is_found)
+        current_mag_param = (char*)filtering_params[index];
+    else
+        current_mag_param = (char*)filtering_params[0];
+
+    is_found = false;
+    index = 0;
+    if (node_obj["current_wrap_s"].IsNull() == false)
+    {
+        current_wrap_s = (char*)node_obj["current_wrap_s"].GetString();
+        for (int n = 0; n < IM_ARRAYSIZE(warp_params) && is_found == false; n++)
+        {
+            is_found = std::string(current_wrap_s) == std::string(warp_params[n]);
+            index = n;
+        }
+    }
+    if (is_found)
+        current_wrap_s = (char*)warp_params[index];
+    else
+        current_wrap_s = (char*)warp_params[0];
+
+    is_found = false;
+    index = 0;
+    if (node_obj["current_wrap_t"].IsNull() == false)
+    {
+        current_wrap_t = (char*)node_obj["current_wrap_t"].GetString();
+        for (int n = 0; n < IM_ARRAYSIZE(warp_params) && is_found == false; n++)
+        {
+            is_found = std::string(current_wrap_t) == std::string(warp_params[n]);
+            index = n;
+        }
+    }
+    if (is_found)
+        current_wrap_t = (char*)warp_params[index];
+    else
+        current_wrap_t = (char*)warp_params[0];
+
     SetupFrameBuffer();
 }
 
@@ -100,24 +265,70 @@ void GlMainLoop_Func::SetupFrameBuffer()
     glBindTexture(GL_TEXTURE_2D, renderedTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, output_width, output_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+    if (current_min_param == "GL_LINEAR")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    else if (current_min_param == "GL_NEAREST")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    
+    if (current_mag_param == "GL_LINEAR")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    else if (current_mag_param == "GL_NEAREST")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    if (current_wrap_s == "GL_CLAMP_TO_EDGE")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    else if (current_wrap_s == "GL_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    else if (current_wrap_s == "GL_MIRRORED_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    else if (current_wrap_s == "GL_CLAMP_TO_BORDER")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    
+    if (current_wrap_t == "GL_CLAMP_TO_EDGE")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    else if (current_wrap_t == "GL_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    else if (current_wrap_t == "GL_MIRRORED_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    else if (current_wrap_t == "GL_CLAMP_TO_BORDER")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glGenTextures(1, &depthTexture);
     glBindTexture(GL_TEXTURE_2D, depthTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, output_width, output_height, 0, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, 0);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, depthTexture, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    if (current_min_param == "GL_LINEAR")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    else if (current_min_param == "GL_NEAREST")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+    if (current_mag_param == "GL_LINEAR")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    else if (current_mag_param == "GL_NEAREST")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    if (current_wrap_s == "GL_CLAMP_TO_EDGE")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    else if (current_wrap_s == "GL_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    else if (current_wrap_s == "GL_MIRRORED_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    else if (current_wrap_s == "GL_CLAMP_TO_BORDER")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+
+    if (current_wrap_t == "GL_CLAMP_TO_EDGE")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    else if (current_wrap_t == "GL_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    else if (current_wrap_t == "GL_MIRRORED_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    else if (current_wrap_t == "GL_CLAMP_TO_BORDER")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    
     // Set the list of draw buffers.
     GLenum DrawBuffers[2] = { GL_DEPTH_STENCIL_ATTACHMENT, GL_DEPTH_ATTACHMENT };
     glDrawBuffers(2, DrawBuffers);
@@ -262,6 +473,14 @@ void GlRenderToTexture_Func::Initialize()
     object_prefix = GetInputPinValue<std::string>(parent_node, "name");
     output_width = GetInputPinValue<int>(parent_node, "width");
     output_height = GetInputPinValue<int>(parent_node, "height");
+    current_min_param = (char*)filtering_params[0];
+    current_mag_param = (char*)filtering_params[0];
+    current_wrap_s = (char*)warp_params[0];
+    current_wrap_t = (char*)warp_params[0];
+    prev_current_min_param = (char*)filtering_params[0];
+    prev_current_mag_param = (char*)filtering_params[0];
+    prev_current_wrap_s = (char*)warp_params[0];
+    prev_current_wrap_t = (char*)warp_params[0];
     SetupFrameBuffer();
 }
 
@@ -272,10 +491,15 @@ void GlRenderToTexture_Func::Run()
         auto config = InstanceConfig::instance();
         int new_width = GetInputPinValue<int>(parent_node, "width");
         int new_height = GetInputPinValue<int>(parent_node, "height");
-        if (new_width != output_width || new_height != output_height)
+        if (new_width != output_width || new_height != output_height || current_min_param != prev_current_min_param ||
+            current_mag_param != prev_current_mag_param || current_wrap_s != prev_current_wrap_s || current_wrap_t != prev_current_wrap_t)
         {
             output_width = new_width;
             output_height = new_height;
+            prev_current_min_param = current_min_param;
+            prev_current_mag_param = current_mag_param;
+            prev_current_wrap_s = current_wrap_s;
+            prev_current_wrap_t = current_wrap_t;
             DeleteFrameBuffer();
             SetupFrameBuffer();
         }
@@ -332,6 +556,82 @@ void GlRenderToTexture_Func::Delete()
     parent_node = nullptr;
 }
 
+void GlRenderToTexture_Func::UpdateNodeInspector()
+{
+    if (ImGui::BeginTabItem("Texture Settings"))
+    {
+        auto paneWidth = ImGui::GetContentRegionAvailWidth();
+        if (current_min_param == NULL)
+            current_min_param = (char*)filtering_params[0];
+        if (current_mag_param == NULL)
+            current_mag_param = (char*)filtering_params[0];
+
+        ImGui::TextUnformatted("Min Filter: ");
+        ImGui::BeginHorizontal("##texture_min_filter_config_panel_1", ImVec2(paneWidth, 0), 1.0f);
+        if (ImGui::BeginCombo("##min_filter_combo", current_min_param)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(filtering_params); n++)
+            {
+                bool is_selected = std::string(current_min_param) == std::string(filtering_params[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(filtering_params[n], is_selected))
+                    current_min_param = (char*)filtering_params[n];
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::EndHorizontal();
+
+        ImGui::TextUnformatted("Mag Filter: ");
+        ImGui::BeginHorizontal("##texture_mag_filter_config_panel_1", ImVec2(paneWidth, 0), 1.0f);
+        if (ImGui::BeginCombo("##mag_filter_combo", current_mag_param)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(filtering_params); n++)
+            {
+                bool is_selected = std::string(current_mag_param) == std::string(filtering_params[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(filtering_params[n], is_selected))
+                    current_mag_param = (char*)filtering_params[n];
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::EndHorizontal();
+
+        ImGui::TextUnformatted("Wrap S: ");
+        ImGui::BeginHorizontal("##texture_wrap_s_config_panel_1", ImVec2(paneWidth, 0), 1.0f);
+        if (ImGui::BeginCombo("##wrap_s_combo", current_wrap_s)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(warp_params); n++)
+            {
+                bool is_selected = std::string(current_wrap_s) == std::string(warp_params[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(warp_params[n], is_selected))
+                    current_wrap_s = (char*)warp_params[n];
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::EndHorizontal();
+
+        ImGui::TextUnformatted("Wrap t: ");
+        ImGui::BeginHorizontal("##texture_wrap_t_config_panel_1", ImVec2(paneWidth, 0), 1.0f);
+        if (ImGui::BeginCombo("##wrap_t_combo", current_wrap_t)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(warp_params); n++)
+            {
+                bool is_selected = std::string(current_wrap_t) == std::string(warp_params[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(warp_params[n], is_selected))
+                    current_wrap_t = (char*)warp_params[n];
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::EndHorizontal();
+    }
+}
+
 void GlRenderToTexture_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
 {
     writer.Key("name");
@@ -340,6 +640,14 @@ void GlRenderToTexture_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuf
     writer.Uint(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("width"))->default_value);
     writer.Key("height");
     writer.Uint(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value);
+    writer.Key("current_min_param");
+    writer.String(current_min_param);
+    writer.Key("current_mag_param");
+    writer.String(current_mag_param);
+    writer.Key("current_wrap_s");
+    writer.String(current_wrap_s);
+    writer.Key("current_wrap_t");
+    writer.String(current_wrap_t);
 }
 
 void GlRenderToTexture_Func::LoadNodeData(rapidjson::Value& node_obj)
@@ -348,6 +656,72 @@ void GlRenderToTexture_Func::LoadNodeData(rapidjson::Value& node_obj)
     std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at("name"))->default_value = std::string(node_obj["name"].GetString());
     std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("width"))->default_value = node_obj["width"].GetUint();
     std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("height"))->default_value = node_obj["height"].GetUint();
+
+
+    bool is_found = false;
+    int index = 0;
+    if (node_obj["current_min_param"].IsNull() == false)
+    {
+        current_min_param = (char*)node_obj["current_min_param"].GetString();
+        for (int n = 0; n < IM_ARRAYSIZE(filtering_params) && is_found == false; n++)
+        {
+            is_found = std::string(current_min_param) == std::string(filtering_params[n]);
+            index = n;
+        }
+    }
+    if (is_found)
+        current_min_param = (char*)filtering_params[index];
+    else
+        current_min_param = (char*)filtering_params[0];
+
+    is_found = false;
+    index = 0;
+    if (node_obj["current_mag_param"].IsNull() == false)
+    {
+        current_mag_param = (char*)node_obj["current_mag_param"].GetString();
+        for (int n = 0; n < IM_ARRAYSIZE(filtering_params) && is_found == false; n++)
+        {
+            is_found = std::string(current_mag_param) == std::string(filtering_params[n]);
+            index = n;
+        }
+    }
+    if (is_found)
+        current_mag_param = (char*)filtering_params[index];
+    else
+        current_mag_param = (char*)filtering_params[0];
+
+    is_found = false;
+    index = 0;
+    if (node_obj["current_wrap_s"].IsNull() == false)
+    {
+        current_wrap_s = (char*)node_obj["current_wrap_s"].GetString();
+        for (int n = 0; n < IM_ARRAYSIZE(warp_params) && is_found == false; n++)
+        {
+            is_found = std::string(current_wrap_s) == std::string(warp_params[n]);
+            index = n;
+        }
+    }
+    if (is_found)
+        current_wrap_s = (char*)warp_params[index];
+    else
+        current_wrap_s = (char*)warp_params[0];
+
+    is_found = false;
+    index = 0;
+    if (node_obj["current_wrap_t"].IsNull() == false)
+    {
+        current_wrap_t = (char*)node_obj["current_wrap_t"].GetString();
+        for (int n = 0; n < IM_ARRAYSIZE(warp_params) && is_found == false; n++)
+        {
+            is_found = std::string(current_wrap_t) == std::string(warp_params[n]);
+            index = n;
+        }
+    }
+    if (is_found)
+        current_wrap_t = (char*)warp_params[index];
+    else
+        current_wrap_t = (char*)warp_params[0];
+
     SetupFrameBuffer();
 }
 
@@ -365,22 +739,68 @@ void GlRenderToTexture_Func::SetupFrameBuffer()
     glBindTexture(GL_TEXTURE_2D, renderedTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, output_width, output_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+    if (current_min_param == "GL_LINEAR")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    else if (current_min_param == "GL_NEAREST")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    if (current_mag_param == "GL_LINEAR")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    else if (current_mag_param == "GL_NEAREST")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    if (current_wrap_s == "GL_CLAMP_TO_EDGE")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    else if (current_wrap_s == "GL_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    else if (current_wrap_s == "GL_MIRRORED_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    else if (current_wrap_s == "GL_CLAMP_TO_BORDER")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+
+    if (current_wrap_t == "GL_CLAMP_TO_EDGE")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    else if (current_wrap_t == "GL_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    else if (current_wrap_t == "GL_MIRRORED_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    else if (current_wrap_t == "GL_CLAMP_TO_BORDER")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glGenTextures(1, &depthTexture);
     glBindTexture(GL_TEXTURE_2D, depthTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, output_width, output_height, 0, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, 0);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, depthTexture, 0);
+    if (current_min_param == "GL_LINEAR")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    else if (current_min_param == "GL_NEAREST")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    if (current_mag_param == "GL_LINEAR")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    else if (current_mag_param == "GL_NEAREST")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    if (current_wrap_s == "GL_CLAMP_TO_EDGE")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    else if (current_wrap_s == "GL_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    else if (current_wrap_s == "GL_MIRRORED_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    else if (current_wrap_s == "GL_CLAMP_TO_BORDER")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+
+    if (current_wrap_t == "GL_CLAMP_TO_EDGE")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    else if (current_wrap_t == "GL_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    else if (current_wrap_t == "GL_MIRRORED_REPEAT")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    else if (current_wrap_t == "GL_CLAMP_TO_BORDER")
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Set the list of draw buffers.

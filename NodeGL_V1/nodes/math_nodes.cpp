@@ -607,6 +607,186 @@ std::shared_ptr<Node> MathDivideNode(std::vector<std::shared_ptr<Node>>& s_Nodes
 
 
 
+void MathSinNode_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void MathSinNode_Func::NoFlowUpdatePinsValues()
+{
+    float in_value = GetInputPinValue<float>(parent_node, "in");
+    std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
+    output_pin->value = glm::sin(glm::radians(in_value));
+}
+
+void MathSinNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("in");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value);
+}
+
+void MathSinNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value = node_obj["in"].GetFloat();
+}
+
+std::string mathSinNodeName = "Sin";
+std::shared_ptr<Node> MathSinNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), mathSinNodeName.c_str(), true));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("in", new PinValue<float>("in", 0, GetNextId(), "In", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("out", new PinValue<float>("out", 0, GetNextId(), "Out", PinType::Float, 0)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<MathSinNode_Func>();
+    std::dynamic_pointer_cast<MathSinNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+void MathCosNode_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void MathCosNode_Func::NoFlowUpdatePinsValues()
+{
+    float in_value = GetInputPinValue<float>(parent_node, "in");
+    std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
+    output_pin->value = glm::cos(glm::radians(in_value));
+}
+
+void MathCosNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("in");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value);
+}
+
+void MathCosNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value = node_obj["in"].GetFloat();
+}
+
+std::string mathCosNodeName = "Cos";
+std::shared_ptr<Node> MathCosNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), mathCosNodeName.c_str(), true));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("in", new PinValue<float>("in", 0, GetNextId(), "In", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("out", new PinValue<float>("out", 0, GetNextId(), "Out", PinType::Float, 0)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<MathCosNode_Func>();
+    std::dynamic_pointer_cast<MathCosNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+void MathToDegreesNode_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void MathToDegreesNode_Func::NoFlowUpdatePinsValues()
+{
+    float in_value = GetInputPinValue<float>(parent_node, "in");
+    std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
+    output_pin->value = glm::degrees(in_value);
+}
+
+void MathToDegreesNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("in");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value);
+}
+
+void MathToDegreesNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value = node_obj["in"].GetFloat();
+}
+
+std::string mathToDegreesNodeName = "To Degrees";
+std::shared_ptr<Node> MathToDegreesNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), mathToDegreesNodeName.c_str(), true));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("in", new PinValue<float>("in", 0, GetNextId(), "In", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("out", new PinValue<float>("out", 0, GetNextId(), "Out", PinType::Float, 0)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<MathToDegreesNode_Func>();
+    std::dynamic_pointer_cast<MathToDegreesNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+void MathToRadiansNode_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void MathToRadiansNode_Func::NoFlowUpdatePinsValues()
+{
+    float in_value = GetInputPinValue<float>(parent_node, "in");
+    std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("out"));
+    output_pin->value = glm::radians(in_value);
+}
+
+void MathToRadiansNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("in");
+    writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value);
+}
+
+void MathToRadiansNode_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value = node_obj["in"].GetFloat();
+}
+
+std::string mathToRadiansNodeName = "To Radians";
+std::shared_ptr<Node> MathToRadiansNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), mathToRadiansNodeName.c_str(), true));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("in", new PinValue<float>("in", 0, GetNextId(), "In", PinType::Float, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("out", new PinValue<float>("out", 0, GetNextId(), "Out", PinType::Float, 0)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<MathToRadiansNode_Func>();
+    std::dynamic_pointer_cast<MathToRadiansNode_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
 void MathNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = MathPlusNode;
@@ -624,6 +804,22 @@ void MathNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = MathDivideNode;
     std::vector<std::string> keywords_4{ "/", "Divide", "Operator", "Math" };
     search_nodes_vector.push_back(SearchNodeObj("/ Operator", "Math (Scalar)", keywords_4, func_4));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = MathSinNode;
+    std::vector<std::string> keywords_5{ "Sin", "Math" };
+    search_nodes_vector.push_back(SearchNodeObj("Sin", "Math (Scalar)", keywords_5, func_5));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_6 = MathCosNode;
+    std::vector<std::string> keywords_6{ "Cos", "Math" };
+    search_nodes_vector.push_back(SearchNodeObj("Cos", "Math (Scalar)", keywords_6, func_6));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_7 = MathToDegreesNode;
+    std::vector<std::string> keywords_7{ "To", "Degrees", "Math" };
+    search_nodes_vector.push_back(SearchNodeObj("To Degrees", "Math (Scalar)", keywords_7, func_7));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_8 = MathToRadiansNode;
+    std::vector<std::string> keywords_8{ "To", "Radians", "Math" };
+    search_nodes_vector.push_back(SearchNodeObj("To Radians", "Math (Scalar)", keywords_8, func_8));
 }
 
 std::shared_ptr<Node> MathNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
@@ -640,6 +836,18 @@ std::shared_ptr<Node> MathNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_N
     }
     else if (loaded_node == nullptr && node_key.rfind(mathDivideNodeName, 0) == 0) {
         loaded_node = MathDivideNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(mathSinNodeName, 0) == 0) {
+        loaded_node = MathSinNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(mathCosNodeName, 0) == 0) {
+        loaded_node = MathCosNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(mathToDegreesNodeName, 0) == 0) {
+        loaded_node = MathToDegreesNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(mathToRadiansNodeName, 0) == 0) {
+        loaded_node = MathToRadiansNode(s_Nodes);
     }
     return loaded_node;
 }

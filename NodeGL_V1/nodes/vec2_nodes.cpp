@@ -101,6 +101,57 @@ std::shared_ptr<Node> BreakVector2Node(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 
+void Vector2Normalize_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void Vector2Normalize_Func::NoFlowUpdatePinsValues()
+{
+    glm::vec2 pin_1_value = GetInputPinValue<glm::vec2>(parent_node, "in_1");
+    glm::vec2 out_val = glm::normalize(pin_1_value);
+    std::shared_ptr<PinValue<glm::vec2>> output_pin = std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->outputs.at("out"));
+    output_pin->value = out_val;
+}
+
+void Vector2Normalize_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    glm::vec2 pin_1_value = std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->inputs.at("in_1"))->default_value;
+    writer.Key("x_1");
+    writer.Double(pin_1_value.x);
+    writer.Key("y_1");
+    writer.Double(pin_1_value.y);
+}
+
+void Vector2Normalize_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    float x_1 = node_obj["x_1"].GetFloat();
+    float y_1 = node_obj["y_1"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->inputs.at("in_1"))->default_value = glm::vec2(x_1, y_1);
+}
+
+std::string vector2NormalizeNodeName = "Normalize - Vector 2";
+std::shared_ptr<Node> Vector2NormalizeNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), vector2NormalizeNodeName.c_str(), true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec2>>>("in_1", new PinValue<glm::vec2>("in_1", 0, GetNextId(), "In 1", PinType::Vector2, glm::vec2(1))));
+
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec2>>>("out", new PinValue<glm::vec2>("out", 0, GetNextId(), "Out", PinType::Vector2, glm::vec2(0))));
+
+    s_Nodes.back()->node_funcs = std::make_shared<Vector2Normalize_Func>();
+    std::dynamic_pointer_cast<Vector2Normalize_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
 void Vec2NodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = MakeVector2Node;
@@ -110,6 +161,10 @@ void Vec2NodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = BreakVector2Node;
     std::vector<std::string> keywords_2{ "Break", "Vector", "2" };
     search_nodes_vector.push_back(SearchNodeObj("Break Vector 2", "Vector 2", keywords_2, func_2));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = Vector2NormalizeNode;
+    std::vector<std::string> keywords_3{ "Normalize", "Vector", "2" };
+    search_nodes_vector.push_back(SearchNodeObj("Normalize - Vector 2", "Vector 2", keywords_3, func_3));
 }
 
 std::shared_ptr<Node> Vec2NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
@@ -120,6 +175,9 @@ std::shared_ptr<Node> Vec2NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_N
     }
     else if (loaded_node == nullptr && node_key.rfind(breakVector2NodeName, 0) == 0) {
         loaded_node = BreakVector2Node(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(vector2NormalizeNodeName, 0) == 0) {
+        loaded_node = Vector2NormalizeNode(s_Nodes);
     }
     return loaded_node;
 }

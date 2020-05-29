@@ -74,6 +74,27 @@ std::shared_ptr<Node> ForLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
+class RunEveryXSeconds_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run();
+    void Delete();
+    void NoFlowUpdatePinsValues() {};
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+
+private:
+    float timer;
+    float prev_seconds;
+};
+
+std::shared_ptr<Node> RunEveryXSecondsNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+
 void FlowNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
 std::shared_ptr<Node> FlowNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 

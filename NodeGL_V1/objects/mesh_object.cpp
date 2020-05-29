@@ -98,22 +98,18 @@ void CalculateNormals(std::vector<Vertex>& vertices, std::vector<unsigned int> i
     std::vector<glm::vec3>mNormals = std::vector<glm::vec3>(vertices.size(), glm::vec3(0, 0, 0));
 
     // For each triangular face
-    for (unsigned int i = 0; i < indices.size() / 3; i += 3) {
-
+    for (unsigned int i = 0; i < indices.size() / 3; i ++) 
+    {
         // Get the three vertices index of the current face
         unsigned int v1 = indices.at(i * 3);
         unsigned int v2 = indices.at(i * 3 + 1);
         unsigned int v3 = indices.at(i * 3 + 2);
 
-        assert(v1 < vertices.size());
-        assert(v2 < vertices.size());
-        assert(v3 < vertices.size());
-
         // Compute the normal of the face
-        glm::vec3 p = vertices.at(v1).Position;
-        glm::vec3 q = vertices.at(v2).Position;
-        glm::vec3 r = vertices.at(v3).Position;
-        glm::vec3 normal = glm::cross(q - p, r - p);// (q - p).cross(r - p);
+        glm::vec3 a = vertices.at(v1).Position;
+        glm::vec3 b = vertices.at(v2).Position;
+        glm::vec3 c = vertices.at(v3).Position;
+        glm::vec3 normal = glm::cross(c - b, a - b);// (q - p).cross(r - p);
         normal = glm::normalize(normal);
 
         // Add the face surface normal to the sum of normals at
@@ -148,7 +144,7 @@ void CalculateTangents(std::vector<Vertex>& vertices, std::vector<unsigned int> 
     std::vector<glm::vec3> mBitangents = std::vector<glm::vec3>(vertices.size(), glm::vec3(0, 0, 0));
 
     // For each face
-    for (unsigned int i = 0; i < indices.size() / 3; i += 3)
+    for (unsigned int i = 0; i < indices.size() / 3; i ++)
     {
         // Get the three vertices index of the face
         unsigned int v1 = indices.at(i * 3);

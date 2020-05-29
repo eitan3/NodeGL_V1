@@ -71,14 +71,32 @@ void EaseAnimation_Func::Run()
     float new_max_val = GetInputPinValue<float>(parent_node, "max");
     float new_duration_val = GetInputPinValue<float>(parent_node, "duration");
     bool reverse_val = GetInputPinValue<bool>(parent_node, "reverse");
+    bool start_random_val = GetInputPinValue<bool>(parent_node, "start_random");
 
-    if (new_min_val != min_val || new_max_val != max_val || new_duration_val != duration_val || reverse != reverse_val)
+    if (new_min_val != min_val || new_max_val != max_val || new_duration_val != duration_val || reverse != reverse_val || start_random != start_random_val)
     {
         min_val = new_min_val;
         max_val = new_max_val;
         duration_val = new_duration_val;
         reverse = reverse_val;
-        anim_time = 0;
+        start_random = start_random_val;
+        if (start_random)
+        {
+            std::random_device rd;  //Will be used to obtain a seed for the random number engine
+            std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+            std::uniform_real_distribution<> dis(0.0, 1.0);
+            float rand_start = dis(gen);
+            anim_time = rand_start * new_duration_val;
+            if (dis(gen) > 0.5)
+                is_reverse = true;
+            else
+                is_reverse = false;
+        }
+        else
+        {
+            anim_time = 0;
+            is_reverse = false;
+        }
     }
 
     bool run_anim_end = false;
@@ -144,8 +162,9 @@ void EaseAnimation_Func::Run()
 
     std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("value"));
     output_pin->value = computed_ease * (max_val - min_val) + min_val;
-
-    RunNextNodeFunc(parent_node, "animation_end");
+    
+    if (run_anim_end)
+        RunNextNodeFunc(parent_node, "animation_end");
     RunNextNodeFunc(parent_node, "next");
 }
 
@@ -190,6 +209,8 @@ void EaseAnimation_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>
     writer.Double(std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("duration"))->default_value);
     writer.Key("reverse");
     writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("reverse"))->default_value);
+    writer.Key("start_random");
+    writer.Bool(std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("start_random"))->default_value);
     writer.Key("ease");
     writer.String(current_ease);
     //std::dynamic_pointer_cast<PinValue<std::string>>(parent_node->inputs.at(""))->default_value;
@@ -201,6 +222,7 @@ void EaseAnimation_Func::LoadNodeData(rapidjson::Value& node_obj)
     std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("max"))->default_value = node_obj["max"].GetFloat();
     std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("duration"))->default_value = node_obj["duration"].GetFloat();
     std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("reverse"))->default_value = node_obj["reverse"].GetBool();
+    std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("start_random"))->default_value = node_obj["start_random"].GetBool();
     current_ease = (char *)node_obj["ease"].GetString();
     bool is_found = false;
     int index = 0;
@@ -227,6 +249,9 @@ std::shared_ptr<Node> EaseAnimationhNode(std::vector<std::shared_ptr<Node>>& s_N
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("reverse", new PinValue<bool>("reverse", 4, GetNextId(), "Reverse", PinType::Bool, true)));
     s_Nodes.back()->inputs.at("reverse")->always_expose = false;
     s_Nodes.back()->inputs.at("reverse")->exposed = false;
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("start_random", new PinValue<bool>("start_random", 5, GetNextId(), "Start Random", PinType::Bool, true)));
+    s_Nodes.back()->inputs.at("start_random")->always_expose = false;
+    s_Nodes.back()->inputs.at("start_random")->exposed = false;
 
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("next", new BasePin("next", 0, GetNextId(), "next", PinType::Flow)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("animation_end", new BasePin("animation_end", 1, GetNextId(), "Animation End", PinType::Flow)));

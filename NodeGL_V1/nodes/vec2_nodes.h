@@ -39,6 +39,22 @@ std::shared_ptr<Node> BreakVector2Node(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 
+class Vector2Normalize_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run() {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
+
+std::shared_ptr<Node> Vector2NormalizeNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
 void Vec2NodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector);
 std::shared_ptr<Node> Vec2NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key);
 

@@ -17,7 +17,7 @@ public:
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
-    void UpdateNodeInspector() {};
+    void UpdateNodeInspector();
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
     void LoadNodeData(rapidjson::Value& node_obj);
 
@@ -29,6 +29,16 @@ private:
     std::string object_prefix;
     int output_width;
     int output_height;
+
+    char* current_min_param;
+    char* current_mag_param;
+    char* current_wrap_s;
+    char* current_wrap_t;
+
+    char* prev_current_min_param;
+    char* prev_current_mag_param;
+    char* prev_current_wrap_s;
+    char* prev_current_wrap_t;
 };
 
 std::shared_ptr<Node> GlMainLoop(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -60,7 +70,7 @@ public:
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
-    void UpdateNodeInspector() {};
+    void UpdateNodeInspector();
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
     void LoadNodeData(rapidjson::Value& node_obj);
 
@@ -72,6 +82,16 @@ private:
     std::string object_prefix;
     int output_width;
     int output_height;
+
+    char* current_min_param;
+    char* current_mag_param;
+    char* current_wrap_s;
+    char* current_wrap_t;
+
+    char* prev_current_min_param;
+    char* prev_current_mag_param;
+    char* prev_current_wrap_s;
+    char* prev_current_wrap_t;
 };
 
 std::shared_ptr<Node> GlRenderToTexture(std::vector<std::shared_ptr<Node>>& s_Nodes);

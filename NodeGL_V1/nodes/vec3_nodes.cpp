@@ -112,6 +112,127 @@ std::shared_ptr<Node> BreakVector3Node(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 
+void Vector3Cross_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void Vector3Cross_Func::NoFlowUpdatePinsValues()
+{
+    glm::vec3 pin_1_value = GetInputPinValue<glm::vec3>(parent_node, "in_1");
+    glm::vec3 pin_2_value = GetInputPinValue<glm::vec3>(parent_node, "in_2");
+    glm::vec3 out_val = glm::cross(pin_1_value, pin_2_value);
+    std::shared_ptr<PinValue<glm::vec3>> output_pin = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->outputs.at("out"));
+    output_pin->value = out_val;
+}
+
+void Vector3Cross_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    glm::vec3 pin_1_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_1"))->default_value;
+    writer.Key("x_1");
+    writer.Double(pin_1_value.x);
+    writer.Key("y_1");
+    writer.Double(pin_1_value.y);
+    writer.Key("z_1");
+    writer.Double(pin_1_value.z);
+    glm::vec3 pin_2_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_2"))->default_value;
+    writer.Key("x_2");
+    writer.Double(pin_2_value.x);
+    writer.Key("y_2");
+    writer.Double(pin_2_value.y);
+    writer.Key("z_2");
+    writer.Double(pin_2_value.z);
+}
+
+void Vector3Cross_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    float x_1 = node_obj["x_1"].GetFloat();
+    float y_1 = node_obj["y_1"].GetFloat();
+    float z_1 = node_obj["z_1"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_1"))->default_value = glm::vec3(x_1, y_1, z_1);
+    float x_2 = node_obj["x_2"].GetFloat();
+    float y_2 = node_obj["y_2"].GetFloat();
+    float z_2 = node_obj["z_2"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_2"))->default_value = glm::vec3(x_2, y_2, z_2);
+}
+
+std::string vector3CrossNodeName = "Cross Product - Vector 3";
+std::shared_ptr<Node> Vector3CrossNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), vector3CrossNodeName.c_str(), true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("in_1", new PinValue<glm::vec3>("in_1", 0, GetNextId(), "In 1", PinType::Vector3, glm::vec3(0))));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("in_2", new PinValue<glm::vec3>("in_2", 1, GetNextId(), "In 2", PinType::Vector3, glm::vec3(0))));
+
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("out", new PinValue<glm::vec3>("out", 0, GetNextId(), "Out", PinType::Vector3, glm::vec3(0))));
+
+    s_Nodes.back()->node_funcs = std::make_shared<Vector3Cross_Func>();
+    std::dynamic_pointer_cast<Vector3Cross_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+void Vector3Normalize_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void Vector3Normalize_Func::NoFlowUpdatePinsValues()
+{
+    glm::vec3 pin_1_value = GetInputPinValue<glm::vec3>(parent_node, "in_1");
+    glm::vec3 out_val = glm::normalize(pin_1_value);
+    std::shared_ptr<PinValue<glm::vec3>> output_pin = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->outputs.at("out"));
+    output_pin->value = out_val;
+}
+
+void Vector3Normalize_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    glm::vec3 pin_1_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_1"))->default_value;
+    writer.Key("x_1");
+    writer.Double(pin_1_value.x);
+    writer.Key("y_1");
+    writer.Double(pin_1_value.y);
+    writer.Key("z_1");
+    writer.Double(pin_1_value.z);
+}
+
+void Vector3Normalize_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    float x_1 = node_obj["x_1"].GetFloat();
+    float y_1 = node_obj["y_1"].GetFloat();
+    float z_1 = node_obj["z_1"].GetFloat();
+    std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at("in_1"))->default_value = glm::vec3(x_1, y_1, z_1);
+}
+
+std::string vector3NormalizeNodeName = "Normalize - Vector 3";
+std::shared_ptr<Node> Vector3NormalizeNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), vector3NormalizeNodeName.c_str(), true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("in_1", new PinValue<glm::vec3>("in_1", 0, GetNextId(), "In 1", PinType::Vector3, glm::vec3(1))));
+    
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::vec3>>>("out", new PinValue<glm::vec3>("out", 0, GetNextId(), "Out", PinType::Vector3, glm::vec3(0))));
+
+    s_Nodes.back()->node_funcs = std::make_shared<Vector3Normalize_Func>();
+    std::dynamic_pointer_cast<Vector3Normalize_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
 void Vec3NodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
 {
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_1 = MakeVector3Node;
@@ -121,6 +242,14 @@ void Vec3NodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_2 = BreakVector3Node;
     std::vector<std::string> keywords_2{ "Break", "Vector", "3" };
     search_nodes_vector.push_back(SearchNodeObj("Break Vector 3", "Vector 3", keywords_2, func_2));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = Vector3CrossNode;
+    std::vector<std::string> keywords_3{ "Cross", "Product", "Vector", "3" };
+    search_nodes_vector.push_back(SearchNodeObj("Cross Product - Vector 3", "Vector 3", keywords_3, func_3));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = Vector3NormalizeNode;
+    std::vector<std::string> keywords_4{ "Normalize", "Vector", "3" };
+    search_nodes_vector.push_back(SearchNodeObj("Normalize - Vector 3", "Vector 3", keywords_4, func_4));
 }
 
 std::shared_ptr<Node> Vec3NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
@@ -131,6 +260,12 @@ std::shared_ptr<Node> Vec3NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_N
     }
     else if (loaded_node == nullptr && node_key.rfind(breakVector3NodeName, 0) == 0) {
         loaded_node = BreakVector3Node(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(vector3CrossNodeName, 0) == 0) {
+        loaded_node = Vector3CrossNode(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(vector3NormalizeNodeName, 0) == 0) {
+        loaded_node = Vector3NormalizeNode(s_Nodes);
     }
     return loaded_node;
 }

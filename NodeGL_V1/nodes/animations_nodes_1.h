@@ -3,6 +3,7 @@
 #define ANIMATIONS_NODES_1_H
 
 #define _USE_MATH_DEFINES
+#include <random>
 #include <math.h>
 #include "node_function_interface.h"
 #include "../nodes_builder.h"
@@ -23,6 +24,7 @@ public:
     float max_val;
     float duration_val;
     bool reverse;
+    bool start_random;
 
     float anim_time;
     bool is_reverse;
