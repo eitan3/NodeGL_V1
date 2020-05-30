@@ -11,7 +11,7 @@
 class EqualNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -27,7 +27,7 @@ std::shared_ptr<Node> EqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class NotEqualNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -43,7 +43,7 @@ std::shared_ptr<Node> NotEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class LessNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -59,7 +59,7 @@ std::shared_ptr<Node> LessNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class LessEqualNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -75,7 +75,7 @@ std::shared_ptr<Node> LessEqualNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 class GreaterNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -91,7 +91,7 @@ std::shared_ptr<Node> GreaterNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class GreaterEqualNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -108,7 +108,7 @@ std::shared_ptr<Node> GreaterEqualNode(std::vector<std::shared_ptr<Node>>& s_Nod
 class AndNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -124,7 +124,7 @@ std::shared_ptr<Node> AndNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class OrNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -140,7 +140,7 @@ std::shared_ptr<Node> OrNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class NotNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};

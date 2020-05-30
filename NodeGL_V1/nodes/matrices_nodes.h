@@ -15,7 +15,7 @@
 class Mat4IdentityNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -32,7 +32,7 @@ std::shared_ptr<Node> Mat4IdentityNode(std::vector<std::shared_ptr<Node>>& s_Nod
 class Mat4TranslateNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -53,7 +53,7 @@ std::shared_ptr<Node> Mat4TranslateNode(std::vector<std::shared_ptr<Node>>& s_No
 class Mat4RotateNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -78,7 +78,7 @@ std::shared_ptr<Node> Mat4RotateNode(std::vector<std::shared_ptr<Node>>& s_Nodes
 class Mat4ScaleNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -99,7 +99,7 @@ std::shared_ptr<Node> Mat4ScaleNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 class Mat4TransformNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -128,7 +128,7 @@ std::shared_ptr<Node> Mat4TransformNode(std::vector<std::shared_ptr<Node>>& s_No
 class OrthoProjNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -153,7 +153,7 @@ std::shared_ptr<Node> OrthoProjNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 class PerspectiveProjNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -177,7 +177,7 @@ std::shared_ptr<Node> PerspectiveProjNode(std::vector<std::shared_ptr<Node>>& s_
 class LookAtNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};

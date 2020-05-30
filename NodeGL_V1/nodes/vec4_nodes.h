@@ -10,7 +10,7 @@
 class MakeVector4_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -26,7 +26,7 @@ std::shared_ptr<Node> MakeVector4Node(std::vector<std::shared_ptr<Node>>& s_Node
 class BreakVector4_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -42,7 +42,7 @@ std::shared_ptr<Node> BreakVector4Node(std::vector<std::shared_ptr<Node>>& s_Nod
 class Vector4Normalize_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};

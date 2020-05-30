@@ -12,7 +12,7 @@
 class CreateCubeNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -42,7 +42,7 @@ std::shared_ptr<Node> CreateCubeNode(std::vector<std::shared_ptr<Node>>& s_Nodes
 class DrawMeshNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};

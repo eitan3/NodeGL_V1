@@ -1,5 +1,3 @@
-Add "Triggered By" argument to Run function, than implement "reset anim" trigger in ease animation
-
 Add "Bind Program With Uniforms" Node
 Add Resources (import textures meshes and so on)
 Add Arrays

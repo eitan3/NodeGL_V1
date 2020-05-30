@@ -420,7 +420,7 @@ std::shared_ptr<Node> CreateProgram(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
-void BindProgram_Func::Run()
+void BindProgram_Func::Run(std::string called_pin)
 {
     auto config = InstanceConfig::instance();
     std::shared_ptr<ProgramObject> in_program = GetInputPinValue<std::shared_ptr<ProgramObject>>(parent_node, "program");
@@ -470,7 +470,7 @@ std::shared_ptr<Node> BindProgramNode(std::vector<std::shared_ptr<Node>>& s_Node
 
 
 
-void SetProgramUniformNode_Func::Run()
+void SetProgramUniformNode_Func::Run(std::string called_pin)
 {
     std::shared_ptr<ProgramObject> in_program = GetInputPinValue<std::shared_ptr<ProgramObject>>(parent_node, "program");
     if (in_program)

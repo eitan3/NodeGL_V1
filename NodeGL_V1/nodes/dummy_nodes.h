@@ -9,7 +9,7 @@
 class DummyNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
@@ -25,7 +25,7 @@ std::shared_ptr<Node> DummyNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class DummySendFloat_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -41,7 +41,7 @@ std::shared_ptr<Node> DummySendFloat(std::vector<std::shared_ptr<Node>>& s_Nodes
 class DummyRecvSendFloat_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -57,7 +57,7 @@ std::shared_ptr<Node> DummyRecvSendFloat(std::vector<std::shared_ptr<Node>>& s_N
 class DummySendInt_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -73,7 +73,7 @@ std::shared_ptr<Node> DummySendInt(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class DummyRecvSendInt_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};

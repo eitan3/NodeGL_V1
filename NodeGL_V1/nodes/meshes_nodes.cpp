@@ -194,7 +194,7 @@ std::shared_ptr<Node> CreateCubeNode(std::vector<std::shared_ptr<Node>>& s_Nodes
 
 
 
-void DrawMeshNode_Func::Run()
+void DrawMeshNode_Func::Run(std::string called_pin)
 {
     std::shared_ptr<MeshObject> in_mesh = GetInputPinValue<std::shared_ptr<MeshObject>>(parent_node, "mesh");
     if (in_mesh)

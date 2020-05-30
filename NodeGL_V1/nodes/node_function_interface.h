@@ -14,7 +14,7 @@ class Node;
 class NodeFunctions {
 public:
     virtual void Initialize() = 0;
-    virtual void Run() = 0;
+    virtual void Run(std::string called_pin) = 0;
     virtual void Delete() = 0;
     virtual void NoFlowUpdatePinsValues() = 0;
     virtual void UpdateNodeUI() = 0;

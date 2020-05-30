@@ -1,6 +1,6 @@
 #include "dummy_nodes.h"
 
-void DummyNode_Func::Run()
+void DummyNode_Func::Run(std::string called_pin)
 {
     RunNextNodeFunc(parent_node, "next");
 }
@@ -35,7 +35,7 @@ void DummySendFloat_Func::Initialize()
 
 }
 
-void DummySendFloat_Func::Run()
+void DummySendFloat_Func::Run(std::string called_pin)
 {
     // Update output pin value
     std::shared_ptr<PinValue<float>> output_pin = std::dynamic_pointer_cast<PinValue<float>>(parent_node->outputs.at("value"));
@@ -83,7 +83,7 @@ void DummyRecvSendFloat_Func::Initialize()
 
 }
 
-void DummyRecvSendFloat_Func::Run()
+void DummyRecvSendFloat_Func::Run(std::string called_pin)
 {
     // Update output pin value
     float input_value = GetInputPinValue<float>(parent_node, "value");
@@ -133,7 +133,7 @@ void DummySendInt_Func::Initialize()
 
 }
 
-void DummySendInt_Func::Run()
+void DummySendInt_Func::Run(std::string called_pin)
 {
     // Update output pin value
     std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("value"));
@@ -181,7 +181,7 @@ void DummyRecvSendInt_Func::Initialize()
 
 }
 
-void DummyRecvSendInt_Func::Run()
+void DummyRecvSendInt_Func::Run(std::string called_pin)
 {
     // Update output pin value
     float input_value = GetInputPinValue<float>(parent_node, "value");

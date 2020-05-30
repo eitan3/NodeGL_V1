@@ -1425,7 +1425,7 @@ void Application_GL_Frame()
 {
     auto config = InstanceConfig::instance();
     std::shared_ptr<Node> node = config->s_Nodes.at(0);
-    node->node_funcs->Run();
+    node->node_funcs->Run("main");
 }
 
 void Application_Frame()

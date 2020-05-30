@@ -9,7 +9,7 @@
 class Sequence_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
@@ -26,7 +26,7 @@ std::shared_ptr<Node> SequenceNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class Branch_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
@@ -43,7 +43,7 @@ std::shared_ptr<Node> BranchNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class WhileLoop_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
@@ -60,7 +60,7 @@ std::shared_ptr<Node> WhileLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 class ForLoop_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
@@ -77,7 +77,7 @@ std::shared_ptr<Node> ForLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class RunEveryXSeconds_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};

@@ -16,7 +16,7 @@
 class CreateSahder_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void DeleteShader();
     void NoFlowUpdatePinsValues() {};
@@ -47,7 +47,7 @@ std::shared_ptr<Node> CreateSahder(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class CreateProgram_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void DeleteProgram();
     void NoFlowUpdatePinsValues();
@@ -69,7 +69,7 @@ std::shared_ptr<Node> CreateProgram(std::vector<std::shared_ptr<Node>>& s_Nodes)
 class BindProgram_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
@@ -88,7 +88,7 @@ std::shared_ptr<Node> BindProgramNode(std::vector<std::shared_ptr<Node>>& s_Node
 class SetProgramUniformNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI();

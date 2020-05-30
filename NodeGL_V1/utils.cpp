@@ -60,12 +60,25 @@ bool CanCreateLink(std::shared_ptr<BasePin>& a, std::shared_ptr<BasePin>& b)
 void RunNextNodeFunc(std::shared_ptr<Node>& parent_node, std::string pin_key)
 {
     if (parent_node->outputs.at(pin_key)->type == PinType::Flow)
+    {
         if (parent_node->outputs.at(pin_key)->links.size() > 0)
+        {
             if (parent_node->outputs.at(pin_key)->links.at(0))
+            {
                 if (parent_node->outputs.at(pin_key)->links.at(0)->endPin)
+                {
                     if (parent_node->outputs.at(pin_key)->links.at(0)->endPin->node)
+                    {
                         if (parent_node->outputs.at(pin_key)->links.at(0)->endPin->node->node_funcs)
-                            parent_node->outputs.at(pin_key)->links.at(0)->endPin->node->node_funcs->Run();
+                        {
+                            std::string in_pin_key = parent_node->outputs.at(pin_key)->links.at(0)->endPin->pin_key;
+                            parent_node->outputs.at(pin_key)->links.at(0)->endPin->node->node_funcs->Run(in_pin_key);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 std::string PinTypeToString(PinType type)

@@ -64,7 +64,7 @@ float easeInOutQuart(float x){
     return x < 0.5 ? 8 * x * x * x * x : 1 - pow(-2 * x + 2, 4) / 2;
 }
 
-void EaseAnimation_Func::Run()
+void EaseAnimation_Func::Run(std::string called_pin)
 {
     auto& io = ImGui::GetIO();
     float new_min_val = GetInputPinValue<float>(parent_node, "min");
@@ -73,7 +73,7 @@ void EaseAnimation_Func::Run()
     bool reverse_val = GetInputPinValue<bool>(parent_node, "reverse");
     bool start_random_val = GetInputPinValue<bool>(parent_node, "start_random");
 
-    if (new_min_val != min_val || new_max_val != max_val || new_duration_val != duration_val || reverse != reverse_val || start_random != start_random_val)
+    if (new_min_val != min_val || new_max_val != max_val || new_duration_val != duration_val || reverse != reverse_val || start_random != start_random_val || called_pin == "reset")
     {
         min_val = new_min_val;
         max_val = new_max_val;
@@ -243,13 +243,14 @@ std::shared_ptr<Node> EaseAnimationhNode(std::vector<std::shared_ptr<Node>>& s_N
     s_Nodes.emplace_back(new Node(GetNextId(), easeAnimationhNodeName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("min", new PinValue<float>("min", 1, GetNextId(), "Min", PinType::Float, 0)));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("max", new PinValue<float>("max", 2, GetNextId(), "Max", PinType::Float, 1)));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("duration", new PinValue<float>("duration", 3, GetNextId(), "Duration", PinType::Float, 1)));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("reverse", new PinValue<bool>("reverse", 4, GetNextId(), "Reverse", PinType::Bool, true)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("reset", new BasePin("reset", 1, GetNextId(), "Reset", PinType::Flow)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("min", new PinValue<float>("min", 2, GetNextId(), "Min", PinType::Float, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("max", new PinValue<float>("max", 3, GetNextId(), "Max", PinType::Float, 1)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("duration", new PinValue<float>("duration", 4, GetNextId(), "Duration", PinType::Float, 1)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("reverse", new PinValue<bool>("reverse", 5, GetNextId(), "Reverse", PinType::Bool, true)));
     s_Nodes.back()->inputs.at("reverse")->always_expose = false;
     s_Nodes.back()->inputs.at("reverse")->exposed = false;
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("start_random", new PinValue<bool>("start_random", 5, GetNextId(), "Start Random", PinType::Bool, true)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<bool>>>("start_random", new PinValue<bool>("start_random", 6, GetNextId(), "Start Random", PinType::Bool, true)));
     s_Nodes.back()->inputs.at("start_random")->always_expose = false;
     s_Nodes.back()->inputs.at("start_random")->exposed = false;
 

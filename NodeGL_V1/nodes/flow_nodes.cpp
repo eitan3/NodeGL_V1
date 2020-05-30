@@ -5,7 +5,7 @@ void Sequence_Func::Initialize()
 
 }
 
-void Sequence_Func::Run()
+void Sequence_Func::Run(std::string called_pin)
 {
     for (auto& output : parent_node->outputs)
     {
@@ -88,7 +88,7 @@ std::shared_ptr<Node> SequenceNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
-void Branch_Func::Run()
+void Branch_Func::Run(std::string called_pin)
 {
     bool condition = GetInputPinValue<bool>(parent_node, "condition");
     if (condition)
@@ -142,7 +142,7 @@ std::shared_ptr<Node> BranchNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
-void WhileLoop_Func::Run()
+void WhileLoop_Func::Run(std::string called_pin)
 {
     bool condition = GetInputPinValue<bool>(parent_node, "condition");
     while (condition)
@@ -193,7 +193,7 @@ std::shared_ptr<Node> WhileLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
-void ForLoop_Func::Run()
+void ForLoop_Func::Run(std::string called_pin)
 {
     float start = GetInputPinValue<float>(parent_node, "start");
     float end = GetInputPinValue<float>(parent_node, "end");
@@ -261,13 +261,13 @@ std::shared_ptr<Node> ForLoopNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
 
 
 
-void RunEveryXSeconds_Func::Run()
+void RunEveryXSeconds_Func::Run(std::string called_pin)
 {
     auto& io = ImGui::GetIO();
     float in_seconds = GetInputPinValue<float>(parent_node, "seconds");
     bool run_anim_end = false;
 
-    if (prev_seconds != in_seconds)
+    if (prev_seconds != in_seconds || called_pin == "reset")
     {
         prev_seconds = in_seconds;
         timer = 0;
@@ -306,7 +306,9 @@ std::shared_ptr<Node> RunEveryXSecondsNode(std::vector<std::shared_ptr<Node>>& s
     s_Nodes.emplace_back(new Node(GetNextId(), runEveryXSecondsNodeName.c_str()));
 
     s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
-    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("seconds", new PinValue<float>("seconds", 1, GetNextId(), "Seconds", PinType::Float, 1)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("reset", new BasePin("reset", 1, GetNextId(), "Reset", PinType::Flow)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("seconds", new PinValue<float>("seconds", 2, GetNextId(), "Seconds", PinType::Float, 1)));
+    
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("complete", new BasePin("complete", 0, GetNextId(), "Every X Second", PinType::Flow)));
     s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("always", new BasePin("always", 1, GetNextId(), "Always", PinType::Flow)));
 

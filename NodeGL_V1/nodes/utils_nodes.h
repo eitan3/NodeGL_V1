@@ -13,7 +13,7 @@
 class PrintString_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
@@ -29,7 +29,7 @@ std::shared_ptr<Node> PrintString(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class ConvertTo_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -45,7 +45,7 @@ std::shared_ptr<Node> ConvertTo(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class SetPlaceholder_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
@@ -63,7 +63,7 @@ std::shared_ptr<Node> SetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes
 class GetPlaceholder_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -82,7 +82,7 @@ std::shared_ptr<Node> GetPlaceholder(std::vector<std::shared_ptr<Node>>& s_Nodes
 class SpoutSender_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void DeleteSpout();
     void NoFlowUpdatePinsValues() {};
@@ -105,7 +105,7 @@ std::shared_ptr<Node> SpoutSenderNode(std::vector<std::shared_ptr<Node>>& s_Node
 class CommentNode_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};

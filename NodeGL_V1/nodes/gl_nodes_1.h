@@ -13,7 +13,7 @@
 class GlMainLoop_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
@@ -48,7 +48,7 @@ std::shared_ptr<Node> GlMainLoop(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class GlClear_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};
@@ -66,7 +66,7 @@ std::shared_ptr<Node> GlClearNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 class GlRenderToTexture_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};

@@ -19,7 +19,7 @@ void GlMainLoop_Func::Initialize()
     SetupFrameBuffer();
 }
 
-void GlMainLoop_Func::Run()
+void GlMainLoop_Func::Run(std::string called_pin)
 {
     if (parent_node->error == "")
     {
@@ -385,7 +385,7 @@ void GlClear_Func::Initialize()
 {
 }
 
-void GlClear_Func::Run()
+void GlClear_Func::Run(std::string called_pin)
 {
     float r = GetInputPinValue<float>(parent_node, "r");
     float g = GetInputPinValue<float>(parent_node, "g");
@@ -484,7 +484,7 @@ void GlRenderToTexture_Func::Initialize()
     SetupFrameBuffer();
 }
 
-void GlRenderToTexture_Func::Run()
+void GlRenderToTexture_Func::Run(std::string called_pin)
 {
     if (parent_node->error == "")
     {

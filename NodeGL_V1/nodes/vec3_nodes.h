@@ -10,7 +10,7 @@
 class MakeVector3_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -26,7 +26,7 @@ std::shared_ptr<Node> MakeVector3Node(std::vector<std::shared_ptr<Node>>& s_Node
 class BreakVector3_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -42,7 +42,7 @@ std::shared_ptr<Node> BreakVector3Node(std::vector<std::shared_ptr<Node>>& s_Nod
 class Vector3Cross_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};
@@ -58,7 +58,7 @@ std::shared_ptr<Node> Vector3CrossNode(std::vector<std::shared_ptr<Node>>& s_Nod
 class Vector3Normalize_Func : public NodeFunctions {
 public:
     void Initialize() {};
-    void Run() {};
+    void Run(std::string called_pin) {};
     void Delete();
     void NoFlowUpdatePinsValues();
     void UpdateNodeUI() {};

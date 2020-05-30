@@ -12,7 +12,7 @@
 class EaseAnimation_Func : public NodeFunctions {
 public:
     void Initialize();
-    void Run();
+    void Run(std::string called_pin);
     void Delete();
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI() {};

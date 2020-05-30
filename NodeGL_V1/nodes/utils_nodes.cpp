@@ -3,7 +3,7 @@
 #include "../InstanceConfig.h"
 
 
-void PrintString_Func::Run()
+void PrintString_Func::Run(std::string called_pin)
 {
     // GetInputPinValue
     std::string input_value = GetInputPinValue<std::string>(parent_node, "value");
@@ -234,7 +234,7 @@ void SetPlaceholder_Func::Initialize()
     placeholder = nullptr;
 }
 
-void SetPlaceholder_Func::Run()
+void SetPlaceholder_Func::Run(std::string called_pin)
 {
     if (placeholder)
     {
@@ -516,7 +516,7 @@ void GetPlaceholder_Func::Initialize()
     placeholder = nullptr;
 }
 
-void GetPlaceholder_Func::Run()
+void GetPlaceholder_Func::Run(std::string called_pin)
 {
 }
 
@@ -738,7 +738,7 @@ void SpoutSender_Func::Initialize()
     bInitialized = false;
 }
 
-void SpoutSender_Func::Run()
+void SpoutSender_Func::Run(std::string called_pin)
 {
     std::shared_ptr<TextureObject> texutre_obj = GetInputPinValue<std::shared_ptr<TextureObject>>(parent_node, "texture");
     if (texutre_obj)
