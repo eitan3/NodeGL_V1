@@ -1,4 +1,3 @@
-Change node_key.rfind() to str.rfind(node_key). loading objects doesnt work properly with the original code
 Add Resources (import textures meshes and so on)
 Add Arrays
 Create multiple render to texture and other nodes when looping
