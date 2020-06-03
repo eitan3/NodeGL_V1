@@ -1,7 +1,8 @@
-Add "Bind Program With Uniforms" Node
+Change node_key.rfind() to str.rfind(node_key). loading objects doesnt work properly with the original code
 Add Resources (import textures meshes and so on)
 Add Arrays
 Create multiple render to texture and other nodes when looping
+Check if all "delete functions" delete EVERYTHING!!!! including pins and links
 
 Reset static id counter
 Need to freeze the editor when other window open up

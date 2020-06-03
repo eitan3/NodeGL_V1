@@ -77,16 +77,7 @@ void CreateCubeNode_Func::LoadNodeData(rapidjson::Value& node_obj)
 
 void CreateCubeNode_Func::SetupMesh()
 {
-    if (mesh_obj)
-    {
-        mesh_obj = nullptr;
-        for (int j = 0; j < parent_node->outputs.at("out")->links.size(); j++)
-        {
-            ed::DeleteLink(parent_node->outputs.at("out")->links.at(j)->id);
-        }
-        parent_node->outputs.at("out")->links.clear();
-    }
-    
+    mesh_obj = nullptr;
     std::vector<Vertex> vertices;
 
     vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));

@@ -76,12 +76,33 @@ public:
     void UpdateNodeInspector() {};
     void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) {};
     void LoadNodeData(rapidjson::Value& node_obj) {};
-
-    std::string object_prefix;
-    std::shared_ptr<ProgramObject> program_obj;
 };
 
 std::shared_ptr<Node> BindProgramNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class BindProgramWithUniforms_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run(std::string called_pin);
+    void Delete();
+    void NoFlowUpdatePinsValues() {};
+    void UpdateNodeUI();
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+
+private:
+    void ProgramChanged();
+    void DeletePins();
+
+    GLuint prev_program;
+    bool continue_loading = false;
+    std::map<std::string, std::shared_ptr<BasePlaceholder>> tmp_loaded_value;
+};
+
+std::shared_ptr<Node> BindProgramWithUniformsNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 
@@ -100,6 +121,7 @@ public:
     void UniformChanged();
     void DeletePin();
 
+private:
     bool continue_loading = false;
 
     GLuint prev_program;

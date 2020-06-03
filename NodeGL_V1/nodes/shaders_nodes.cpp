@@ -469,6 +469,390 @@ std::shared_ptr<Node> BindProgramNode(std::vector<std::shared_ptr<Node>>& s_Node
 
 
 
+void BindProgramWithUniforms_Func::Run(std::string called_pin)
+{
+    auto config = InstanceConfig::instance();
+    std::shared_ptr<ProgramObject> in_program = GetInputPinValue<std::shared_ptr<ProgramObject>>(parent_node, "program");
+    if (in_program)
+    {
+        if (in_program->object_id != prev_program)
+        {
+            ProgramChanged();
+        }
+
+        config->programs_stack.push(config->current_program);
+
+        glUseProgram(in_program->object_id);
+
+        for (int n = 0; n < in_program->uniforms_arr.size(); n++)
+        {
+            std::string uniName = in_program->uniforms_arr.at(n).name;
+            std::string pin_key = "uni_pin_" + std::to_string(n);
+            if (parent_node->inputs.at(pin_key)->type == PinType::Bool)
+            {
+                bool uni_value = GetInputPinValue<bool>(parent_node, pin_key);
+                glUniform1i(glGetUniformLocation(in_program->object_id, uniName.c_str()), uni_value);
+
+                /*GLint get_values[1];
+                glGetUniformiv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                std::cout << glGetError() << ", " << get_values[0] << std::endl;*/
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Int)
+            {
+                int uni_value = GetInputPinValue<int>(parent_node, pin_key);
+                glUniform1i(glGetUniformLocation(in_program->object_id, uniName.c_str()), uni_value);
+
+                /*GLint get_values[1];
+                glGetUniformiv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                std::cout << glGetError() << ", " << get_values[0] << std::endl;*/
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Float)
+            {
+                float uni_value = GetInputPinValue<float>(parent_node, pin_key);
+                glUniform1f(glGetUniformLocation(in_program->object_id, uniName.c_str()), uni_value);
+
+                /*GLfloat get_values[1];
+                glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                std::cout << glGetError() << ", " << get_values[0] << std::endl;*/
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Vector2)
+            {
+                glm::vec2 uni_value = GetInputPinValue<glm::vec2>(parent_node, pin_key);
+                glUniform2fv(glGetUniformLocation(in_program->object_id, uniName.c_str()), 1, glm::value_ptr(uni_value));
+
+                /*GLfloat get_values[2];
+                glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                std::cout << glGetError() << ", " << get_values[0] << ", " << get_values[1] << std::endl;*/
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Vector3)
+            {
+                glm::vec3 uni_value = GetInputPinValue<glm::vec3>(parent_node, pin_key);
+                glUniform3fv(glGetUniformLocation(in_program->object_id, uniName.c_str()), 1, glm::value_ptr(uni_value));
+
+                /*GLfloat get_values[3];
+                glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                std::cout << glGetError() << ", " << get_values[0] << ", " << get_values[1] << ", " << get_values[2] << std::endl;*/
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Vector4)
+            {
+                glm::vec4 uni_value = GetInputPinValue<glm::vec4>(parent_node, pin_key);
+                glUniform4fv(glGetUniformLocation(in_program->object_id, uniName.c_str()), 1, glm::value_ptr(uni_value));
+
+                //GLfloat get_values[4];
+                //glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                //std::cout << glGetError() << ", " << get_values[0] << ", " << get_values[1] << ", " << get_values[2] << ", " << get_values[3] << std::endl;
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Matrix4x4)
+            {
+                glm::mat4 uni_value = GetInputPinValue<glm::mat4>(parent_node, pin_key);
+                glUniformMatrix4fv(glGetUniformLocation(in_program->object_id, uniName.c_str()), 1, false, &uni_value[0][0]);
+
+                /*GLfloat get_values[16];
+                glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                std::cout << glGetError();
+                for (int i = 0; i < 16; i++)
+                    std::cout << ", " << get_values[i];
+                std::cout << std::endl;*/
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::TextureObject)
+            {
+                std::shared_ptr<TextureObject> uni_value = GetInputPinValue<std::shared_ptr<TextureObject>>(parent_node, pin_key);
+                if (uni_value)
+                {
+                    glActiveTexture(GL_TEXTURE0 + in_program->current_texture);
+                    glBindTexture(GL_TEXTURE_2D, uni_value->object_id);
+                    glUniform1i(glGetUniformLocation(in_program->object_id, uniName.c_str()), in_program->current_texture);
+                    in_program->current_texture++;
+                }
+            }
+        }
+
+        RunNextNodeFunc(parent_node, "in_bind");
+        in_program->current_texture = 0;
+
+        GLuint prev_prog = config->programs_stack.top();
+        config->programs_stack.pop();
+        glUseProgram(prev_prog);
+    }
+    RunNextNodeFunc(parent_node, "complete");
+}
+
+void BindProgramWithUniforms_Func::Delete()
+{
+    parent_node = nullptr;
+    tmp_loaded_value.clear();
+}
+
+void BindProgramWithUniforms_Func::UpdateNodeUI()
+{
+    std::shared_ptr<ProgramObject> in_program = GetInputPinValue<std::shared_ptr<ProgramObject>>(parent_node, "program");
+    if (in_program)
+    {
+        if (in_program->object_id != prev_program)
+        {
+            ProgramChanged();
+        }
+    }
+    else
+    {
+        prev_program = 0;
+        DeletePins();
+    }
+}
+
+void BindProgramWithUniforms_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    std::shared_ptr<ProgramObject> in_program = GetInputPinValue<std::shared_ptr<ProgramObject>>(parent_node, "program");
+    if (in_program)
+    {
+        writer.Key("uniforms");
+        writer.StartArray();
+        for (int n = 0; n < in_program->uniforms_arr.size(); n++)
+        {
+            std::string uniName = in_program->uniforms_arr.at(n).name;
+            std::string pin_key = "uni_pin_" + std::to_string(n);
+            writer.StartArray();
+            writer.String(uniName.c_str());
+            writer.String(PinTypeToString(in_program->uniforms_arr.at(n).type).c_str());
+
+            if (parent_node->inputs.at(pin_key)->type == PinType::Bool)
+            {
+                bool uni_value = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at(pin_key))->default_value;
+                writer.Bool(uni_value);
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Int)
+            {
+                int uni_value = std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at(pin_key))->default_value;
+                writer.Int(uni_value);
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Float)
+            {
+                float uni_value = std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at(pin_key))->default_value;
+                writer.Double(uni_value);
+            }
+            if (parent_node->inputs.at(pin_key)->type == PinType::Vector2)
+            {
+                glm::vec2 uni_value = std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->inputs.at(pin_key))->default_value;
+                writer.StartArray();
+                writer.Double(uni_value.x);
+                writer.Double(uni_value.y);
+                writer.EndArray();
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Vector3)
+            {
+                glm::vec3 uni_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at(pin_key))->default_value;
+                writer.StartArray();
+                writer.Double(uni_value.x);
+                writer.Double(uni_value.y);
+                writer.Double(uni_value.z);
+                writer.EndArray();
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Vector4)
+            {
+                glm::vec4 uni_value = std::dynamic_pointer_cast<PinValue<glm::vec4>>(parent_node->inputs.at(pin_key))->default_value;
+                writer.StartArray();
+                writer.Double(uni_value.x);
+                writer.Double(uni_value.y);
+                writer.Double(uni_value.z);
+                writer.Double(uni_value.w);
+                writer.EndArray();
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Matrix4x4)
+            {
+                glm::mat4 uni_value = std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->inputs.at(pin_key))->default_value;
+                writer.StartArray();
+                const float* pSource = (const float*)glm::value_ptr(uni_value);
+                for (int i = 0; i < 16; ++i)
+                    writer.Double(pSource[i]);
+                writer.EndArray();
+            }
+            writer.EndArray();
+        }
+        writer.EndArray();
+    }
+}
+
+void BindProgramWithUniforms_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    for (int uni_i = 0; uni_i < node_obj["uniforms"].GetArray().Size(); uni_i++)
+    {
+        std::string uniform_name = node_obj["uniforms"].GetArray()[uni_i][0].GetString();
+        PinType uniform_type = StringToPinType(node_obj["uniforms"].GetArray()[uni_i][1].GetString());
+        
+        if (uniform_type == PinType::Bool)
+        {
+            bool uni_value = node_obj["uniforms"].GetArray()[uni_i][2].GetBool();
+            std::shared_ptr<PlaceholderValue<bool>> tmp_ph = std::make_shared<PlaceholderValue<bool>>("tmp", uniform_type, uni_value);
+            tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
+        }
+        else if (uniform_type == PinType::Int)
+        {
+            int uni_value = node_obj["uniforms"].GetArray()[uni_i][2].GetInt();
+            std::shared_ptr<PlaceholderValue<int>> tmp_ph = std::make_shared<PlaceholderValue<int>>("tmp", uniform_type, uni_value);
+            tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
+        }
+        else if (uniform_type == PinType::Float)
+        {
+            float uni_value = node_obj["uniforms"].GetArray()[uni_i][2].GetFloat();
+            std::shared_ptr<PlaceholderValue<float>> tmp_ph = std::make_shared<PlaceholderValue<float>>("tmp", uniform_type, uni_value);
+            tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
+        }
+        if (uniform_type == PinType::Vector2)
+        {
+            glm::vec2 uni_value;
+            uni_value.x = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[0].GetFloat();
+            uni_value.y = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[1].GetFloat();
+            std::shared_ptr<PlaceholderValue<glm::vec2>> tmp_ph = std::make_shared<PlaceholderValue<glm::vec2>>("tmp", uniform_type, uni_value);
+            tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
+        }
+        else if (uniform_type == PinType::Vector3)
+        {
+            glm::vec3 uni_value;
+            uni_value.x = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[0].GetFloat();
+            uni_value.y = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[1].GetFloat();
+            uni_value.z = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[2].GetFloat();
+            std::shared_ptr<PlaceholderValue<glm::vec3>> tmp_ph = std::make_shared<PlaceholderValue<glm::vec3>>("tmp", uniform_type, uni_value);
+            tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
+        }
+        else if (uniform_type == PinType::Vector4)
+        {
+            glm::vec4 uni_value;
+            uni_value.x = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[0].GetFloat();
+            uni_value.y = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[1].GetFloat();
+            uni_value.z = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[2].GetFloat();
+            uni_value.w = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[3].GetFloat();
+            std::shared_ptr<PlaceholderValue<glm::vec4>> tmp_ph = std::make_shared<PlaceholderValue<glm::vec4>>("tmp", uniform_type, uni_value);
+            tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
+        }
+        else if (uniform_type == PinType::Matrix4x4)
+        {
+            glm::mat4 uni_value;
+            float* pSource = (float*)glm::value_ptr(uni_value);
+            for (int i = 0; i < 16; ++i)
+            {
+                pSource[i] = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[i].GetFloat();
+            }
+            std::shared_ptr<PlaceholderValue<glm::mat4>> tmp_ph = std::make_shared<PlaceholderValue<glm::mat4>>("tmp", uniform_type, uni_value);
+            tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
+        }
+    }
+    continue_loading = true;
+}
+
+void BindProgramWithUniforms_Func::ProgramChanged()
+{
+    DeletePins();
+    std::shared_ptr<ProgramObject> in_program = GetInputPinValue<std::shared_ptr<ProgramObject>>(parent_node, "program");
+    if (in_program)
+    {
+        prev_program = in_program->object_id;
+        if (in_program->uniforms_arr.size() > 0)
+        {
+            for (int n = 0; n < in_program->uniforms_arr.size(); n++)
+            {
+                std::string uniName = in_program->uniforms_arr.at(n).name;
+                parent_node->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("uni_pin_" + std::to_string(n), new PinValue<float>("uni_pin_" + std::to_string(n), n + 2, GetNextId(), uniName.c_str(), PinType::Float, 0)));
+                UtilsChangePinType(parent_node, PinKind::Input, "uni_pin_" + std::to_string(n), in_program->uniforms_arr.at(n).type);
+            }
+            BuildNode(parent_node);
+
+            if (continue_loading && tmp_loaded_value.size() > 0)
+            {
+                for (int n = 0; n < in_program->uniforms_arr.size(); n++)
+                {
+                    std::string uniName = in_program->uniforms_arr.at(n).name;
+                    std::string pin_key = "uni_pin_" + std::to_string(n);
+                    PinType uniform_type = in_program->uniforms_arr.at(n).type;
+                    if (uniform_type == PinType::Bool)
+                    {
+                        if (tmp_loaded_value.count(uniName) > 0)
+                            std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<bool>>(tmp_loaded_value.at(uniName))->value;
+                    }
+                    else if (uniform_type == PinType::Int)
+                    {
+                        if (tmp_loaded_value.count(uniName) > 0)
+                            std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<int>>(tmp_loaded_value.at(uniName))->value;
+                    }
+                    else if (uniform_type == PinType::Float)
+                    {
+                        if (tmp_loaded_value.count(uniName) > 0)
+                            std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<float>>(tmp_loaded_value.at(uniName))->value;
+                    }
+                    if (uniform_type == PinType::Vector2)
+                    {
+                        if (tmp_loaded_value.count(uniName) > 0)
+                            std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec2>>(tmp_loaded_value.at(uniName))->value;
+                    }
+                    else if (uniform_type == PinType::Vector3)
+                    {
+                        if (tmp_loaded_value.count(uniName) > 0)
+                            std::dynamic_pointer_cast<PinValue<glm::vec3>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec3>>(tmp_loaded_value.at(uniName))->value;
+                    }
+                    else if (uniform_type == PinType::Vector4)
+                    {
+                        if (tmp_loaded_value.count(uniName) > 0)
+                            std::dynamic_pointer_cast<PinValue<glm::vec4>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec4>>(tmp_loaded_value.at(uniName))->value;
+                    }
+                    else if (uniform_type == PinType::Matrix4x4)
+                    {
+                        if (tmp_loaded_value.count(uniName) > 0)
+                            std::dynamic_pointer_cast<PinValue<glm::mat4>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::mat4>>(tmp_loaded_value.at(uniName))->value;
+                    }
+                }
+                tmp_loaded_value.clear();
+                continue_loading = false;
+            }
+        }
+    }
+}
+
+void BindProgramWithUniforms_Func::DeletePins()
+{
+    unsigned int started_size = parent_node->inputs.size();
+    for (int i = 2; i < started_size; i++)
+    {
+        std::string pin_key = "uni_pin_" + std::to_string(i - 2);
+        if (parent_node->inputs.count(pin_key) > 0)
+        {
+            for (int j = 0; j < parent_node->inputs.at(pin_key)->links.size(); j++)
+            {
+                ed::DeleteLink(parent_node->inputs.at(pin_key)->links.at(j)->id);
+            }
+            parent_node->inputs.at(pin_key)->node = nullptr;
+            parent_node->inputs.at(pin_key)->links.clear();
+
+            parent_node->inputs.erase(pin_key);
+        }
+    }
+    if (started_size > 2)
+        BuildNode(parent_node);
+}
+
+std::string bindProgramWithUniformsNodeName = "Bind Program With Uniforms";
+std::shared_ptr<Node> BindProgramWithUniformsNode(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), bindProgramWithUniformsNodeName.c_str()));
+
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("enter", new BasePin("enter", 0, GetNextId(), "Enter", PinType::Flow)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>>>("program", new PinValue<std::shared_ptr<ProgramObject>>("program", 1, GetNextId(), "Program", PinType::ProgramObject, nullptr)));
+
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("in_bind", new BasePin("in_bind", 0, GetNextId(), "Bind Context", PinType::Flow)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<BasePin>>("complete", new BasePin("complete", 1, GetNextId(), "Complete Binding", PinType::Flow)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<BindProgramWithUniforms_Func>();
+    std::dynamic_pointer_cast<BindProgramWithUniforms_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
 
 void SetProgramUniformNode_Func::Run(std::string called_pin)
 {
@@ -568,6 +952,7 @@ void SetProgramUniformNode_Func::Run(std::string called_pin)
 void SetProgramUniformNode_Func::Delete()
 {
     parent_node = nullptr;
+    tmp_loaded_value = nullptr;
 }
 
 void SetProgramUniformNode_Func::UpdateNodeUI()
@@ -608,6 +993,7 @@ void SetProgramUniformNode_Func::UpdateNodeUI()
     }
     else
     {
+        prev_program = 0;
         DeletePin();
     }
 }
@@ -855,8 +1241,19 @@ void SetProgramUniformNode_Func::UniformChanged()
 
 void SetProgramUniformNode_Func::DeletePin()
 {
-    if (parent_node->inputs.count("uni_pin") > 0)
-        parent_node->inputs.erase("uni_pin");
+    std::string pin_key = "uni_pin";
+    if (parent_node->inputs.count(pin_key) > 0)
+    {
+        for (int j = 0; j < parent_node->inputs.at(pin_key)->links.size(); j++)
+        {
+            ed::DeleteLink(parent_node->inputs.at(pin_key)->links.at(j)->id);
+        }
+        parent_node->inputs.at(pin_key)->node = nullptr;
+        parent_node->inputs.at(pin_key)->links.clear();
+
+        parent_node->inputs.erase(pin_key);
+    }
+
     parent_node->info = "";
     if (continue_loading == false)
     {
@@ -902,9 +1299,13 @@ void ShadersNodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::vector<std::string> keywords_3{ "Bind", "Program" };
     search_nodes_vector.push_back(SearchNodeObj("Bind Program", "Shaders Nodes", keywords_3, func_3));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = SetProgramUniformNode;
-    std::vector<std::string> keywords_4{ "Set", "Program", "Uniform" };
-    search_nodes_vector.push_back(SearchNodeObj("Set Program Uniform", "Shaders Nodes", keywords_4, func_4));
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = BindProgramWithUniformsNode;
+    std::vector<std::string> keywords_4{ "Bind", "Program", "Uniforms", "Shader" };
+    search_nodes_vector.push_back(SearchNodeObj("Bind Program With Uniforms", "Shaders Nodes", keywords_4, func_4));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = SetProgramUniformNode;
+    std::vector<std::string> keywords_5{ "Set", "Program", "Uniform" };
+    search_nodes_vector.push_back(SearchNodeObj("Set Program Uniform", "Shaders Nodes", keywords_5, func_5));
 }
 
 std::shared_ptr<Node> ShadersNodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
@@ -915,6 +1316,9 @@ std::shared_ptr<Node> ShadersNodesLoadSetup(std::vector<std::shared_ptr<Node>>& 
     }
     else if (loaded_node == nullptr && node_key.rfind(createSahderName, 0) == 0) {
         loaded_node = CreateSahder(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(bindProgramWithUniformsNodeName, 0) == 0) {
+        loaded_node = BindProgramWithUniformsNode(s_Nodes);
     }
     else if (loaded_node == nullptr && node_key.rfind(bindProgramNodeName, 0) == 0) {
         loaded_node = BindProgramNode(s_Nodes);
