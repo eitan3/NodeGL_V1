@@ -31,6 +31,12 @@
     <Filter Include="Source Files\SpoutSDK">
       <UniqueIdentifier>{022cd1e9-7fb7-4071-b88a-ddc54e36cef5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\windows">
+      <UniqueIdentifier>{c8f90e2b-b1bb-4703-bda0-8386d562136a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\windows">
+      <UniqueIdentifier>{e02aa6c3-5ed2-4c9c-8a8e-fa192c444c89}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -135,14 +141,14 @@
     <ClCompile Include="nodes\vec4_nodes.cpp">
       <Filter>Source Files\nodes</Filter>
     </ClCompile>
-    <ClCompile Include="node_search_popup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="nodes\vec2_nodes.cpp">
       <Filter>Source Files\nodes</Filter>
     </ClCompile>
     <ClCompile Include="nodes\meshes_nodes.cpp">
       <Filter>Source Files\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="node_search_popup.cpp">
+      <Filter>Source Files\windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -266,14 +272,14 @@
     <ClInclude Include="nodes\vec4_nodes.h">
       <Filter>Header Files\nodes</Filter>
     </ClInclude>
-    <ClInclude Include="node_search_popup.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="nodes\vec2_nodes.h">
       <Filter>Header Files\nodes</Filter>
     </ClInclude>
     <ClInclude Include="nodes\meshes_nodes.h">
       <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="node_search_popup.h">
+      <Filter>Header Files\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

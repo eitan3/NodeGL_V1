@@ -29,7 +29,8 @@
 #include "utils.h"
 #include "id_generator.h"
 #include "nodes_builder.h"
-#include "node_search_popup.h"
+
+#include "windows/node_search_popup.h"
 #include "nodes/nodes_collection.h"
 
 // To add GL Main Loop
@@ -1253,6 +1254,11 @@ void ShowNodeSearchWindow()
     }
 }
 
+void ShowResourcesWindow()
+{
+
+}
+
 void ShowWindows()
 {
     auto editor_config = EditorConfig::instance();
@@ -1310,6 +1316,11 @@ void ShowWindows()
     {
         delete_placeholder_combo = "";
     }
+
+    if (editor_config->showResourcesWindow)
+    {
+        ShowResourcesWindow();
+    }
 }
 #pragma endregion
 
@@ -1361,6 +1372,10 @@ void CreateMenuBar()
             if (ImGui::MenuItem("Nodes Hierarchy Window"))
             {
                 showNodeHierarchyWindow = true;
+            }
+            if (ImGui::MenuItem("Resources"))
+            {
+                editor_config->showResourcesWindow = true;
             }
             if (ImGui::MenuItem("Textures Viewer"))
             {
