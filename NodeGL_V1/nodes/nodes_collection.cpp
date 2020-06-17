@@ -14,6 +14,7 @@ void CollectSearchNodes(std::vector<SearchNodeObj>& search_nodes_vector)
 	Vec4NodesSearchSetup(search_nodes_vector);
 	MatricesNodes_SearchSetup(search_nodes_vector);
 	MeshesNodesSearchSetup(search_nodes_vector);
+	ResourcesNodesSearchSetup(search_nodes_vector);
 }
 
 std::shared_ptr<Node> LoadNodeFromJSON(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
@@ -43,5 +44,7 @@ std::shared_ptr<Node> LoadNodeFromJSON(std::vector<std::shared_ptr<Node>>& s_Nod
 		loaded_node = MatricesNodes_LoadSetup(s_Nodes, node_key);
 	if (loaded_node == nullptr)
 		loaded_node = MeshesNodesLoadSetup(s_Nodes, node_key);
+	if (loaded_node == nullptr)
+		loaded_node = ResourcesNodesLoadSetup(s_Nodes, node_key);
 	return loaded_node;
 }

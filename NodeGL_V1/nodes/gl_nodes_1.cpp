@@ -12,10 +12,10 @@ void GlMainLoop_Func::Initialize()
     current_mag_param = (char*)filtering_params[0];
     current_wrap_s = (char*)warp_params[0];
     current_wrap_t = (char*)warp_params[0];
-    prev_current_min_param = (char*)filtering_params[0];
-    prev_current_mag_param = (char*)filtering_params[0];
-    prev_current_wrap_s = (char*)warp_params[0];
-    prev_current_wrap_t = (char*)warp_params[0];
+    prev_min_param = (char*)filtering_params[0];
+    prev_mag_param = (char*)filtering_params[0];
+    prev_wrap_s = (char*)warp_params[0];
+    prev_wrap_t = (char*)warp_params[0];
     SetupFrameBuffer();
 }
 
@@ -26,15 +26,15 @@ void GlMainLoop_Func::Run(std::string called_pin)
         auto config = InstanceConfig::instance();
         int new_width = GetInputPinValue<int>(parent_node, "width");
         int new_height = GetInputPinValue<int>(parent_node, "height");
-        if (new_width != output_width || new_height != output_height || current_min_param != prev_current_min_param || 
-            current_mag_param != prev_current_mag_param || current_wrap_s != prev_current_wrap_s || current_wrap_t != prev_current_wrap_t)
+        if (new_width != output_width || new_height != output_height || current_min_param != prev_min_param || 
+            current_mag_param != prev_mag_param || current_wrap_s != prev_wrap_s || current_wrap_t != prev_wrap_t)
         {
             output_width = new_width;
             output_height = new_height;
-            prev_current_min_param = current_min_param;
-            prev_current_mag_param = current_mag_param;
-            prev_current_wrap_s = current_wrap_s;
-            prev_current_wrap_t = current_wrap_t;
+            prev_min_param = current_min_param;
+            prev_mag_param = current_mag_param;
+            prev_wrap_s = current_wrap_s;
+            prev_wrap_t = current_wrap_t;
             DeleteFrameBuffer();
             SetupFrameBuffer();
         }
@@ -344,6 +344,14 @@ void GlMainLoop_Func::SetupFrameBuffer()
     config->InsertTexture(object_prefix + "_color", std::make_shared<TextureObject>(object_prefix + "_color", renderedTexture, output_width, output_height));
     config->InsertTexture(object_prefix + "_depth", std::make_shared<TextureObject>(object_prefix + "_depth", depthTexture, output_width, output_height));
     config->InsertFrameBuffer(object_prefix, std::make_shared<FrameBufferObject>(object_prefix, framebuffer_id));
+    config->GetTexture(object_prefix + "_color")->current_min_param = current_min_param;
+    config->GetTexture(object_prefix + "_color")->current_mag_param = current_mag_param;
+    config->GetTexture(object_prefix + "_color")->current_wrap_s = current_wrap_s;
+    config->GetTexture(object_prefix + "_color")->current_wrap_t = current_wrap_t;
+    config->GetTexture(object_prefix + "_depth")->current_min_param = current_min_param;
+    config->GetTexture(object_prefix + "_depth")->current_mag_param = current_mag_param;
+    config->GetTexture(object_prefix + "_depth")->current_wrap_s = current_wrap_s;
+    config->GetTexture(object_prefix + "_depth")->current_wrap_t = current_wrap_t;
     parent_node->error = "";
 }
 
@@ -477,10 +485,10 @@ void GlRenderToTexture_Func::Initialize()
     current_mag_param = (char*)filtering_params[0];
     current_wrap_s = (char*)warp_params[0];
     current_wrap_t = (char*)warp_params[0];
-    prev_current_min_param = (char*)filtering_params[0];
-    prev_current_mag_param = (char*)filtering_params[0];
-    prev_current_wrap_s = (char*)warp_params[0];
-    prev_current_wrap_t = (char*)warp_params[0];
+    prev_min_param = (char*)filtering_params[0];
+    prev_mag_param = (char*)filtering_params[0];
+    prev_wrap_s = (char*)warp_params[0];
+    prev_wrap_t = (char*)warp_params[0];
     SetupFrameBuffer();
 }
 
@@ -491,15 +499,15 @@ void GlRenderToTexture_Func::Run(std::string called_pin)
         auto config = InstanceConfig::instance();
         int new_width = GetInputPinValue<int>(parent_node, "width");
         int new_height = GetInputPinValue<int>(parent_node, "height");
-        if (new_width != output_width || new_height != output_height || current_min_param != prev_current_min_param ||
-            current_mag_param != prev_current_mag_param || current_wrap_s != prev_current_wrap_s || current_wrap_t != prev_current_wrap_t)
+        if (new_width != output_width || new_height != output_height || current_min_param != prev_min_param ||
+            current_mag_param != prev_mag_param || current_wrap_s != prev_wrap_s || current_wrap_t != prev_wrap_t)
         {
             output_width = new_width;
             output_height = new_height;
-            prev_current_min_param = current_min_param;
-            prev_current_mag_param = current_mag_param;
-            prev_current_wrap_s = current_wrap_s;
-            prev_current_wrap_t = current_wrap_t;
+            prev_min_param = current_min_param;
+            prev_mag_param = current_mag_param;
+            prev_wrap_s = current_wrap_s;
+            prev_wrap_t = current_wrap_t;
             DeleteFrameBuffer();
             SetupFrameBuffer();
         }
@@ -818,6 +826,14 @@ void GlRenderToTexture_Func::SetupFrameBuffer()
     config->InsertTexture(object_prefix + "_color", std::make_shared<TextureObject>(object_prefix + "_color", renderedTexture, output_width, output_height));
     config->InsertTexture(object_prefix + "_depth", std::make_shared<TextureObject>(object_prefix + "_depth", depthTexture, output_width, output_height));
     config->InsertFrameBuffer(object_prefix, std::make_shared<FrameBufferObject>(object_prefix, framebuffer_id));
+    config->GetTexture(object_prefix + "_color")->current_min_param = current_min_param;
+    config->GetTexture(object_prefix + "_color")->current_mag_param = current_mag_param;
+    config->GetTexture(object_prefix + "_color")->current_wrap_s = current_wrap_s;
+    config->GetTexture(object_prefix + "_color")->current_wrap_t = current_wrap_t;
+    config->GetTexture(object_prefix + "_depth")->current_min_param = current_min_param;
+    config->GetTexture(object_prefix + "_depth")->current_mag_param = current_mag_param;
+    config->GetTexture(object_prefix + "_depth")->current_wrap_s = current_wrap_s;
+    config->GetTexture(object_prefix + "_depth")->current_wrap_t = current_wrap_t;
     parent_node->error = "";
 }
 

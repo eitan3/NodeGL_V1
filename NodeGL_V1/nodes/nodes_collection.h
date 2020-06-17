@@ -15,6 +15,7 @@
 #include "vec4_nodes.h"
 #include "matrices_nodes.h";
 #include "meshes_nodes.h"
+#include "resources_nodes.h"
 
 void CollectSearchNodes(std::vector<SearchNodeObj>& search_nodes_vector);
 

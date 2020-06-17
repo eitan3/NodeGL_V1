@@ -80,47 +80,49 @@ void CreateCubeNode_Func::SetupMesh()
     mesh_obj = nullptr;
     std::vector<Vertex> vertices;
 
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    float minUV = 0;
+    float maxUV = 1;
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(maxUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(minUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(maxUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(minUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(maxUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(minUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(maxUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(maxUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(minUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, min_z), glm::vec2(maxUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, min_y, max_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, max_z), glm::vec2(minUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, min_y, min_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(1, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(0, 0), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(0, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
-    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(1, 1), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, min_z), glm::vec2(maxUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, min_z), glm::vec2(minUV, minUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(min_x, max_y, max_z), glm::vec2(minUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
+    vertices.push_back(Vertex(glm::vec3(max_x, max_y, max_z), glm::vec2(maxUV, maxUV), glm::vec3(0), glm::vec3(0), glm::vec3(0)));
 
     std::vector<unsigned int> indices;
     for (int i = 0; i < vertices.size(); i++)

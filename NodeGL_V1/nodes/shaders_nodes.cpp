@@ -28,7 +28,18 @@ void CreateSahder_Func::DeleteShader()
             {
                 for (int j = 0; j < output.second->links.size(); j++)
                 {
-                    ed::DeleteLink(output.second->links.at(j)->id);
+                    std::shared_ptr<Link> link = output.second->links.at(j);
+                    if (link->startPin)
+                    {
+                        link->startPin->links.erase(std::remove(link->startPin->links.begin(), link->startPin->links.end(), link), link->startPin->links.end());
+                        link->startPin = nullptr;
+                    }
+                    if (link->endPin)
+                    {
+                        link->endPin->links.erase(std::remove(link->endPin->links.begin(), link->endPin->links.end(), link), link->endPin->links.end());
+                        link->endPin = nullptr;
+                    }
+                    ed::DeleteLink(link->id);
                 }
                 output.second->node = nullptr;
                 output.second->links.clear();
@@ -307,7 +318,18 @@ void CreateProgram_Func::DeleteProgram()
             {
                 for (int j = 0; j < output.second->links.size(); j++)
                 {
-                    ed::DeleteLink(output.second->links.at(j)->id);
+                    std::shared_ptr<Link> link = output.second->links.at(j);
+                    if (link->startPin)
+                    {
+                        link->startPin->links.erase(std::remove(link->startPin->links.begin(), link->startPin->links.end(), link), link->startPin->links.end());
+                        link->startPin = nullptr;
+                    }
+                    if (link->endPin)
+                    {
+                        link->endPin->links.erase(std::remove(link->endPin->links.begin(), link->endPin->links.end(), link), link->endPin->links.end());
+                        link->endPin = nullptr;
+                    }
+                    ed::DeleteLink(link->id);
                 }
                 output.second->node = nullptr;
                 output.second->links.clear();
@@ -816,7 +838,18 @@ void BindProgramWithUniforms_Func::DeletePins()
         {
             for (int j = 0; j < parent_node->inputs.at(pin_key)->links.size(); j++)
             {
-                ed::DeleteLink(parent_node->inputs.at(pin_key)->links.at(j)->id);
+                std::shared_ptr<Link> link = parent_node->inputs.at(pin_key)->links.at(j);
+                if (link->startPin)
+                {
+                    link->startPin->links.erase(std::remove(link->startPin->links.begin(), link->startPin->links.end(), link), link->startPin->links.end());
+                    link->startPin = nullptr;
+                }
+                if (link->endPin)
+                {
+                    link->endPin->links.erase(std::remove(link->endPin->links.begin(), link->endPin->links.end(), link), link->endPin->links.end());
+                    link->endPin = nullptr;
+                }
+                ed::DeleteLink(link->id);
             }
             parent_node->inputs.at(pin_key)->node = nullptr;
             parent_node->inputs.at(pin_key)->links.clear();
@@ -824,8 +857,7 @@ void BindProgramWithUniforms_Func::DeletePins()
             parent_node->inputs.erase(pin_key);
         }
     }
-    if (started_size > 2)
-        BuildNode(parent_node);
+    BuildNode(parent_node);
 }
 
 std::string bindProgramWithUniformsNodeName = "Bind Program With Uniforms";
@@ -1198,7 +1230,18 @@ void SetProgramUniformNode_Func::UniformChanged()
         {
             for (int j = 0; j < parent_node->inputs.at("uni_pin")->links.size(); j++)
             {
-                ed::DeleteLink(parent_node->inputs.at("uni_pin")->links.at(j)->id);
+                std::shared_ptr<Link> link = parent_node->inputs.at("uni_pin")->links.at(j);
+                if (link->startPin)
+                {
+                    link->startPin->links.erase(std::remove(link->startPin->links.begin(), link->startPin->links.end(), link), link->startPin->links.end());
+                    link->startPin = nullptr;
+                }
+                if (link->endPin)
+                {
+                    link->endPin->links.erase(std::remove(link->endPin->links.begin(), link->endPin->links.end(), link), link->endPin->links.end());
+                    link->endPin = nullptr;
+                }
+                ed::DeleteLink(link->id);
             }
             parent_node->inputs.at("uni_pin")->links.clear();
             UtilsChangePinType(parent_node, PinKind::Input, "uni_pin", uniform_type);
@@ -1246,7 +1289,18 @@ void SetProgramUniformNode_Func::DeletePin()
     {
         for (int j = 0; j < parent_node->inputs.at(pin_key)->links.size(); j++)
         {
-            ed::DeleteLink(parent_node->inputs.at(pin_key)->links.at(j)->id);
+            std::shared_ptr<Link> link = parent_node->inputs.at(pin_key)->links.at(j);
+            if (link->startPin)
+            {
+                link->startPin->links.erase(std::remove(link->startPin->links.begin(), link->startPin->links.end(), link), link->startPin->links.end());
+                link->startPin = nullptr;
+            }
+            if (link->endPin)
+            {
+                link->endPin->links.erase(std::remove(link->endPin->links.begin(), link->endPin->links.end(), link), link->endPin->links.end());
+                link->endPin = nullptr;
+            }
+            ed::DeleteLink(link->id);
         }
         parent_node->inputs.at(pin_key)->node = nullptr;
         parent_node->inputs.at(pin_key)->links.clear();

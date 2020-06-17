@@ -100,7 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\Application;..\blueprint-utilities;..\dxerr;..\imgui;..\imgui_canvas;..\imgui_node_editor;..\Dependencies\gl3w\Include;..\Dependencies\glfw-3.3.2\include;..\Dependencies\Dirent;..\Dependencies\Json\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Application;..\blueprint-utilities;..\dxerr;..\imgui;..\imgui_canvas;..\imgui_node_editor;..\Dependencies\gl3w\Include;..\Dependencies\glfw-3.3.2\include;..\Dependencies\Dirent;..\Dependencies\Json\include;..\Dependencies\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -134,7 +134,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\Application;..\blueprint-utilities;..\dxerr;..\imgui;..\imgui_canvas;..\imgui_node_editor;..\Dependencies\gl3w\Include;..\Dependencies\glfw-3.3.2\include;..\Dependencies\Dirent;..\Dependencies\Json\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Application;..\blueprint-utilities;..\dxerr;..\imgui;..\imgui_canvas;..\imgui_node_editor;..\Dependencies\gl3w\Include;..\Dependencies\glfw-3.3.2\include;..\Dependencies\Dirent;..\Dependencies\Json\include;..\Dependencies\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -159,13 +159,13 @@
     <ClCompile Include="nodes\gl_nodes_1.cpp" />
     <ClCompile Include="nodes\math_nodes.cpp" />
     <ClCompile Include="nodes\relational_logical_nodes.cpp" />
+    <ClCompile Include="nodes\resources_nodes.cpp" />
     <ClCompile Include="nodes\shaders_nodes.cpp" />
     <ClCompile Include="nodes\utils_nodes.cpp" />
     <ClCompile Include="nodes\vec2_nodes.cpp" />
     <ClCompile Include="nodes\vec3_nodes.cpp" />
     <ClCompile Include="nodes\vec4_nodes.cpp" />
     <ClCompile Include="nodes_builder.cpp" />
-    <ClCompile Include="node_search_popup.cpp" />
     <ClCompile Include="objects\framebuffer_object.cpp" />
     <ClCompile Include="objects\mesh_object.cpp" />
     <ClCompile Include="objects\program_object.cpp" />
@@ -184,16 +184,18 @@
     <ClCompile Include="SpoutSDK\SpoutSenderNames.cpp" />
     <ClCompile Include="SpoutSDK\SpoutSharedMemory.cpp" />
     <ClCompile Include="utils.cpp" />
+    <ClCompile Include="windows\node_search_popup.cpp" />
+    <ClCompile Include="windows\resources_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nodes\animations_nodes_1.h" />
     <ClInclude Include="nodes\matrices_nodes.h" />
     <ClInclude Include="nodes\meshes_nodes.h" />
     <ClInclude Include="nodes\relational_logical_nodes.h" />
+    <ClInclude Include="nodes\resources_nodes.h" />
     <ClInclude Include="nodes\vec2_nodes.h" />
     <ClInclude Include="nodes\vec3_nodes.h" />
     <ClInclude Include="nodes\vec4_nodes.h" />
-    <ClInclude Include="node_search_popup.h" />
     <ClInclude Include="project_enums.h" />
     <ClInclude Include="project_classes.h" />
     <ClInclude Include="EditorConfig.h" />
@@ -229,6 +231,8 @@
     <ClInclude Include="SpoutSDK\SpoutSenderNames.h" />
     <ClInclude Include="SpoutSDK\SpoutSharedMemory.h" />
     <ClInclude Include="utils.h" />
+    <ClInclude Include="windows\node_search_popup.h" />
+    <ClInclude Include="windows\resources_window.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="nodes\ToDo.txt" />

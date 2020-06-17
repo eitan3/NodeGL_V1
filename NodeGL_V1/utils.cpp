@@ -386,7 +386,18 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
                                         template_pin_type_selected_item = PinTypeToString(input->template_allowed_types[n]);
                                         for (int link_i = 0; link_i < input->links.size(); link_i++)
                                         {
-                                            ed::DeleteLink(input->links.at(link_i)->id);
+                                            std::shared_ptr<Link> link = input->links.at(link_i);
+                                            if (link->startPin)
+                                            {
+                                                link->startPin->links.erase(std::remove(link->startPin->links.begin(), link->startPin->links.end(), link), link->startPin->links.end());
+                                                link->startPin = nullptr;
+                                            }
+                                            if (link->endPin)
+                                            {
+                                                link->endPin->links.erase(std::remove(link->endPin->links.begin(), link->endPin->links.end(), link), link->endPin->links.end());
+                                                link->endPin = nullptr;
+                                            }
+                                            ed::DeleteLink(link->id);
                                         }
                                         input->links.clear();
                                         UtilsChangePinType(input->node, input->kind, input->pin_key, input->template_allowed_types[n]);
@@ -416,7 +427,18 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
                                         template_pin_type_selected_item = PinTypeToString(output->template_allowed_types[n]);
                                         for (int link_i = 0; link_i < output->links.size(); link_i++)
                                         {
-                                            ed::DeleteLink(output->links.at(link_i)->id);
+                                            std::shared_ptr<Link> link = output->links.at(link_i);
+                                            if (link->startPin)
+                                            {
+                                                link->startPin->links.erase(std::remove(link->startPin->links.begin(), link->startPin->links.end(), link), link->startPin->links.end());
+                                                link->startPin = nullptr;
+                                            }
+                                            if (link->endPin)
+                                            {
+                                                link->endPin->links.erase(std::remove(link->endPin->links.begin(), link->endPin->links.end(), link), link->endPin->links.end());
+                                                link->endPin = nullptr;
+                                            }
+                                            ed::DeleteLink(link->id);
                                         }
                                         output->links.clear();
                                         UtilsChangePinType(output->node, output->kind, output->pin_key, output->template_allowed_types[n]);

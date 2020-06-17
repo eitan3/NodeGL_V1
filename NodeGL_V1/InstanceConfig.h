@@ -251,7 +251,6 @@ public:
 
 private:
 	std::map<std::string, std::shared_ptr<BasePlaceholder>> placeholders_map;
-	std::map<std::string, std::shared_ptr<BasePlaceholder>> resource_map;
 	std::map<std::string, std::shared_ptr<TextureObject>> texture_map;
 	std::map<std::string, std::shared_ptr<RenderBufferObject>> renderbuffer_map;
 	std::map<std::string, std::shared_ptr<FrameBufferObject>> framebuffer_map;

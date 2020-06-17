@@ -17,6 +17,10 @@ public:
     GLuint object_id;
     int width;
     int height;
+    char* current_min_param;
+    char* current_mag_param;
+    char* current_wrap_s;
+    char* current_wrap_t;
 };
 
 #endif

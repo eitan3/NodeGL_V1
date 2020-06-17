@@ -24,7 +24,6 @@ public:
 
 	bool showOpenInstanceWindow = false;
 	bool showSaveInstanceWindow = false;
-	bool showResourcesWindow = false;
 	bool showCreatePlaceholderWindow = false;
 	bool showSelectPlaceholderWindow = false;
 	bool showRenamePlaceholderWindow = false;

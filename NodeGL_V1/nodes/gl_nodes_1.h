@@ -35,10 +35,10 @@ private:
     char* current_wrap_s;
     char* current_wrap_t;
 
-    char* prev_current_min_param;
-    char* prev_current_mag_param;
-    char* prev_current_wrap_s;
-    char* prev_current_wrap_t;
+    char* prev_min_param;
+    char* prev_mag_param;
+    char* prev_wrap_s;
+    char* prev_wrap_t;
 };
 
 std::shared_ptr<Node> GlMainLoop(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -88,10 +88,10 @@ private:
     char* current_wrap_s;
     char* current_wrap_t;
 
-    char* prev_current_min_param;
-    char* prev_current_mag_param;
-    char* prev_current_wrap_s;
-    char* prev_current_wrap_t;
+    char* prev_min_param;
+    char* prev_mag_param;
+    char* prev_wrap_s;
+    char* prev_wrap_t;
 };
 
 std::shared_ptr<Node> GlRenderToTexture(std::vector<std::shared_ptr<Node>>& s_Nodes);
