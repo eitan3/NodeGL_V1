@@ -1,4 +1,3 @@
-Check if all "delete functions" delete EVERYTHING!!!! including pins and links
 Add Arrays
 
 Add multisample option for Framebuffer
@@ -7,6 +6,7 @@ Create Camera Object (?)
 
 Need to freeze the editor when other window open up
 Fix ImGui naming. use ## (you can check in imgui.ini which windows doesn't use it)
+Check if all "delete functions" delete EVERYTHING!!!! including pins and links
 Add Resources (import assimp meshes and so on)
 
 Recreate https://cables.gl/p/j8R1Q7
