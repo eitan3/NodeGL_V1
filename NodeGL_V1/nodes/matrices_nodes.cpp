@@ -647,7 +647,7 @@ void LookAtNode_Func::Delete()
 void LookAtNode_Func::NoFlowUpdatePinsValues()
 {
     glm::vec3 position = GetInputPinValue<glm::vec3>(parent_node, "position");
-    float yaw = GetInputPinValue<float>(parent_node, "yaw");
+    float yaw = GetInputPinValue<float>(parent_node, "yaw") + 90;
     float pitch = GetInputPinValue<float>(parent_node, "pitch");
     bool is_degrees = GetInputPinValue<bool>(parent_node, "is_degrees");
 
@@ -672,7 +672,7 @@ void LookAtNode_Func::NoFlowUpdatePinsValues()
             front.z = sin(yaw) * cos(pitch);
         }
         front = glm::normalize(front);
-        glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.0, 1.0, 0.0)));
+        glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.0, -1.0, 0.0)));
         glm::vec3 up = glm::normalize(glm::cross(right, front));
 
         glm::mat4 lookAt = glm::lookAt(position, position + front, up);

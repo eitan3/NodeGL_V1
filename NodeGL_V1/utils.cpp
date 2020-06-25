@@ -51,7 +51,7 @@ bool IsPinLinked(ed::PinId id, std::vector<std::shared_ptr<Link>>& s_Links)
 
 bool CanCreateLink(std::shared_ptr<BasePin>& a, std::shared_ptr<BasePin>& b)
 {
-    if (!a || !b || a == b || a->kind == b->kind || a->type != b->type || a->node == b->node)
+    if (!a || !b || a == b || a->kind == b->kind || a->type != b->type || a->node == b->node || a->isArr != b->isArr)
         return false;
 
     return true;
@@ -161,9 +161,10 @@ std::vector<std::string> SortPins(std::map<std::string, std::shared_ptr<BasePin>
 
 bool CanAddToInputsTab(std::shared_ptr<BasePin> pin)
 {
-    if (pin->type == PinType::Bool || pin->type == PinType::Float || pin->type == PinType::Int || pin->type == PinType::String || 
-        pin->type == PinType::Vector2 || pin->type == PinType::Vector3 || pin->type == PinType::Vector4)
-        return true;
+    if (pin->isArr == false)
+        if (pin->type == PinType::Bool || pin->type == PinType::Float || pin->type == PinType::Int || pin->type == PinType::String || 
+            pin->type == PinType::Vector2 || pin->type == PinType::Vector3 || pin->type == PinType::Vector4)
+            return true;
     return false;
 }
 
@@ -400,7 +401,7 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
                                             ed::DeleteLink(link->id);
                                         }
                                         input->links.clear();
-                                        UtilsChangePinType(input->node, input->kind, input->pin_key, input->template_allowed_types[n]);
+                                        UtilsChangePinType(input->node, input->kind, input->pin_key, input->template_allowed_types[n], input->isArr);
                                     }
                                     if (is_selected)
                                         ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
@@ -441,7 +442,7 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
                                             ed::DeleteLink(link->id);
                                         }
                                         output->links.clear();
-                                        UtilsChangePinType(output->node, output->kind, output->pin_key, output->template_allowed_types[n]);
+                                        UtilsChangePinType(output->node, output->kind, output->pin_key, output->template_allowed_types[n], output->isArr);
                                     }
                                     if (is_selected)
                                         ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
@@ -458,156 +459,323 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
     }
 }
 
-void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::string index, PinType type)
+void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::string index, PinType type, bool isArr)
 {
-    if (kind == PinKind::Input)
+    if (isArr == false)
     {
-        std::shared_ptr<Node> node = parent_node->inputs.at(index)->node;;
-        bool isTemplate = parent_node->inputs.at(index)->isTemplate;
-        std::vector<PinType> template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
-        if (type == PinType::Bool)
+        if (kind == PinKind::Input)
         {
-            std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, false);
-            parent_node->inputs.at(index) = new_node;
+            std::shared_ptr<Node> node = parent_node->inputs.at(index)->node;;
+            bool isTemplate = parent_node->inputs.at(index)->isTemplate;
+            std::vector<PinType> template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            bool isGeneralArray = parent_node->inputs.at(index)->isGeneralArray;
+            if (type == PinType::Bool)
+            {
+                std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, false);
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Float)
+            {
+                std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, 0);
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Int)
+            {
+                std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, 0);
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::String)
+            {
+                std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, "");
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector2)
+            {
+                std::shared_ptr<PinValue<glm::vec2>> new_node = std::make_shared<PinValue<glm::vec2>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::vec2(0));
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector3)
+            {
+                std::shared_ptr<PinValue<glm::vec3>> new_node = std::make_shared<PinValue<glm::vec3>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::vec3(0));
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector4)
+            {
+                std::shared_ptr<PinValue<glm::vec4>> new_node = std::make_shared<PinValue<glm::vec4>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::vec4(0));
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Matrix4x4)
+            {
+                std::shared_ptr<PinValue<glm::mat4>> new_node = std::make_shared<PinValue<glm::mat4>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::mat4(1.0));
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::TextureObject)
+            {
+                std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::ProgramObject)
+            {
+                std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::VertexShaderObject)
+            {
+                std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::FragmentShaderObject)
+            {
+                std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::MeshObject)
+            {
+                std::shared_ptr<PinValue<std::shared_ptr<MeshObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<MeshObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
+                parent_node->inputs.at(index) = new_node;
+            }
+            parent_node->inputs.at(index)->node = node;
+            parent_node->inputs.at(index)->isTemplate = isTemplate;
+            parent_node->inputs.at(index)->template_allowed_types = template_allowed_types;
+            parent_node->inputs.at(index)->isArr = isArr;
+            parent_node->inputs.at(index)->isGeneralArray = isGeneralArray;
         }
-        else if (type == PinType::Float)
+        else if (kind == PinKind::Output)
         {
-            std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, 0);
-            parent_node->inputs.at(index) = new_node;
+            std::shared_ptr<Node> node = parent_node->outputs.at(index)->node;;
+            bool isTemplate = parent_node->outputs.at(index)->isTemplate;
+            std::vector<PinType> template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            bool isGeneralArray = parent_node->outputs.at(index)->isGeneralArray;
+            if (type == PinType::Bool)
+            {
+                std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, false);
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Float)
+            {
+                std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, 0);
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Int)
+            {
+                std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, 0);
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::String)
+            {
+                std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, "");
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector2)
+            {
+                std::shared_ptr<PinValue<glm::vec2>> new_node = std::make_shared<PinValue<glm::vec2>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::vec2(0));
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector3)
+            {
+                std::shared_ptr<PinValue<glm::vec3>> new_node = std::make_shared<PinValue<glm::vec3>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::vec3(0));
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector4)
+            {
+                std::shared_ptr<PinValue<glm::vec4>> new_node = std::make_shared<PinValue<glm::vec4>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::vec4(0));
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Matrix4x4)
+            {
+                std::shared_ptr<PinValue<glm::mat4>> new_node = std::make_shared<PinValue<glm::mat4>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::mat4(1.0));
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::TextureObject)
+            {
+                std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::ProgramObject)
+            {
+                std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::VertexShaderObject)
+            {
+                std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::FragmentShaderObject)
+            {
+                std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::MeshObject)
+            {
+                std::shared_ptr<PinValue<std::shared_ptr<MeshObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<MeshObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
+                parent_node->outputs.at(index) = new_node;
+            }
+            parent_node->outputs.at(index)->node = node;
+            parent_node->outputs.at(index)->isTemplate = isTemplate;
+            parent_node->outputs.at(index)->template_allowed_types = template_allowed_types;
+            parent_node->outputs.at(index)->isArr = isArr;
+            parent_node->outputs.at(index)->isGeneralArray = isGeneralArray;
         }
-        else if (type == PinType::Int)
-        {
-            std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, 0);
-            parent_node->inputs.at(index) = new_node;
-        }
-        else if (type == PinType::String)
-        {
-            std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, "");
-            parent_node->inputs.at(index) = new_node;
-        }
-        else if (type == PinType::Vector2)
-        {
-            std::shared_ptr<PinValue<glm::vec2>> new_node = std::make_shared<PinValue<glm::vec2>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::vec2(0));
-            parent_node->inputs.at(index) = new_node;
-        }
-        else if (type == PinType::Vector3)
-        {
-            std::shared_ptr<PinValue<glm::vec3>> new_node = std::make_shared<PinValue<glm::vec3>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::vec3(0));
-            parent_node->inputs.at(index) = new_node;
-        }
-        else if (type == PinType::Vector4)
-        {
-            std::shared_ptr<PinValue<glm::vec4>> new_node = std::make_shared<PinValue<glm::vec4>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::vec4(0));
-            parent_node->inputs.at(index) = new_node;
-        }
-        else if (type == PinType::Matrix4x4)
-        {
-            std::shared_ptr<PinValue<glm::mat4>> new_node = std::make_shared<PinValue<glm::mat4>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::mat4(1.0));
-            parent_node->inputs.at(index) = new_node;
-        }
-        else if (type == PinType::TextureObject)
-        {
-            std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
-            parent_node->inputs.at(index) = new_node;
-        }
-        else if (type == PinType::ProgramObject)
-        {
-            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
-            parent_node->inputs.at(index) = new_node;
-        }
-        else if (type == PinType::VertexShaderObject)
-        {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
-            parent_node->inputs.at(index) = new_node;
-        }
-        else if (type == PinType::FragmentShaderObject)
-        {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
-            parent_node->inputs.at(index) = new_node;
-        }
-        else if (type == PinType::MeshObject)
-        {
-            std::shared_ptr<PinValue<std::shared_ptr<MeshObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<MeshObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, nullptr);
-            parent_node->inputs.at(index) = new_node;
-        }
-        parent_node->inputs.at(index)->node = node;
-        parent_node->inputs.at(index)->isTemplate = isTemplate;
-        parent_node->inputs.at(index)->template_allowed_types = template_allowed_types;
     }
-    else if (kind == PinKind::Output)
+    else
     {
-        std::shared_ptr<Node> node = parent_node->outputs.at(index)->node;;
-        bool isTemplate = parent_node->outputs.at(index)->isTemplate;
-        std::vector<PinType> template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
-        if (type == PinType::Bool)
+        if (kind == PinKind::Input)
         {
-            std::shared_ptr<PinValue<bool>> new_node = std::make_shared<PinValue<bool>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, false);
-            parent_node->outputs.at(index) = new_node;
+            std::shared_ptr<Node> node = parent_node->inputs.at(index)->node;;
+            bool isTemplate = parent_node->inputs.at(index)->isTemplate;
+            std::vector<PinType> template_allowed_types = parent_node->inputs.at(index)->template_allowed_types;
+            bool isGeneralArray = parent_node->inputs.at(index)->isGeneralArray;
+            if (type == PinType::Bool)
+            {
+                std::shared_ptr<PinArrValue<bool>> new_node = std::make_shared<PinArrValue<bool>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<bool>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Float)
+            {
+                std::shared_ptr<PinArrValue<float>> new_node = std::make_shared<PinArrValue<float>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<float>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Int)
+            {
+                std::shared_ptr<PinArrValue<int>> new_node = std::make_shared<PinArrValue<int>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<int>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::String)
+            {
+                std::shared_ptr<PinArrValue<std::string>> new_node = std::make_shared<PinArrValue<std::string>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::string>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector2)
+            {
+                std::shared_ptr<PinArrValue<glm::vec2>> new_node = std::make_shared<PinArrValue<glm::vec2>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::vec2>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector3)
+            {
+                std::shared_ptr<PinArrValue<glm::vec3>> new_node = std::make_shared<PinArrValue<glm::vec3>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::vec3>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector4)
+            {
+                std::shared_ptr<PinArrValue<glm::vec4>> new_node = std::make_shared<PinArrValue<glm::vec4>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::vec4>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::Matrix4x4)
+            {
+                std::shared_ptr<PinArrValue<glm::mat4>> new_node = std::make_shared<PinArrValue<glm::mat4>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::mat4>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::TextureObject)
+            {
+                std::shared_ptr<PinArrValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinArrValue<std::shared_ptr<TextureObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::shared_ptr<TextureObject>>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::ProgramObject)
+            {
+                std::shared_ptr<PinArrValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinArrValue<std::shared_ptr<ProgramObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::shared_ptr<ProgramObject>>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::VertexShaderObject)
+            {
+                std::shared_ptr<PinArrValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinArrValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::shared_ptr<ShaderObject>>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::FragmentShaderObject)
+            {
+                std::shared_ptr<PinArrValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinArrValue<std::shared_ptr<ShaderObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::shared_ptr<ShaderObject>>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::MeshObject)
+            {
+                std::shared_ptr<PinArrValue<std::shared_ptr<MeshObject>>> new_node = std::make_shared<PinArrValue<std::shared_ptr<MeshObject>>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::shared_ptr<MeshObject>>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            parent_node->inputs.at(index)->node = node;
+            parent_node->inputs.at(index)->isTemplate = isTemplate;
+            parent_node->inputs.at(index)->template_allowed_types = template_allowed_types;
+            parent_node->inputs.at(index)->isArr = isArr;
+            parent_node->inputs.at(index)->isGeneralArray = isGeneralArray;
         }
-        else if (type == PinType::Float)
+        else if (kind == PinKind::Output)
         {
-            std::shared_ptr<PinValue<float>> new_node = std::make_shared<PinValue<float>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, 0);
-            parent_node->outputs.at(index) = new_node;
+            std::shared_ptr<Node> node = parent_node->outputs.at(index)->node;;
+            bool isTemplate = parent_node->outputs.at(index)->isTemplate;
+            std::vector<PinType> template_allowed_types = parent_node->outputs.at(index)->template_allowed_types;
+            bool isGeneralArray = parent_node->outputs.at(index)->isGeneralArray;
+            if (type == PinType::Bool)
+            {
+                std::shared_ptr<PinArrValue<bool>> new_node = std::make_shared<PinArrValue<bool>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<bool>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Float)
+            {
+                std::shared_ptr<PinArrValue<float>> new_node = std::make_shared<PinArrValue<float>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<float>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Int)
+            {
+                std::shared_ptr<PinArrValue<int>> new_node = std::make_shared<PinArrValue<int>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<int>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::String)
+            {
+                std::shared_ptr<PinArrValue<std::string>> new_node = std::make_shared<PinArrValue<std::string>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::string>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector2)
+            {
+                std::shared_ptr<PinArrValue<glm::vec2>> new_node = std::make_shared<PinArrValue<glm::vec2>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::vec2>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector3)
+            {
+                std::shared_ptr<PinArrValue<glm::vec3>> new_node = std::make_shared<PinArrValue<glm::vec3>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::vec3>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Vector4)
+            {
+                std::shared_ptr<PinArrValue<glm::vec4>> new_node = std::make_shared<PinArrValue<glm::vec4>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::vec4>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::Matrix4x4)
+            {
+                std::shared_ptr<PinArrValue<glm::mat4>> new_node = std::make_shared<PinArrValue<glm::mat4>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::mat4>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::TextureObject)
+            {
+                std::shared_ptr<PinArrValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinArrValue<std::shared_ptr<TextureObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::shared_ptr<TextureObject>>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::ProgramObject)
+            {
+                std::shared_ptr<PinArrValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinArrValue<std::shared_ptr<ProgramObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::shared_ptr<ProgramObject>>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::VertexShaderObject)
+            {
+                std::shared_ptr<PinArrValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinArrValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::shared_ptr<ShaderObject>>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::FragmentShaderObject)
+            {
+                std::shared_ptr<PinArrValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinArrValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::shared_ptr<ShaderObject>>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::MeshObject)
+            {
+                std::shared_ptr<PinArrValue<std::shared_ptr<MeshObject>>> new_node = std::make_shared<PinArrValue<std::shared_ptr<MeshObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::shared_ptr<MeshObject>>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            parent_node->outputs.at(index)->node = node;
+            parent_node->outputs.at(index)->isTemplate = isTemplate;
+            parent_node->outputs.at(index)->template_allowed_types = template_allowed_types;
+            parent_node->outputs.at(index)->isArr = isArr;
+            parent_node->outputs.at(index)->isGeneralArray = isGeneralArray;
         }
-        else if (type == PinType::Int)
-        {
-            std::shared_ptr<PinValue<int>> new_node = std::make_shared<PinValue<int>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, 0);
-            parent_node->outputs.at(index) = new_node;
-        }
-        else if (type == PinType::String)
-        {
-            std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, "");
-            parent_node->outputs.at(index) = new_node;
-        }
-        else if (type == PinType::Vector2)
-        {
-            std::shared_ptr<PinValue<glm::vec2>> new_node = std::make_shared<PinValue<glm::vec2>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::vec2(0));
-            parent_node->outputs.at(index) = new_node;
-        }
-        else if (type == PinType::Vector3)
-        {
-            std::shared_ptr<PinValue<glm::vec3>> new_node = std::make_shared<PinValue<glm::vec3>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::vec3(0));
-            parent_node->outputs.at(index) = new_node;
-        }
-        else if (type == PinType::Vector4)
-        {
-            std::shared_ptr<PinValue<glm::vec4>> new_node = std::make_shared<PinValue<glm::vec4>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::vec4(0));
-            parent_node->outputs.at(index) = new_node;
-        }
-        else if (type == PinType::Matrix4x4)
-        {
-            std::shared_ptr<PinValue<glm::mat4>> new_node = std::make_shared<PinValue<glm::mat4>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::mat4(1.0));
-            parent_node->outputs.at(index) = new_node;
-        }
-        else if (type == PinType::TextureObject)
-        {
-            std::shared_ptr<PinValue<std::shared_ptr<TextureObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<TextureObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
-            parent_node->outputs.at(index) = new_node;
-        }
-        else if (type == PinType::ProgramObject)
-        {
-            std::shared_ptr<PinValue<std::shared_ptr<ProgramObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ProgramObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
-            parent_node->outputs.at(index) = new_node;
-        }
-        else if (type == PinType::VertexShaderObject)
-        {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
-            parent_node->outputs.at(index) = new_node;
-        }
-        else if (type == PinType::FragmentShaderObject)
-        {
-            std::shared_ptr<PinValue<std::shared_ptr<ShaderObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<ShaderObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
-            parent_node->outputs.at(index) = new_node;
-        }
-        else if (type == PinType::MeshObject)
-        {
-            std::shared_ptr<PinValue<std::shared_ptr<MeshObject>>> new_node = std::make_shared<PinValue<std::shared_ptr<MeshObject>>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, nullptr);
-            parent_node->outputs.at(index) = new_node;
-        }
-        parent_node->outputs.at(index)->node = node;
-        parent_node->outputs.at(index)->isTemplate = isTemplate;
-        parent_node->outputs.at(index)->template_allowed_types = template_allowed_types;
     }
+    
     BuildNode(parent_node);
 }
 
@@ -638,6 +806,60 @@ T GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key)
     return input_pin->GetValue();
 }
 
+template<typename T>
+std::shared_ptr<std::vector<T>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key)
+{
+    if (parent_node->inputs.at(pin_key)->links.size() > 0)
+    {
+        if (parent_node->inputs.at(pin_key)->links.at(0))
+        {
+            if (parent_node->inputs.at(pin_key)->links.at(0)->startPin)
+            {
+                std::shared_ptr<PinArrValue<T>> input_pin = std::dynamic_pointer_cast<PinArrValue<T>>(parent_node->inputs.at(pin_key)->links.at(0)->startPin);
+                if (input_pin)
+                {
+                    if (input_pin->node)
+                    {
+                        input_pin->node->node_funcs->NoFlowUpdatePinsValues();
+                        //std::dynamic_pointer_cast<PinArrValue<T>>(parent_node->inputs.at(pin_key))->value = input_pin->GetValue();
+                        return input_pin->GetValue();
+                    }
+                }
+            }
+        }
+    }
+    std::shared_ptr<PinArrValue<T>> input_pin = std::dynamic_pointer_cast<PinArrValue<T>>(parent_node->inputs.at(pin_key));
+    //input_pin->value = input_pin->default_value;
+    return input_pin->GetValue();
+}
+
+template<typename T>
+std::shared_ptr<std::vector<T>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key)
+{
+    if (parent_node->inputs.at(pin_key)->links.size() > 0)
+    {
+        if (parent_node->inputs.at(pin_key)->links.at(0))
+        {
+            if (parent_node->inputs.at(pin_key)->links.at(0)->startPin)
+            {
+                std::shared_ptr<PinArrValue<T>> input_pin = std::dynamic_pointer_cast<PinArrValue<T>>(parent_node->inputs.at(pin_key)->links.at(0)->startPin);
+                if (input_pin)
+                {
+                    if (input_pin->node)
+                    {
+                        input_pin->node->node_funcs->NoFlowUpdatePinsValues();
+                        //std::dynamic_pointer_cast<PinArrValue<T>>(parent_node->inputs.at(pin_key))->value = input_pin->default_value;
+                        return input_pin->default_value;
+                    }
+                }
+            }
+        }
+    }
+    std::shared_ptr<PinArrValue<T>> input_pin = std::dynamic_pointer_cast<PinArrValue<T>>(parent_node->inputs.at(pin_key));
+    //input_pin->value = input_pin->default_value;
+    return input_pin->GetValue();
+}
+
 
 
 
@@ -663,3 +885,33 @@ template std::shared_ptr<TextureObject> GetInputPinValue(std::shared_ptr<Node>& 
 template std::shared_ptr<ProgramObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<ShaderObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<MeshObject> GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+
+
+
+template std::shared_ptr<std::vector<bool>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<int>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<float>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<std::string>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::vec2>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::vec3>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::vec4>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::mat4>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<std::shared_ptr<TextureObject>>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<std::shared_ptr<ProgramObject>>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<std::shared_ptr<ShaderObject>>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<std::shared_ptr<MeshObject>>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+
+
+
+template std::shared_ptr<std::vector<bool>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<int>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<float>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<std::string>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::vec2>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::vec3>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::vec4>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::mat4>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<std::shared_ptr<TextureObject>>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<std::shared_ptr<ProgramObject>>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<std::shared_ptr<ShaderObject>>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<std::shared_ptr<MeshObject>>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);

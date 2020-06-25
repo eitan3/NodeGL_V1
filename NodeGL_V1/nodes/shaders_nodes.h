@@ -127,6 +127,7 @@ private:
     GLuint prev_program;
     std::string current_uniform = "";
     PinType uniform_type = PinType::Float;
+    bool uniform_isArr = false;
     std::shared_ptr<BasePlaceholder> tmp_loaded_value;
 };
 

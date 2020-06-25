@@ -15,11 +15,13 @@ struct UniformInfo
 {
     std::string name;
     PinType type;
+    bool isArr;
 
     UniformInfo(std::string name, PinType type)
     {
         this->name = name;
         this->type = type;
+        this->isArr = false;
     }
 };
 

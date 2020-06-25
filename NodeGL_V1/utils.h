@@ -23,9 +23,15 @@ std::string PinTypeToString(PinType type);
 PinType StringToPinType(std::string str);
 std::vector<std::string> SortPins(std::map<std::string, std::shared_ptr<BasePin>> pins);
 void AddInputPinsTab(std::shared_ptr<Node> node);
-void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::string index, PinType type);
+void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::string index, PinType type, bool isArr);
 
 template<typename T>
 T GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+
+template<typename T>
+std::shared_ptr<std::vector<T>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+
+template<typename T>
+std::shared_ptr<std::vector<T>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 
 #endif

@@ -28,6 +28,10 @@ public:
 	bool showSelectPlaceholderWindow = false;
 	bool showRenamePlaceholderWindow = false;
 	bool showDeletePlaceholderWindow = false;
+	bool showCreateArrayWindow = false;
+	bool showSelectArrayWindow = false;
+	bool showRenameArrayWindow = false;
+	bool showDeleteArrayWindow = false;
 	bool showNodeSearchWindow = false;
 };
 

@@ -5,6 +5,7 @@
 #include <rapidjson/document.h>
 #include "gl_nodes_1.h"
 #include "utils_nodes.h"
+#include "arrays_nodes.h"
 #include "shaders_nodes.h"
 #include "flow_nodes.h"
 #include "relational_logical_nodes.h"

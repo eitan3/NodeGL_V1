@@ -24,7 +24,8 @@ class BasePin
 {
 public:
     BasePin(std::string pin_key, int order, int id, const char* name, PinType type) :
-        pin_key(pin_key), order(order), id(id), node(), name(name), type(type), kind(PinKind::Input), isTemplate(false), exposed(true), always_expose(true)
+        pin_key(pin_key), order(order), id(id), node(), name(name), type(type), kind(PinKind::Input), isTemplate(false), 
+        exposed(true), always_expose(true), isArr(false), isGeneralArray(false)
     {
     }
 
@@ -45,10 +46,12 @@ public:
     PinKind     kind;
 
     bool isTemplate;
+    bool isGeneralArray;
     std::vector<PinType> template_allowed_types;
 
     bool exposed;
     bool always_expose;
+    bool isArr;
 };
 
 
@@ -57,6 +60,7 @@ class PinValue : public BasePin {
 public:
     PinValue(std::string pin_key, int order, int id, const char* name, PinType type, T default_val) : BasePin(pin_key, order, id, name, type)
     {
+        isArr = false;
         value = default_val;
         default_value = default_val;
     }
@@ -76,12 +80,54 @@ public:
 };
 
 
+template<class T>
+class PinArrValue : public BasePin {
+public:
+    PinArrValue(std::string pin_key, int order, int id, const char* name, PinType type, std::shared_ptr<std::vector<T>> default_val) : BasePin(pin_key, order, id, name, type)
+    {
+        isArr = true;
+        value = default_val;
+        default_value = std::make_shared<std::vector<T>>();
+        if (default_val)
+        {
+            for (int i = 0; i < default_val->size(); i++)
+            {
+                default_value->push_back(default_val->at(i));
+            }
+        }
+    }
+
+    ~PinArrValue()
+    {
+        node = nullptr;
+        links.clear();
+        template_allowed_types.clear();
+        if (value)
+            value->clear();
+        if (default_value)
+            default_value->clear();
+    }
+
+    std::shared_ptr<std::vector<T>> GetValue()
+    {
+        return value;
+    }
+
+    void SetValue(std::shared_ptr<std::vector<T>> v)
+    {
+        value = v;
+    }
+    std::shared_ptr<std::vector<T>> value;
+    std::shared_ptr<std::vector<T>> default_value;
+};
+
+
 class Node
 {
 public:
     Node(int id, const char* name, ImColor color = ImColor(128, 128, 128)) :
         id(id), name(name), no_flow_node(false), color(color), type(NodeType::Blueprint), size(0, 0),
-        is_set_placeholder(false), is_get_placeholder(false)
+        is_set_placeholder(false), is_get_placeholder(false), is_get_array(false)
     {
     }
 
@@ -103,6 +149,7 @@ public:
     bool no_flow_node;
     bool is_set_placeholder;
     bool is_get_placeholder;
+    bool is_get_array;
     std::map<std::string, std::shared_ptr<BasePin>> inputs;
     std::map<std::string, std::shared_ptr<BasePin>> outputs;
     ImColor color;
@@ -197,6 +244,58 @@ public:
     }
 
     T value;
+};
+
+
+class BaseArray
+{
+public:
+    BaseArray(std::string name, PinType type) :
+        name(name), type(type)
+    {
+
+    }
+
+    virtual ~BaseArray()
+    {
+        nodesID_vec.clear();
+    }
+
+    std::string name;
+    PinType type;
+    std::vector<ed::NodeId> nodesID_vec;
+};
+
+
+template<class T>
+class ArrayValue : public BaseArray
+{
+public:
+    ArrayValue(std::string name, PinType type, std::shared_ptr<std::vector<T>> value) :
+        BaseArray(name, type)
+    {
+        this->value = value;
+        this->default_value = std::make_shared<std::vector<T>>();
+        if (value)
+        {
+            for (int i = 0; i < value->size(); i++)
+            {
+                this->default_value->push_back(value->at(i));
+            }
+        }
+    }
+
+    ~ArrayValue()
+    {
+        nodesID_vec.clear();
+        if (value)
+            value->clear();
+        if (default_value)
+            default_value->clear();
+    }
+
+    std::shared_ptr<std::vector<T>> value;
+    std::shared_ptr<std::vector<T>> default_value;
 };
 
 #endif

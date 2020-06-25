@@ -50,11 +50,26 @@ public:
 		return false;
 	}
 
+	bool isArrayNameUsed(std::string key)
+	{
+		if (arrays_map.count(key) > 0)
+			return true;
+		return false;
+	}
+
 	bool InsertNewPlaceholder(std::string key, std::shared_ptr<BasePlaceholder> value)
 	{
 		if (IsPlaceholderNameUsed(key))
 			return false;
 		placeholders_map.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(key, value));
+		return true;
+	}
+
+	bool InsertNewArray(std::string key, std::shared_ptr<BaseArray> value)
+	{
+		if (isArrayNameUsed(key))
+			return false;
+		arrays_map.insert(std::pair<std::string, std::shared_ptr<BaseArray>>(key, value));
 		return true;
 	}
 
@@ -67,10 +82,26 @@ public:
 		return v;
 	}
 
+	std::vector<std::string> GetArraysMapKeys()
+	{
+		std::vector<std::string> v;
+		for (std::map<std::string, std::shared_ptr<BaseArray>>::iterator it = arrays_map.begin(); it != arrays_map.end(); ++it) {
+			v.push_back(it->first);
+		}
+		return v;
+	}
+
 	std::shared_ptr<BasePlaceholder> GetPlaceholder(std::string key)
 	{
 		if (IsPlaceholderNameUsed(key))
 			return placeholders_map.at(key);
+		return nullptr;
+	}
+
+	std::shared_ptr<BaseArray> GetArray(std::string key)
+	{
+		if (isArrayNameUsed(key))
+			return arrays_map.at(key);
 		return nullptr;
 	}
 
@@ -79,6 +110,16 @@ public:
 		if (IsPlaceholderNameUsed(key))
 		{
 			placeholders_map.erase(key);
+			return true;
+		}
+		return false;
+	}
+
+	bool DeleteArray(std::string key)
+	{
+		if (isArrayNameUsed(key))
+		{
+			arrays_map.erase(key);
 			return true;
 		}
 		return false;
@@ -209,6 +250,11 @@ public:
 		placeholders_map.clear();
 	}
 
+	void ClearArrays()
+	{
+		arrays_map.clear();
+	}
+
 	std::vector<std::string>  GetTextureMapKeys()
 	{
 		std::vector<std::string> v;
@@ -251,6 +297,7 @@ public:
 
 private:
 	std::map<std::string, std::shared_ptr<BasePlaceholder>> placeholders_map;
+	std::map<std::string, std::shared_ptr<BaseArray>> arrays_map;
 	std::map<std::string, std::shared_ptr<TextureObject>> texture_map;
 	std::map<std::string, std::shared_ptr<RenderBufferObject>> renderbuffer_map;
 	std::map<std::string, std::shared_ptr<FrameBufferObject>> framebuffer_map;

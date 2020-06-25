@@ -72,8 +72,8 @@ void EqualNode_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
     PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
     PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type, false);
 
     if (parent_node->inputs.at("x_1")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
@@ -187,8 +187,8 @@ void NotEqualNode_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
     PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
     PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type, false);
 
     if (parent_node->inputs.at("x_1")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
@@ -302,8 +302,8 @@ void LessNode_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
     PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
     PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type, false);
 
     if (parent_node->inputs.at("x_1")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
@@ -417,8 +417,8 @@ void LessEqualNode_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
     PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
     PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type, false);
 
     if (parent_node->inputs.at("x_1")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
@@ -532,8 +532,8 @@ void GreaterNode_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
     PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
     PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type, false);
 
     if (parent_node->inputs.at("x_1")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
@@ -647,8 +647,8 @@ void GreaterEqualNode_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
     PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
     PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type, false);
 
     if (parent_node->inputs.at("x_1")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();

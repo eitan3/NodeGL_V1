@@ -103,9 +103,9 @@ void MathPlusNode_Func::LoadNodeData(rapidjson::Value& node_obj)
     PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
     PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
     PinType out_type = StringToPinType(std::string(node_obj["out_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
-    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type, false);
+    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type, false);
     
     if (parent_node->inputs.at("x_1")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
@@ -252,9 +252,9 @@ void MathMinusNode_Func::LoadNodeData(rapidjson::Value& node_obj)
     PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
     PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
     PinType out_type = StringToPinType(std::string(node_obj["out_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
-    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type, false);
+    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type, false);
 
     if (parent_node->inputs.at("x_1")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
@@ -402,9 +402,9 @@ void MathMultiplyNode_Func::LoadNodeData(rapidjson::Value& node_obj)
     PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
     PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
     PinType out_type = StringToPinType(std::string(node_obj["out_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
-    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type, false);
+    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type, false);
 
     if (parent_node->inputs.at("x_1")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();
@@ -560,9 +560,9 @@ void MathDivideNode_Func::LoadNodeData(rapidjson::Value& node_obj)
     PinType x1_type = StringToPinType(std::string(node_obj["x_1_type"].GetString()));
     PinType x2_type = StringToPinType(std::string(node_obj["x_2_type"].GetString()));
     PinType out_type = StringToPinType(std::string(node_obj["out_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type);
-    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_1", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Input, "x_2", x2_type, false);
+    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type, false);
 
     if (parent_node->inputs.at("x_1")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("x_1"))->default_value = node_obj["x_1"].GetFloat();

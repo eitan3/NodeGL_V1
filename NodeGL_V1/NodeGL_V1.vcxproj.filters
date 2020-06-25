@@ -156,6 +156,9 @@
     <ClCompile Include="nodes\resources_nodes.cpp">
       <Filter>Source Files\nodes</Filter>
     </ClCompile>
+    <ClCompile Include="nodes\arrays_nodes.cpp">
+      <Filter>Source Files\nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_utils.h">
@@ -291,6 +294,9 @@
       <Filter>Header Files\windows</Filter>
     </ClInclude>
     <ClInclude Include="nodes\resources_nodes.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\arrays_nodes.h">
       <Filter>Header Files\nodes</Filter>
     </ClInclude>
   </ItemGroup>

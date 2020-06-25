@@ -773,8 +773,11 @@ void BindProgramWithUniforms_Func::ProgramChanged()
             for (int n = 0; n < in_program->uniforms_arr.size(); n++)
             {
                 std::string uniName = in_program->uniforms_arr.at(n).name;
-                parent_node->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("uni_pin_" + std::to_string(n), new PinValue<float>("uni_pin_" + std::to_string(n), n + 2, GetNextId(), uniName.c_str(), PinType::Float, 0)));
-                UtilsChangePinType(parent_node, PinKind::Input, "uni_pin_" + std::to_string(n), in_program->uniforms_arr.at(n).type);
+                if (in_program->uniforms_arr.at(n).isArr == false)
+                    parent_node->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<float>>>("uni_pin_" + std::to_string(n), new PinValue<float>("uni_pin_" + std::to_string(n), n + 2, GetNextId(), uniName.c_str(), PinType::Float, 0)));
+                else
+                    parent_node->inputs.insert(std::pair<std::string, std::shared_ptr<PinArrValue<float>>>("uni_pin_" + std::to_string(n), new PinArrValue<float>("uni_pin_" + std::to_string(n), n + 2, GetNextId(), uniName.c_str(), PinType::Float, std::make_shared<std::vector<float>>())));
+                UtilsChangePinType(parent_node, PinKind::Input, "uni_pin_" + std::to_string(n), in_program->uniforms_arr.at(n).type, in_program->uniforms_arr.at(n).isArr);
             }
             BuildNode(parent_node);
 
@@ -785,6 +788,8 @@ void BindProgramWithUniforms_Func::ProgramChanged()
                     std::string uniName = in_program->uniforms_arr.at(n).name;
                     std::string pin_key = "uni_pin_" + std::to_string(n);
                     PinType uniform_type = in_program->uniforms_arr.at(n).type;
+                    if (in_program->uniforms_arr.at(n).isArr)
+                        continue;
                     if (uniform_type == PinType::Bool)
                     {
                         if (tmp_loaded_value.count(uniName) > 0)
@@ -1019,6 +1024,7 @@ void SetProgramUniformNode_Func::UpdateNodeUI()
             {
                 current_uniform = in_program->uniforms_arr.at(0).name;
                 uniform_type = in_program->uniforms_arr.at(0).type;
+                uniform_isArr = in_program->uniforms_arr.at(0).isArr;
             }
             UniformChanged();
         }
@@ -1054,6 +1060,7 @@ void SetProgramUniformNode_Func::UpdateNodeInspector()
                         {
                             current_uniform = in_program->uniforms_arr.at(n).name;
                             uniform_type = in_program->uniforms_arr.at(n).type;
+                            uniform_isArr = in_program->uniforms_arr.at(n).isArr;
                             UniformChanged();
                         }
                         if (is_selected)
@@ -1081,7 +1088,8 @@ void SetProgramUniformNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::Strin
         writer.String(current_uniform.c_str());
         writer.Key("uniform_type");
         writer.String(PinTypeToString(uniform_type).c_str());
-
+        writer.Key("uniform_isArr");
+        writer.Bool(uniform_isArr);
 
         if (parent_node->inputs.at("uni_pin")->type == PinType::Bool)
         {
@@ -1150,6 +1158,10 @@ void SetProgramUniformNode_Func::LoadNodeData(rapidjson::Value& node_obj)
     {
         current_uniform = std::string(node_obj["current_uniform"].GetString());
         continue_loading = true;
+    }
+    if (!node_obj["uniform_isArr"].IsNull())
+    {
+        uniform_isArr = node_obj["uniform_isArr"].GetBool();
     }
     if (!node_obj["uniform_type"].IsNull())
     {
@@ -1226,6 +1238,10 @@ void SetProgramUniformNode_Func::UniformChanged()
         {
             parent_node->inputs.at("uni_pin")->name = current_uniform;
         }
+        if (parent_node->inputs.at("uni_pin")->isArr != uniform_isArr)
+        {
+            parent_node->inputs.at("uni_pin")->isArr = uniform_isArr;
+        }
         if (parent_node->inputs.at("uni_pin")->type != uniform_type)
         {
             for (int j = 0; j < parent_node->inputs.at("uni_pin")->links.size(); j++)
@@ -1244,9 +1260,9 @@ void SetProgramUniformNode_Func::UniformChanged()
                 ed::DeleteLink(link->id);
             }
             parent_node->inputs.at("uni_pin")->links.clear();
-            UtilsChangePinType(parent_node, PinKind::Input, "uni_pin", uniform_type);
+            UtilsChangePinType(parent_node, PinKind::Input, "uni_pin", uniform_type, uniform_isArr);
 
-            if (tmp_loaded_value)
+            if (tmp_loaded_value && uniform_isArr == false)
             {
                 if (uniform_type == PinType::Bool)
                 {
@@ -1313,6 +1329,7 @@ void SetProgramUniformNode_Func::DeletePin()
     {
         current_uniform = "";
         uniform_type = PinType::Float;
+        uniform_isArr = false;
     }
 }
 

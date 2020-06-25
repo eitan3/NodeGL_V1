@@ -185,8 +185,8 @@ void ConvertTo_Func::LoadNodeData(rapidjson::Value& node_obj)
 {
     PinType x1_type = StringToPinType(std::string(node_obj["in_type"].GetString()));
     PinType out_type = StringToPinType(std::string(node_obj["out_type"].GetString()));
-    UtilsChangePinType(parent_node, PinKind::Input, "in", x1_type);
-    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type);
+    UtilsChangePinType(parent_node, PinKind::Input, "in", x1_type, false);
+    UtilsChangePinType(parent_node, PinKind::Output, "out", out_type, false);
 
     if (parent_node->inputs.at("in")->type == PinType::Float)
         std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("in"))->default_value = node_obj["in_value"].GetFloat();
@@ -438,7 +438,7 @@ void SetPlaceholder_Func::LoadNodeData(rapidjson::Value& node_obj)
         std::shared_ptr<BasePlaceholder> ph = config->GetPlaceholder(ph_name);
         parent_node->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 1, GetNextId(), "Value", PinType::String, "")));
         BuildNode(parent_node);
-        UtilsChangePinType(parent_node, PinKind::Input, "placeholder_pin", ph->type);
+        UtilsChangePinType(parent_node, PinKind::Input, "placeholder_pin", ph->type, false);
         ph->nodesID_vec.push_back(parent_node->id);
         placeholder = ph;
 
@@ -681,7 +681,7 @@ void GetPlaceholder_Func::LoadNodeData(rapidjson::Value& node_obj)
         std::shared_ptr<BasePlaceholder> ph = config->GetPlaceholder(ph_name);
         parent_node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 0, GetNextId(), "Value", PinType::String, "")));
         BuildNode(parent_node);
-        UtilsChangePinType(parent_node, PinKind::Output, "placeholder_pin", ph->type);
+        UtilsChangePinType(parent_node, PinKind::Output, "placeholder_pin", ph->type, false);
         ph->nodesID_vec.push_back(parent_node->id);
         placeholder = ph;
         placeholder_type = ph->type;

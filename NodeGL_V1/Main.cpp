@@ -82,6 +82,20 @@ std::string rename_placeholder_original_combo;
 // Variable for 'Delete Placeholder' Window
 std::string delete_placeholder_combo;
 
+// Variables for 'Create Array' Window
+std::string create_array_name;
+std::string create_array_type_combo;
+
+// Variable for 'Select Array' Window
+std::string select_array_combo;
+
+// Variables for 'Rename Array' Window
+std::string rename_array_name;
+std::string rename_array_original_combo;
+
+// Variable for 'Delete Array' Window
+std::string delete_array_combo;
+
 // Variables for seraching nodes on right click
 std::vector<SearchNodeObj> search_nodes_vector;
 
@@ -152,6 +166,7 @@ void ResetInstance()
         config->s_Nodes.at(node_i)->node_funcs = nullptr;
     }
     config->ClearPlaceholders();
+    config->ClearArrays();
 
     config->s_Links.clear();
     config->s_Nodes.clear();
@@ -273,31 +288,38 @@ void DrawPinIcon(std::shared_ptr<BasePin> pin, bool connected, int alpha)
     IconType iconType;
     ImColor  color = GetIconColor(pin->type);
     color.Value.w = alpha / 255.0f;
-    if (pin->isTemplate == false)
+    if (pin->isArr == false)
     {
-        switch (pin->type)
+        if (pin->isTemplate == false)
         {
-        case PinType::Flow:     iconType = IconType::Flow;   break;
-        case PinType::Bool:     iconType = IconType::Circle; break;
-        case PinType::Int:      iconType = IconType::Circle; break;
-        case PinType::Float:    iconType = IconType::Circle; break;
-        case PinType::String:   iconType = IconType::Circle; break;
-        case PinType::Vector2:   iconType = IconType::Circle; break;
-        case PinType::Vector3:   iconType = IconType::Circle; break;
-        case PinType::Vector4:   iconType = IconType::Circle; break;
-        case PinType::Matrix4x4:   iconType = IconType::Circle; break;
-        case PinType::ProgramObject:   iconType = IconType::Circle; break;
-        case PinType::VertexShaderObject:   iconType = IconType::Circle; break;
-        case PinType::FragmentShaderObject:   iconType = IconType::Circle; break;
-        case PinType::TextureObject:   iconType = IconType::Circle; break;
-        case PinType::MeshObject:   iconType = IconType::Circle; break;
-        default:
-            return;
+            switch (pin->type)
+            {
+            case PinType::Flow:     iconType = IconType::Flow;   break;
+            case PinType::Bool:     iconType = IconType::Circle; break;
+            case PinType::Int:      iconType = IconType::Circle; break;
+            case PinType::Float:    iconType = IconType::Circle; break;
+            case PinType::String:   iconType = IconType::Circle; break;
+            case PinType::Vector2:   iconType = IconType::Circle; break;
+            case PinType::Vector3:   iconType = IconType::Circle; break;
+            case PinType::Vector4:   iconType = IconType::Circle; break;
+            case PinType::Matrix4x4:   iconType = IconType::Circle; break;
+            case PinType::ProgramObject:   iconType = IconType::Circle; break;
+            case PinType::VertexShaderObject:   iconType = IconType::Circle; break;
+            case PinType::FragmentShaderObject:   iconType = IconType::Circle; break;
+            case PinType::TextureObject:   iconType = IconType::Circle; break;
+            case PinType::MeshObject:   iconType = IconType::Circle; break;
+            default:
+                return;
+            }
+        }
+        else
+        {
+            iconType = IconType::Diamond;
         }
     }
     else
     {
-        iconType = IconType::Diamond;
+        iconType = IconType::Grid;
     }
 
     ax::Widgets::Icon(ImVec2(s_PinIconSize, s_PinIconSize), iconType, connected, color, ImColor(32, 32, 32, alpha));
@@ -803,7 +825,7 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
                 node->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 1, GetNextId(), "Value", PinType::String, "")));
                 BuildNode(node);
             }
-            UtilsChangePinType(node, PinKind::Input, "placeholder_pin", ph->type);
+            UtilsChangePinType(node, PinKind::Input, "placeholder_pin", ph->type, false);
         }
         else if (node->is_get_placeholder)
         {
@@ -840,7 +862,7 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
                 node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 0, GetNextId(), "Value", PinType::String, "")));
                 BuildNode(node);
             }
-            UtilsChangePinType(node, PinKind::Output, "placeholder_pin", ph->type);
+            UtilsChangePinType(node, PinKind::Output, "placeholder_pin", ph->type, false);
         }
         ph->nodesID_vec.push_back(selectedNode);
         editor_config->showSelectPlaceholderWindow = false;
@@ -968,6 +990,340 @@ void ShowDeletePlaceholderWindow(bool* show = nullptr)
     ImGui::End();
 }
 
+void AddArrayPH(std::string ph_name, PinType pinType)
+{
+    auto config = InstanceConfig::instance();
+    if (pinType == PinType::String)
+    {
+        std::shared_ptr<ArrayValue<std::string>> ph = std::make_shared< ArrayValue<std::string>>(ph_name, pinType, std::make_shared<std::vector<std::string>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::Bool)
+    {
+        std::shared_ptr<ArrayValue<bool>> ph = std::make_shared< ArrayValue<bool>>(ph_name, pinType, std::make_shared<std::vector<bool>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::Float)
+    {
+        std::shared_ptr<ArrayValue<float>> ph = std::make_shared< ArrayValue<float>>(ph_name, pinType, std::make_shared<std::vector<float>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::Int)
+    {
+        std::shared_ptr<ArrayValue<int>> ph = std::make_shared< ArrayValue<int>>(ph_name, pinType, std::make_shared<std::vector<int>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::Vector2)
+    {
+        std::shared_ptr<ArrayValue<glm::vec2>> ph = std::make_shared< ArrayValue<glm::vec2>>(ph_name, pinType, std::make_shared<std::vector<glm::vec2>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::Vector3)
+    {
+        std::shared_ptr<ArrayValue<glm::vec3>> ph = std::make_shared< ArrayValue<glm::vec3>>(ph_name, pinType, std::make_shared<std::vector<glm::vec3>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::Vector4)
+    {
+        std::shared_ptr<ArrayValue<glm::vec4>> ph = std::make_shared< ArrayValue<glm::vec4>>(ph_name, pinType, std::make_shared<std::vector<glm::vec4>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::Matrix4x4)
+    {
+        std::shared_ptr<ArrayValue<glm::mat4>> ph = std::make_shared< ArrayValue<glm::mat4>>(ph_name, pinType, std::make_shared<std::vector<glm::mat4>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::TextureObject)
+    {
+        std::shared_ptr<ArrayValue<std::shared_ptr<TextureObject>>> ph = std::make_shared< ArrayValue<std::shared_ptr<TextureObject>>>(ph_name, pinType, std::make_shared<std::vector<std::shared_ptr<TextureObject>>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::ProgramObject)
+    {
+        std::shared_ptr<ArrayValue<std::shared_ptr<ProgramObject>>> ph = std::make_shared< ArrayValue<std::shared_ptr<ProgramObject>>>(ph_name, pinType, std::make_shared<std::vector<std::shared_ptr<ProgramObject>>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::VertexShaderObject)
+    {
+        std::shared_ptr<ArrayValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< ArrayValue<std::shared_ptr<ShaderObject>>>(ph_name, pinType, std::make_shared<std::vector<std::shared_ptr<ShaderObject>>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::FragmentShaderObject)
+    {
+        std::shared_ptr<ArrayValue<std::shared_ptr<ShaderObject>>> ph = std::make_shared< ArrayValue<std::shared_ptr<ShaderObject>>>(ph_name, pinType, std::make_shared<std::vector<std::shared_ptr<ShaderObject>>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+    else if (pinType == PinType::MeshObject)
+    {
+        std::shared_ptr<ArrayValue<std::shared_ptr<MeshObject>>> ph = std::make_shared< ArrayValue<std::shared_ptr<MeshObject>>>(ph_name, pinType, std::make_shared<std::vector<std::shared_ptr<MeshObject>>>());;
+        config->InsertNewArray(ph_name, ph);
+    }
+}
+
+void ShowCreateArrayWindow(bool* show = nullptr)
+{
+    if (!ImGui::Begin("Create Vector", show))
+    {
+        ImGui::End();
+        return;
+    }
+    ImGui::SetWindowSize(ImVec2(256, 0));
+    auto editor_config = EditorConfig::instance();
+    auto config = InstanceConfig::instance();
+    auto paneWidth = ImGui::GetContentRegionAvailWidth();
+
+    ImGui::BeginHorizontal("##vector_name", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Vector Name");
+    ImGui::InputText("##vector_name_input", (char*)create_array_name.data(), create_array_name.capacity() + 1.0);
+    create_array_name = std::string(create_array_name.data());
+    create_array_name.reserve(create_array_name.capacity() + 1.0);
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##vector_type", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Vector Type");
+    std::string items[] = { PinTypeToString(PinType::String), PinTypeToString(PinType::Bool), PinTypeToString(PinType::Float), PinTypeToString(PinType::Int),
+        PinTypeToString(PinType::Vector2), PinTypeToString(PinType::Vector3), PinTypeToString(PinType::Vector4), PinTypeToString(PinType::Matrix4x4),
+        PinTypeToString(PinType::TextureObject), PinTypeToString(PinType::ProgramObject), PinTypeToString(PinType::VertexShaderObject),
+        PinTypeToString(PinType::FragmentShaderObject), PinTypeToString(PinType::MeshObject) };
+    if (create_array_type_combo == "")
+        create_array_type_combo = items[0];
+    if (ImGui::BeginCombo("##vector_type_combo", create_array_type_combo.data())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < ARRAYSIZE(items); n++)
+        {
+            bool is_selected = (create_array_type_combo == items[n]);
+            if (ImGui::Selectable(items[n].c_str(), is_selected))
+            {
+                create_array_type_combo = items[n];
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##vector_buttons", ImVec2(paneWidth, 0), 1.0f);
+    if (ImGui::Button("Create"))
+    {
+        if (config->isArrayNameUsed(create_array_name) == false)
+        {
+            PinType pinType = StringToPinType(create_array_type_combo);
+            AddArrayPH(create_array_name, pinType);
+            editor_config->showCreateArrayWindow = false;
+        }
+    }
+    if (ImGui::Button("Cancel"))
+    {
+        editor_config->showCreateArrayWindow = false;
+    }
+
+    ImGui::EndHorizontal();
+    ImGui::End();
+}
+
+void ShowSelectArrayWindow(bool* show = nullptr)
+{
+    if (!ImGui::Begin("Select Vector", show))
+    {
+        ImGui::End();
+        return;
+    }
+    ImGui::SetWindowSize(ImVec2(256, 0));
+    auto editor_config = EditorConfig::instance();
+    auto config = InstanceConfig::instance();
+    auto paneWidth = ImGui::GetContentRegionAvailWidth();
+
+    ImGui::BeginHorizontal("##vector_original", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Select Vector");
+    std::vector<std::string> all_vectors = config->GetArraysMapKeys();
+    if (select_array_combo == "")
+        select_array_combo = all_vectors[0];
+    if (ImGui::BeginCombo("##vector_type_combo", select_array_combo.data())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < all_vectors.size(); n++)
+        {
+            bool is_selected = (select_array_combo == all_vectors[n]);
+            if (ImGui::Selectable(all_vectors[n].c_str(), is_selected))
+            {
+                select_array_combo = all_vectors[n];
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##vector_buttons", ImVec2(paneWidth, 0), 1.0f);
+    if (ImGui::Button("Select"))
+    {
+        auto node = FindNode(selectedNode, config->s_Nodes);
+        std::shared_ptr<BaseArray> ph = config->GetArray(select_array_combo);
+        
+        
+        if (std::dynamic_pointer_cast<GetArrayNode_Func>(node->node_funcs)->arrayPH)
+        {
+            std::shared_ptr<BaseArray> prev_ph = std::dynamic_pointer_cast<GetArrayNode_Func>(node->node_funcs)->arrayPH;
+            prev_ph->nodesID_vec.erase(std::remove(prev_ph->nodesID_vec.begin(), prev_ph->nodesID_vec.end(), node->id), prev_ph->nodesID_vec.end());
+            prev_ph = nullptr;
+        }
+        std::dynamic_pointer_cast<GetArrayNode_Func>(node->node_funcs)->arrayPH = ph;
+        std::dynamic_pointer_cast<GetArrayNode_Func>(node->node_funcs)->arrayPH_type = ph->type;
+
+        if (node->outputs.count("array_pin") > 0)
+        {
+            for (int link_i = 0; link_i < node->outputs.at("array_pin")->links.size(); link_i++)
+            {
+                std::shared_ptr<BasePin> output = node->outputs.at("array_pin");
+                if (output->links.at(link_i)->startPin)
+                {
+                    output->links.at(link_i)->startPin->links.erase(std::remove(output->links.at(link_i)->startPin->links.begin(), output->links.at(link_i)->startPin->links.end(), output->links.at(link_i)), output->links.at(link_i)->startPin->links.end());
+                    output->links.at(link_i)->startPin = nullptr;
+                }
+                if (output->links.at(link_i)->endPin)
+                {
+                    output->links.at(link_i)->endPin->links.erase(std::remove(output->links.at(link_i)->endPin->links.begin(), output->links.at(link_i)->endPin->links.end(), output->links.at(link_i)), output->links.at(link_i)->endPin->links.end());
+                    output->links.at(link_i)->endPin = nullptr;
+                }
+                ed::DeleteLink(output->links.at(link_i)->id);
+            }
+            node->outputs.at("array_pin")->links.clear();
+        }
+        else
+        {
+            node->outputs.insert(std::pair<std::string, std::shared_ptr<PinArrValue<std::string>>>("array_pin", new PinArrValue<std::string>("array_pin", 0, GetNextId(), "Value", PinType::String, std::make_shared<std::vector<std::string>>())));
+            BuildNode(node);
+        }
+        UtilsChangePinType(node, PinKind::Output, "array_pin", ph->type, true);
+        
+
+        ph->nodesID_vec.push_back(selectedNode);
+        editor_config->showSelectArrayWindow = false;
+    }
+    if (ImGui::Button("Cancel"))
+    {
+        editor_config->showSelectArrayWindow = false;
+    }
+
+    ImGui::EndHorizontal();
+    ImGui::End();
+}
+
+void ShowRenameArrayWindow(bool* show = nullptr)
+{
+    if (!ImGui::Begin("Rename Vector", show))
+    {
+        ImGui::End();
+        return;
+    }
+    ImGui::SetWindowSize(ImVec2(256, 0));
+    auto editor_config = EditorConfig::instance();
+    auto config = InstanceConfig::instance();
+    auto paneWidth = ImGui::GetContentRegionAvailWidth();
+
+    ImGui::BeginHorizontal("##vector_original", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Vector To Rename");
+    std::vector<std::string> all_vectors = config->GetArraysMapKeys();
+    if (rename_array_original_combo == "")
+        rename_array_original_combo = all_vectors[0];
+    if (ImGui::BeginCombo("##vector_type_combo", rename_array_original_combo.data())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < all_vectors.size(); n++)
+        {
+            bool is_selected = (rename_array_original_combo == all_vectors[n]);
+            if (ImGui::Selectable(all_vectors[n].c_str(), is_selected))
+            {
+                rename_array_original_combo = all_vectors[n];
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##vector_name", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Vector Name");
+    ImGui::InputText("##vector_name_input", (char*)rename_array_name.data(), rename_array_name.capacity() + 1.0);
+    rename_array_name = std::string(rename_array_name.data());
+    rename_array_name.reserve(rename_array_name.capacity() + 1.0);
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##vector_buttons", ImVec2(paneWidth, 0), 1.0f);
+    if (ImGui::Button("Rename"))
+    {
+        if (config->isArrayNameUsed(rename_array_name) == false)
+        {
+            std::shared_ptr<BaseArray> ph = config->GetArray(rename_array_original_combo);
+            ph->name = rename_array_name;
+            config->DeleteArray(rename_array_original_combo);
+            config->InsertNewArray(rename_array_name, ph);
+            editor_config->showRenameArrayWindow = false;
+        }
+    }
+    if (ImGui::Button("Cancel"))
+    {
+        editor_config->showRenameArrayWindow = false;
+    }
+
+    ImGui::EndHorizontal();
+    ImGui::End();
+}
+
+void ShowDeleteArrayWindow(bool* show = nullptr)
+{
+    if (!ImGui::Begin("Delete Vector", show))
+    {
+        ImGui::End();
+        return;
+    }
+    ImGui::SetWindowSize(ImVec2(256, 0));
+    auto editor_config = EditorConfig::instance();
+    auto config = InstanceConfig::instance();
+    auto paneWidth = ImGui::GetContentRegionAvailWidth();
+
+    ImGui::BeginHorizontal("##vector_original", ImVec2(paneWidth, 0), 1.0f);
+    ImGui::TextUnformatted("Select Vector");
+    std::vector<std::string> all_vectors = config->GetArraysMapKeys();
+    if (delete_array_combo == "")
+        delete_array_combo = all_vectors[0];
+    if (ImGui::BeginCombo("##vector_type_combo", delete_array_combo.data())) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < all_vectors.size(); n++)
+        {
+            bool is_selected = (delete_array_combo == all_vectors[n]);
+            if (ImGui::Selectable(all_vectors[n].c_str(), is_selected))
+            {
+                delete_array_combo = all_vectors[n];
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::EndHorizontal();
+
+    ImGui::BeginHorizontal("##vector_buttons", ImVec2(paneWidth, 0), 1.0f);
+    if (ImGui::Button("Delete"))
+    {
+        std::shared_ptr<BaseArray> ph = config->GetArray(delete_array_combo);
+        for (int ph_node_i = 0; ph_node_i < ph->nodesID_vec.size(); ph_node_i++)
+        {
+            ed::DeleteNode(ph->nodesID_vec.at(ph_node_i));
+        }
+        config->DeleteArray(delete_array_combo);
+        editor_config->showDeleteArrayWindow = false;
+    }
+    if (ImGui::Button("Cancel"))
+    {
+        editor_config->showDeleteArrayWindow = false;
+    }
+
+    ImGui::EndHorizontal();
+    ImGui::End();
+}
+
 void ShowOpenInstanceWindow()
 {
     auto editor_config = EditorConfig::instance();
@@ -1001,6 +1357,13 @@ void ShowOpenInstanceWindow()
             std::string ph_name = std::string(ph_arr.GetArray()[0].GetString());
             PinType ph_type = StringToPinType(std::string(ph_arr.GetArray()[1].GetString()));
             AddPlaceholder(ph_name, ph_type);
+        }
+        rapidjson::Value& vecs_arr_val = d["vectors"];
+        for (auto& vec_arr : vecs_arr_val.GetArray())
+        {
+            std::string vec_name = std::string(vec_arr.GetArray()[0].GetString());
+            PinType vec_type = StringToPinType(std::string(vec_arr.GetArray()[1].GetString()));
+            AddArrayPH(vec_name, vec_type);
         }
 
         std::map < std::string, std::shared_ptr<Node>> json_to_node_mapper;
@@ -1076,6 +1439,13 @@ void ShowOpenInstanceWindow()
                                 std::string link_str_id = start_node_name + end_node_name + start_pin_name + end_pin_name;
                                 if (std::find(loaded_nodes.begin(), loaded_nodes.end(), link_str_id) == loaded_nodes.end())
                                 {
+                                    // Accept New Link
+                                    if (endPin->isGeneralArray)
+                                    {
+                                        UtilsChangePinType(endPin->node, endPin->kind, endPin->pin_key, startPin->type, endPin->isArr);
+                                    }
+                                    startPin = startNode->outputs.at(link_obj["start_pin"].GetString());
+                                    endPin = endNode->inputs.at(link_obj["end_pin"].GetString());
                                     config->s_Links.emplace_back(new Link(GetNextId(), startPin->id, endPin->id, startPin, endPin));
                                     config->s_Links.back()->color = GetIconColor(startPin->type);
                                     startPin->links.push_back(config->s_Links.back());
@@ -1166,6 +1536,18 @@ void ShowSaveInstanceWindow()
             writer.StartArray();
             writer.String(ph->name.c_str());
             writer.String(PinTypeToString(ph->type).c_str());
+            writer.EndArray();
+        }
+        writer.EndArray();
+        writer.Key("vectors");
+        writer.StartArray();
+        std::vector<std::string> vecs_keys = config->GetArraysMapKeys();
+        for (int ph_i = 0; ph_i < vecs_keys.size(); ph_i++)
+        {
+            std::shared_ptr<BaseArray> vec = config->GetArray(vecs_keys.at(ph_i));
+            writer.StartArray();
+            writer.String(vec->name.c_str());
+            writer.String(PinTypeToString(vec->type).c_str());
             writer.EndArray();
         }
         writer.EndArray();
@@ -1278,23 +1660,31 @@ void ShowNodeSearchWindow()
 void ShowWindows()
 {
     auto editor_config = EditorConfig::instance();
+    // Save Instance Window
     if (editor_config->showSaveInstanceWindow)
         ShowSaveInstanceWindow();
+    
+    // Open Instance Window
     if (editor_config->showOpenInstanceWindow)
         ShowOpenInstanceWindow();
 
+    // Node Search Window
     if (editor_config->showNodeSearchWindow)
         ShowNodeSearchWindow();
 
+    // Style Editor Window
     if (showStyleEditor)
         ShowStyleEditor(&showStyleEditor);
 
+    // Show Texture Viewer
     if (showTextureViewer)
         ShowTextureViewer(&showTextureViewer);
 
+    // Node Hierarchy Window
     if (showNodeHierarchyWindow)
         ShowNodeHierarchyWindow(&showNodeHierarchyWindow);
 
+    // Create Placeholder Window
     if (editor_config->showCreatePlaceholderWindow)
     {
         ShowCreatePlaceholderWindow(&editor_config->showCreatePlaceholderWindow);
@@ -1305,6 +1695,7 @@ void ShowWindows()
         create_placeholder_type_combo = "";
     }
 
+    // Show Placeholder Window
     if (editor_config->showSelectPlaceholderWindow)
     {
         ShowSelectPlaceholderWindow(&editor_config->showSelectPlaceholderWindow);
@@ -1314,6 +1705,7 @@ void ShowWindows()
         select_placeholder_combo = "";
     }
 
+    // Rename Placeholder Window
     if (editor_config->showRenamePlaceholderWindow)
     {
         ShowRenamePlaceholderWindow(&editor_config->showRenamePlaceholderWindow);
@@ -1324,6 +1716,7 @@ void ShowWindows()
         rename_placeholder_original_combo = "";
     }
 
+    // Delete Placeholder Window
     if (editor_config->showDeletePlaceholderWindow)
     {
         ShowDeletePlaceholderWindow(&editor_config->showDeletePlaceholderWindow);
@@ -1331,6 +1724,48 @@ void ShowWindows()
     else
     {
         delete_placeholder_combo = "";
+    }
+
+    // Create Vector Window
+    if (editor_config->showCreateArrayWindow)
+    {
+        ShowCreateArrayWindow(&editor_config->showCreateArrayWindow);
+    }
+    else
+    {
+        create_array_name = "";
+        create_array_type_combo = "";
+    }
+
+    // Show PlacehoVectorlder Window
+    if (editor_config->showSelectArrayWindow)
+    {
+        ShowSelectArrayWindow(&editor_config->showSelectArrayWindow);
+    }
+    else
+    {
+        select_array_combo = "";
+    }
+
+    // Rename Vector Window
+    if (editor_config->showRenameArrayWindow)
+    {
+        ShowRenameArrayWindow(&editor_config->showRenameArrayWindow);
+    }
+    else
+    {
+        rename_array_name = "";
+        rename_array_original_combo = "";
+    }
+
+    // Delete Vector Window
+    if (editor_config->showDeleteArrayWindow)
+    {
+        ShowDeleteArrayWindow(&editor_config->showDeleteArrayWindow);
+    }
+    else
+    {
+        delete_array_combo = "";
     }
 }
 #pragma endregion
@@ -1378,19 +1813,7 @@ void CreateMenuBar()
             }
             ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Windows"))
-        {
-            if (ImGui::MenuItem("Nodes Hierarchy Window"))
-            {
-                showNodeHierarchyWindow = true;
-            }
-            if (ImGui::MenuItem("Textures Viewer"))
-            {
-                showTextureViewer = true;
-            }
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Placeholders"))
+        if (ImGui::BeginMenu("Data Types"))
         {
             if (ImGui::MenuItem("Create Placeholder"))
                 editor_config->showCreatePlaceholderWindow = true;
@@ -1400,6 +1823,28 @@ void CreateMenuBar()
                     editor_config->showRenamePlaceholderWindow = true;
                 if (ImGui::MenuItem("Delete Placeholder"))
                     editor_config->showDeletePlaceholderWindow = true;
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Create Vector"))
+                editor_config->showCreateArrayWindow = true;
+            if (config->GetArraysMapKeys().size() > 0)
+            {
+                if (ImGui::MenuItem("Rename Vector"))
+                    editor_config->showRenameArrayWindow = true;
+                if (ImGui::MenuItem("Delete Vector"))
+                    editor_config->showDeleteArrayWindow = true;
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Windows"))
+        {
+            if (ImGui::MenuItem("Nodes Hierarchy Window"))
+            {
+                showNodeHierarchyWindow = true;
+            }
+            if (ImGui::MenuItem("Textures Viewer"))
+            {
+                showTextureViewer = true;
             }
             ImGui::EndMenu();
         }
@@ -1532,182 +1977,185 @@ void Application_Frame()
                 ImGui::Spring(0);
 
                 static bool wasActive = false;
-                if (input->type == PinType::String)
+                if (input->isArr == false)
                 {
-                    ImGui::PushItemWidth(100.0f);
-                    std::shared_ptr<PinValue<std::string>> input_pin_value = std::dynamic_pointer_cast<PinValue<std::string>>(input);
-                    if (input_pin_value->links.size() > 0)
+                    if (input->type == PinType::String)
                     {
-                        ImGui::InputText("##edit", (char*)input_pin_value->value.data(), input_pin_value->value.capacity() + 1.0);
-                        input_pin_value->value = std::string(input_pin_value->value.data());
+                        ImGui::PushItemWidth(100.0f);
+                        std::shared_ptr<PinValue<std::string>> input_pin_value = std::dynamic_pointer_cast<PinValue<std::string>>(input);
+                        if (input_pin_value->links.size() > 0)
+                        {
+                            ImGui::InputText("##edit", (char*)input_pin_value->value.data(), input_pin_value->value.capacity() + 1.0);
+                            input_pin_value->value = std::string(input_pin_value->value.data());
+                        }
+                        else
+                        {
+                            ImGui::InputText("##edit", (char*)input_pin_value->default_value.data(), input_pin_value->default_value.capacity() + 1.0);
+                            input_pin_value->default_value = std::string(input_pin_value->default_value.data());
+                        }
+                        ImGui::PopItemWidth();
+                        if (ImGui::IsItemActive() && !wasActive)
+                        {
+                            ed::EnableShortcuts(false);
+                            wasActive = true;
+                        }
+                        else if (!ImGui::IsItemActive() && wasActive)
+                        {
+                            ed::EnableShortcuts(true);
+                            wasActive = false;
+                        }
+                        ImGui::Spring(0);
                     }
-                    else
+                    else if (input->type == PinType::Bool)
                     {
-                        ImGui::InputText("##edit", (char*)input_pin_value->default_value.data(), input_pin_value->default_value.capacity() + 1.0);
-                        input_pin_value->default_value = std::string(input_pin_value->default_value.data());
+                        std::shared_ptr<PinValue<bool>> input_pin_value = std::dynamic_pointer_cast<PinValue<bool>>(input);
+                        ImGui::PushItemWidth(100.0f);
+                        if (input_pin_value->links.size() > 0)
+                            ImGui::Checkbox("##edit", &input_pin_value->value);
+                        else
+                            ImGui::Checkbox("##edit", &input_pin_value->default_value);
+                        ImGui::PopItemWidth();
+                        if (ImGui::IsItemActive() && !wasActive)
+                        {
+                            ed::EnableShortcuts(false);
+                            wasActive = true;
+                        }
+                        else if (!ImGui::IsItemActive() && wasActive)
+                        {
+                            ed::EnableShortcuts(true);
+                            wasActive = false;
+                        }
+                        ImGui::Spring(0);
                     }
-                    ImGui::PopItemWidth();
-                    if (ImGui::IsItemActive() && !wasActive)
+                    else if (input->type == PinType::Float)
                     {
-                        ed::EnableShortcuts(false);
-                        wasActive = true;
+                        std::shared_ptr<PinValue<float>> input_pin_value = std::dynamic_pointer_cast<PinValue<float>>(input);
+                        ImGui::PushItemWidth(100.0f);
+                        if (input_pin_value->links.size() > 0)
+                            ImGui::InputFloat("##edit", &input_pin_value->value, 0.0, 0.0, "%.6f", 0);
+                        else
+                            ImGui::InputFloat("##edit", &input_pin_value->default_value, 0.0, 0.0, "%.6f", 0);
+                        ImGui::PopItemWidth();
+                        if (ImGui::IsItemActive() && !wasActive)
+                        {
+                            ed::EnableShortcuts(false);
+                            wasActive = true;
+                        }
+                        else if (!ImGui::IsItemActive() && wasActive)
+                        {
+                            ed::EnableShortcuts(true);
+                            wasActive = false;
+                        }
+                        ImGui::Spring(0);
                     }
-                    else if (!ImGui::IsItemActive() && wasActive)
+                    else if (input->type == PinType::Vector2)
                     {
-                        ed::EnableShortcuts(true);
-                        wasActive = false;
+                        std::shared_ptr<PinValue<glm::vec2>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec2>>(input);
+                        ImGui::PushItemWidth(125.0f);
+                        if (input_pin_value->links.size() > 0)
+                        {
+                            float float2[2] = { input_pin_value->value.x, input_pin_value->value.y };
+                            ImGui::InputFloat2("##edit", float2);
+                            input_pin_value->value = glm::vec2(float2[0], float2[1]);
+                        }
+                        else
+                        {
+                            float float2[2] = { input_pin_value->default_value.x, input_pin_value->default_value.y };
+                            ImGui::InputFloat2("##edit", float2);
+                            input_pin_value->default_value = glm::vec2(float2[0], float2[1]);
+                        }
+                        ImGui::PopItemWidth();
+                        if (ImGui::IsItemActive() && !wasActive)
+                        {
+                            ed::EnableShortcuts(false);
+                            wasActive = true;
+                        }
+                        else if (!ImGui::IsItemActive() && wasActive)
+                        {
+                            ed::EnableShortcuts(true);
+                            wasActive = false;
+                        }
+                        ImGui::Spring(0);
                     }
-                    ImGui::Spring(0);
-                }
-                else if (input->type == PinType::Bool)
-                {
-                    std::shared_ptr<PinValue<bool>> input_pin_value = std::dynamic_pointer_cast<PinValue<bool>>(input);
-                    ImGui::PushItemWidth(100.0f);
-                    if (input_pin_value->links.size() > 0)
-                        ImGui::Checkbox("##edit", &input_pin_value->value);
-                    else
-                        ImGui::Checkbox("##edit", &input_pin_value->default_value);
-                    ImGui::PopItemWidth();
-                    if (ImGui::IsItemActive() && !wasActive)
+                    else if (input->type == PinType::Vector3)
                     {
-                        ed::EnableShortcuts(false);
-                        wasActive = true;
+                        std::shared_ptr<PinValue<glm::vec3>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(input);
+                        ImGui::PushItemWidth(125.0f);
+                        if (input_pin_value->links.size() > 0)
+                        {
+                            float float3[3] = { input_pin_value->value.x, input_pin_value->value.y, input_pin_value->value.z };
+                            ImGui::InputFloat3("##edit", float3);
+                            input_pin_value->value = glm::vec3(float3[0], float3[1], float3[2]);
+                        }
+                        else
+                        {
+                            float float3[3] = { input_pin_value->default_value.x, input_pin_value->default_value.y, input_pin_value->default_value.z };
+                            ImGui::InputFloat3("##edit", float3);
+                            input_pin_value->default_value = glm::vec3(float3[0], float3[1], float3[2]);
+                        }
+                        ImGui::PopItemWidth();
+                        if (ImGui::IsItemActive() && !wasActive)
+                        {
+                            ed::EnableShortcuts(false);
+                            wasActive = true;
+                        }
+                        else if (!ImGui::IsItemActive() && wasActive)
+                        {
+                            ed::EnableShortcuts(true);
+                            wasActive = false;
+                        }
+                        ImGui::Spring(0);
                     }
-                    else if (!ImGui::IsItemActive() && wasActive)
+                    else if (input->type == PinType::Vector4)
                     {
-                        ed::EnableShortcuts(true);
-                        wasActive = false;
+                        std::shared_ptr<PinValue<glm::vec4>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec4>>(input);
+                        ImGui::PushItemWidth(125.0f);
+                        if (input_pin_value->links.size() > 0)
+                        {
+                            float float4[4] = { input_pin_value->value.x, input_pin_value->value.y, input_pin_value->value.z, input_pin_value->value.w };
+                            ImGui::InputFloat4("##edit", float4);
+                            input_pin_value->value = glm::vec4(float4[0], float4[1], float4[2], float4[3]);
+                        }
+                        else
+                        {
+                            float float4[4] = { input_pin_value->default_value.x, input_pin_value->default_value.y, input_pin_value->default_value.z, input_pin_value->default_value.w };
+                            ImGui::InputFloat4("##edit", float4);
+                            input_pin_value->default_value = glm::vec4(float4[0], float4[1], float4[2], float4[3]);
+                        }
+                        ImGui::PopItemWidth();
+                        if (ImGui::IsItemActive() && !wasActive)
+                        {
+                            ed::EnableShortcuts(false);
+                            wasActive = true;
+                        }
+                        else if (!ImGui::IsItemActive() && wasActive)
+                        {
+                            ed::EnableShortcuts(true);
+                            wasActive = false;
+                        }
+                        ImGui::Spring(0);
                     }
-                    ImGui::Spring(0);
-                }
-                else if (input->type == PinType::Float)
-                {
-                    std::shared_ptr<PinValue<float>> input_pin_value = std::dynamic_pointer_cast<PinValue<float>>(input);
-                    ImGui::PushItemWidth(100.0f);
-                    if (input_pin_value->links.size() > 0)
-                        ImGui::InputFloat("##edit", &input_pin_value->value, 0.0, 0.0, "%.6f", 0);
-                    else
-                        ImGui::InputFloat("##edit", &input_pin_value->default_value, 0.0, 0.0, "%.6f", 0);
-                    ImGui::PopItemWidth();
-                    if (ImGui::IsItemActive() && !wasActive)
+                    else if (input->type == PinType::Int)
                     {
-                        ed::EnableShortcuts(false);
-                        wasActive = true;
+                        std::shared_ptr<PinValue<int>> input_pin_value = std::dynamic_pointer_cast<PinValue<int>>(input);
+                        ImGui::PushItemWidth(100.0f);
+                        if (input_pin_value->links.size() > 0)
+                            ImGui::InputInt("##edit", &input_pin_value->value, 0, 0, 0);
+                        else
+                            ImGui::InputInt("##edit", &input_pin_value->default_value, 0, 0, 0);
+                        ImGui::PopItemWidth();
+                        if (ImGui::IsItemActive() && !wasActive)
+                        {
+                            ed::EnableShortcuts(false);
+                            wasActive = true;
+                        }
+                        else if (!ImGui::IsItemActive() && wasActive)
+                        {
+                            ed::EnableShortcuts(true);
+                            wasActive = false;
+                        }
+                        ImGui::Spring(0);
                     }
-                    else if (!ImGui::IsItemActive() && wasActive)
-                    {
-                        ed::EnableShortcuts(true);
-                        wasActive = false;
-                    }
-                    ImGui::Spring(0);
-                }
-                else if (input->type == PinType::Vector2)
-                {
-                    std::shared_ptr<PinValue<glm::vec2>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec2>>(input);
-                    ImGui::PushItemWidth(125.0f);
-                    if (input_pin_value->links.size() > 0)
-                    {
-                        float float2[2] = { input_pin_value->value.x, input_pin_value->value.y };
-                        ImGui::InputFloat2("##edit", float2);
-                        input_pin_value->value = glm::vec2(float2[0], float2[1]);
-                    }
-                    else
-                    {
-                        float float2[2] = { input_pin_value->default_value.x, input_pin_value->default_value.y };
-                        ImGui::InputFloat2("##edit", float2);
-                        input_pin_value->default_value = glm::vec2(float2[0], float2[1]);
-                    }
-                    ImGui::PopItemWidth();
-                    if (ImGui::IsItemActive() && !wasActive)
-                    {
-                        ed::EnableShortcuts(false);
-                        wasActive = true;
-                    }
-                    else if (!ImGui::IsItemActive() && wasActive)
-                    {
-                        ed::EnableShortcuts(true);
-                        wasActive = false;
-                    }
-                    ImGui::Spring(0);
-                }
-                else if (input->type == PinType::Vector3)
-                {
-                    std::shared_ptr<PinValue<glm::vec3>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec3>>(input);
-                    ImGui::PushItemWidth(125.0f);
-                    if (input_pin_value->links.size() > 0)
-                    {
-                        float float3[3] = { input_pin_value->value.x, input_pin_value->value.y, input_pin_value->value.z };
-                        ImGui::InputFloat3("##edit", float3);
-                        input_pin_value->value = glm::vec3(float3[0], float3[1], float3[2]);
-                    }
-                    else
-                    {
-                        float float3[3] = { input_pin_value->default_value.x, input_pin_value->default_value.y, input_pin_value->default_value.z };
-                        ImGui::InputFloat3("##edit", float3);
-                        input_pin_value->default_value = glm::vec3(float3[0], float3[1], float3[2]);
-                    }
-                    ImGui::PopItemWidth();
-                    if (ImGui::IsItemActive() && !wasActive)
-                    {
-                        ed::EnableShortcuts(false);
-                        wasActive = true;
-                    }
-                    else if (!ImGui::IsItemActive() && wasActive)
-                    {
-                        ed::EnableShortcuts(true);
-                        wasActive = false;
-                    }
-                    ImGui::Spring(0);
-                }
-                else if (input->type == PinType::Vector4)
-                {
-                    std::shared_ptr<PinValue<glm::vec4>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::vec4>>(input);
-                    ImGui::PushItemWidth(125.0f);
-                    if (input_pin_value->links.size() > 0)
-                    {
-                        float float4[4] = { input_pin_value->value.x, input_pin_value->value.y, input_pin_value->value.z, input_pin_value->value.w };
-                        ImGui::InputFloat4("##edit", float4);
-                        input_pin_value->value = glm::vec4(float4[0], float4[1], float4[2], float4[3]);
-                    }
-                    else
-                    {
-                        float float4[4] = { input_pin_value->default_value.x, input_pin_value->default_value.y, input_pin_value->default_value.z, input_pin_value->default_value.w };
-                        ImGui::InputFloat4("##edit", float4);
-                        input_pin_value->default_value = glm::vec4(float4[0], float4[1], float4[2], float4[3]);
-                    }
-                    ImGui::PopItemWidth();
-                    if (ImGui::IsItemActive() && !wasActive)
-                    {
-                        ed::EnableShortcuts(false);
-                        wasActive = true;
-                    }
-                    else if (!ImGui::IsItemActive() && wasActive)
-                    {
-                        ed::EnableShortcuts(true);
-                        wasActive = false;
-                    }
-                    ImGui::Spring(0);
-                }
-                else if (input->type == PinType::Int)
-                {
-                    std::shared_ptr<PinValue<int>> input_pin_value = std::dynamic_pointer_cast<PinValue<int>>(input);
-                    ImGui::PushItemWidth(100.0f);
-                    if (input_pin_value->links.size() > 0)
-                        ImGui::InputInt("##edit", &input_pin_value->value, 0, 0, 0);
-                    else
-                        ImGui::InputInt("##edit", &input_pin_value->default_value, 0, 0, 0);
-                    ImGui::PopItemWidth();
-                    if (ImGui::IsItemActive() && !wasActive)
-                    {
-                        ed::EnableShortcuts(false);
-                        wasActive = true;
-                    }
-                    else if (!ImGui::IsItemActive() && wasActive)
-                    {
-                        ed::EnableShortcuts(true);
-                        wasActive = false;
-                    }
-                    ImGui::Spring(0);
                 }
 
                 if (!input->name.empty())
@@ -1729,7 +2177,7 @@ void Application_Frame()
                 ImGui::Spring(1, 0);
             }
 
-            if (!isSimple && (node->is_set_placeholder || node->is_get_placeholder))
+            if (!isSimple && (node->is_set_placeholder || node->is_get_placeholder || node->is_get_array))
             {
                 builder.Middle();
 
@@ -1740,6 +2188,9 @@ void Application_Frame()
                 if (node->is_get_placeholder)
                     if (std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder)
                         ImGui::TextUnformatted(std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder->name.c_str());
+                if (node->is_get_array)
+                    if (std::dynamic_pointer_cast<GetArrayNode_Func>(node->node_funcs)->arrayPH)
+                        ImGui::TextUnformatted(std::dynamic_pointer_cast<GetArrayNode_Func>(node->node_funcs)->arrayPH->name.c_str());
                 ImGui::Spring(1, 0);
             }
 
@@ -1865,26 +2316,51 @@ void Application_Frame()
 
                     if (startPin && endPin)
                     {
+                        bool isValidPins = true;
                         if (endPin == startPin)
                         {
+                            showLabelOnMouse("x Start pin cannot be the end pin", ImColor(45, 32, 32, 180));
                             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+                            isValidPins = false;
                         }
                         else if (endPin->kind == startPin->kind)
                         {
                             showLabelOnMouse("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
                             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+                            isValidPins = false;
                         }
                         else if (endPin->node->id == startPin->node->id)
                         {
                             showLabelOnMouse("x Cannot connect to self", ImColor(45, 32, 32, 180));
                             ed::RejectNewItem(ImColor(255, 0, 0), 1.0f);
+                            isValidPins = false;
                         }
-                        else if (endPin->type != startPin->type)
+                        else if (endPin->isArr != startPin->isArr)
                         {
                             showLabelOnMouse("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
                             ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
+                            isValidPins = false;
                         }
-                        else
+                        else if (endPin->isArr == false)
+                        {
+                            if (endPin->type != startPin->type)
+                            {
+                                showLabelOnMouse("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
+                                ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
+                                isValidPins = false;
+                            }
+                        }
+                        else if (endPin->isArr == true)
+                        {
+                            if (endPin->type != startPin->type && endPin->isGeneralArray == false)
+                            {
+                                showLabelOnMouse("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
+                                ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
+                                isValidPins = false;
+                            }
+                        }
+                        
+                        if (isValidPins)
                         {
                             showLabelOnMouse("+ Create Link", ImColor(32, 45, 32, 180));
                             if (ed::AcceptNewItem(ImColor(128, 255, 128), 4.0f))
@@ -1905,9 +2381,16 @@ void Application_Frame()
                                             config->s_Links.at(link_i)->endPin = nullptr;
                                         }
                                         ed::DeleteLink(config->s_Links.at(link_i)->id);
-                                        link_i = config->s_Links.size();
                                     }
                                 }
+                                
+                                // Accept New Link
+                                if (endPin->isGeneralArray)
+                                {
+                                    UtilsChangePinType(endPin->node, endPin->kind, endPin->pin_key, startPin->type, endPin->isArr);
+                                }
+                                startPin = FindPin(startPinId, config->s_Nodes);
+                                endPin = FindPin(endPinId, config->s_Nodes);
                                 config->s_Links.emplace_back(new Link(GetNextId(), startPinId, endPinId, startPin, endPin));
                                 config->s_Links.back()->color = GetIconColor(startPin->type);
                                 startPin->links.push_back(config->s_Links.back());
@@ -2089,7 +2572,7 @@ void Application_Frame()
                                 ed::DeleteLink(pin->links.at(link_i)->id);
                             }
                             pin->links.clear();
-                            UtilsChangePinType(pin->node, pin->kind, pin->pin_key, pin->template_allowed_types[n]);
+                            UtilsChangePinType(pin->node, pin->kind, pin->pin_key, pin->template_allowed_types[n], pin->isArr);
                         }
                         if (is_selected)
                             ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)

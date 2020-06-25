@@ -4,6 +4,7 @@ void CollectSearchNodes(std::vector<SearchNodeObj>& search_nodes_vector)
 {
 	FlowNodesSearchSetup(search_nodes_vector);
 	NodesUtilsSearchSetup(search_nodes_vector);
+	ArraysNodesSearchSetup(search_nodes_vector);
 	GlNodes1_SearchSetup(search_nodes_vector);
 	ShadersNodesSearchSetup(search_nodes_vector);
 	AnimNodesSearchSetup(search_nodes_vector);
@@ -34,6 +35,8 @@ std::shared_ptr<Node> LoadNodeFromJSON(std::vector<std::shared_ptr<Node>>& s_Nod
 		loaded_node = ShadersNodesLoadSetup(s_Nodes, node_key);
 	if (loaded_node == nullptr)
 		loaded_node = NodesUtilsLoadSetup(s_Nodes, node_key);
+	if (loaded_node == nullptr)
+		loaded_node = ArraysNodesLoadSetup(s_Nodes, node_key);
 	if (loaded_node == nullptr)
 		loaded_node = Vec2NodesLoadSetup(s_Nodes, node_key);
 	if (loaded_node == nullptr)
