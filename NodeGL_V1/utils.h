@@ -25,6 +25,9 @@ std::vector<std::string> SortPins(std::map<std::string, std::shared_ptr<BasePin>
 void AddInputPinsTab(std::shared_ptr<Node> node);
 void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::string index, PinType type, bool isArr);
 
+void UtilsDeleteLink(std::shared_ptr<Link> link);
+void UtilsDeleteLinks(std::shared_ptr<BasePin> pin);
+
 template<typename T>
 T GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 

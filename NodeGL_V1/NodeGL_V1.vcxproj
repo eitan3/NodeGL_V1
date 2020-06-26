@@ -136,7 +136,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\Application;..\blueprint-utilities;..\dxerr;..\imgui;..\imgui_canvas;..\imgui_node_editor;..\Dependencies\gl3w\Include;..\Dependencies\glfw-3.3.2\include;..\Dependencies\Dirent;..\Dependencies\Json\include;..\Dependencies\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

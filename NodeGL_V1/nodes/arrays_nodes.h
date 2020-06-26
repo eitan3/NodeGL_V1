@@ -5,6 +5,7 @@
 #include "node_function_interface.h"
 #include "../nodes_builder.h"
 #include "../utils.h"
+#include <glm\gtc\type_ptr.hpp>
 
 
 
@@ -52,8 +53,11 @@ public:
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI();
     void UpdateNodeInspector() {};
-    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) {};
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+
+private:
+    std::shared_ptr<BasePlaceholder> tmp_loaded_value;
 };
 
 std::shared_ptr<Node> ArrayInsertNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -68,8 +72,11 @@ public:
     void NoFlowUpdatePinsValues() {};
     void UpdateNodeUI();
     void UpdateNodeInspector() {};
-    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer) {};
-    void LoadNodeData(rapidjson::Value& node_obj) {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+
+private:
+    std::shared_ptr<BasePlaceholder> tmp_loaded_value;
 };
 
 std::shared_ptr<Node> ArrayInsertDefaultNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
@@ -121,6 +128,41 @@ public:
 };
 
 std::shared_ptr<Node> ArrayClearToDefaultValuesNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class ArraySetValueNode_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run(std::string called_pin);
+    void Delete();
+    void NoFlowUpdatePinsValues() {};
+    void UpdateNodeUI();
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+
+private:
+    std::shared_ptr<BasePlaceholder> tmp_loaded_value;
+};
+
+std::shared_ptr<Node> ArraySetValueNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class ArrayGetValueNode_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run(std::string called_pin) {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI();
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
+
+std::shared_ptr<Node> ArrayGetValueNode(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
 

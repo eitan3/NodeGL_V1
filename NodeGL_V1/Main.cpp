@@ -803,22 +803,7 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
             std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder = ph;
             if (node->inputs.count("placeholder_pin") > 0)
             {
-                for (int link_i = 0; link_i < node->inputs.at("placeholder_pin")->links.size(); link_i++)
-                {
-                    std::shared_ptr<BasePin> input = node->inputs.at("placeholder_pin");
-                    if (input->links.at(link_i)->startPin)
-                    {
-                        input->links.at(link_i)->startPin->links.erase(std::remove(input->links.at(link_i)->startPin->links.begin(), input->links.at(link_i)->startPin->links.end(), input->links.at(link_i)), input->links.at(link_i)->startPin->links.end());
-                        input->links.at(link_i)->startPin = nullptr;
-                    }
-                    if (input->links.at(link_i)->endPin)
-                    {
-                        input->links.at(link_i)->endPin->links.erase(std::remove(input->links.at(link_i)->endPin->links.begin(), input->links.at(link_i)->endPin->links.end(), input->links.at(link_i)), input->links.at(link_i)->endPin->links.end());
-                        input->links.at(link_i)->endPin = nullptr;
-                    }
-                    ed::DeleteLink(input->links.at(link_i)->id);
-                }
-                node->inputs.at("placeholder_pin")->links.clear();
+                UtilsDeleteLinks(node->inputs.at("placeholder_pin"));
             }
             else
             {
@@ -840,22 +825,7 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
             
             if (node->outputs.count("placeholder_pin") > 0)
             {
-                for (int link_i = 0; link_i < node->outputs.at("placeholder_pin")->links.size(); link_i++)
-                {
-                    std::shared_ptr<BasePin> output = node->outputs.at("placeholder_pin");
-                    if (output->links.at(link_i)->startPin)
-                    {
-                        output->links.at(link_i)->startPin->links.erase(std::remove(output->links.at(link_i)->startPin->links.begin(), output->links.at(link_i)->startPin->links.end(), output->links.at(link_i)), output->links.at(link_i)->startPin->links.end());
-                        output->links.at(link_i)->startPin = nullptr;
-                    }
-                    if (output->links.at(link_i)->endPin)
-                    {
-                        output->links.at(link_i)->endPin->links.erase(std::remove(output->links.at(link_i)->endPin->links.begin(), output->links.at(link_i)->endPin->links.end(), output->links.at(link_i)), output->links.at(link_i)->endPin->links.end());
-                        output->links.at(link_i)->endPin = nullptr;
-                    }
-                    ed::DeleteLink(output->links.at(link_i)->id);
-                }
-                node->outputs.at("placeholder_pin")->links.clear();
+                UtilsDeleteLinks(node->outputs.at("placeholder_pin"));
             }
             else
             {
@@ -1173,22 +1143,7 @@ void ShowSelectArrayWindow(bool* show = nullptr)
 
         if (node->outputs.count("array_pin") > 0)
         {
-            for (int link_i = 0; link_i < node->outputs.at("array_pin")->links.size(); link_i++)
-            {
-                std::shared_ptr<BasePin> output = node->outputs.at("array_pin");
-                if (output->links.at(link_i)->startPin)
-                {
-                    output->links.at(link_i)->startPin->links.erase(std::remove(output->links.at(link_i)->startPin->links.begin(), output->links.at(link_i)->startPin->links.end(), output->links.at(link_i)), output->links.at(link_i)->startPin->links.end());
-                    output->links.at(link_i)->startPin = nullptr;
-                }
-                if (output->links.at(link_i)->endPin)
-                {
-                    output->links.at(link_i)->endPin->links.erase(std::remove(output->links.at(link_i)->endPin->links.begin(), output->links.at(link_i)->endPin->links.end(), output->links.at(link_i)), output->links.at(link_i)->endPin->links.end());
-                    output->links.at(link_i)->endPin = nullptr;
-                }
-                ed::DeleteLink(output->links.at(link_i)->id);
-            }
-            node->outputs.at("array_pin")->links.clear();
+            UtilsDeleteLinks(node->outputs.at("array_pin"));
         }
         else
         {
@@ -1951,20 +1906,7 @@ void Application_Frame()
                 std::shared_ptr<BasePin> input = node->inputs.at(sort_pins.at(pi));
                 if (input->exposed == false)
                 {
-                    for (int link_i = 0; link_i < input->links.size(); link_i++)
-                    {
-                        if (input->links.at(link_i)->startPin)
-                        {
-                            input->links.at(link_i)->startPin->links.erase(std::remove(input->links.at(link_i)->startPin->links.begin(), input->links.at(link_i)->startPin->links.end(), input->links.at(link_i)), input->links.at(link_i)->startPin->links.end());
-                            input->links.at(link_i)->startPin = nullptr;
-                        }
-                        if (input->links.at(link_i)->endPin)
-                        {
-                            input->links.at(link_i)->endPin->links.erase(std::remove(input->links.at(link_i)->endPin->links.begin(), input->links.at(link_i)->endPin->links.end(), input->links.at(link_i)), input->links.at(link_i)->endPin->links.end());
-                            input->links.at(link_i)->endPin = nullptr;
-                        }
-                        ed::DeleteLink(input->links.at(link_i)->id);
-                    }
+                    UtilsDeleteLinks(input);
                     continue;
                 }
                 auto alpha = ImGui::GetStyle().Alpha;
@@ -2278,17 +2220,7 @@ void Application_Frame()
         {
             if (link->startPin == nullptr || link->endPin == nullptr)
             {
-                if (link->startPin)
-                {
-                    link->startPin->links.erase(std::remove(link->startPin->links.begin(), link->startPin->links.end(), link), link->startPin->links.end());
-                    link->startPin = nullptr;
-                }
-                if (link->endPin)
-                {
-                    link->endPin->links.erase(std::remove(link->endPin->links.begin(), link->endPin->links.end(), link), link->endPin->links.end());
-                    link->endPin = nullptr;
-                }
-                ed::DeleteLink(link->id);
+                UtilsDeleteLink(link);
             }
             else
             {
@@ -2370,17 +2302,7 @@ void Application_Frame()
                                     if ((config->s_Links.at(link_i)->startPinID == startPinId && startPin->type == PinType::Flow) ||
                                         (config->s_Links.at(link_i)->endPinID == endPinId && endPin->type != PinType::Flow && endPin->kind == PinKind::Input))
                                     {
-                                        if (config->s_Links.at(link_i)->startPin)
-                                        {
-                                            config->s_Links.at(link_i)->startPin->links.erase(std::remove(config->s_Links.at(link_i)->startPin->links.begin(), config->s_Links.at(link_i)->startPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->startPin->links.end());
-                                            config->s_Links.at(link_i)->startPin = nullptr;
-                                        }
-                                        if (config->s_Links.at(link_i)->endPin)
-                                        {
-                                            config->s_Links.at(link_i)->endPin->links.erase(std::remove(config->s_Links.at(link_i)->endPin->links.begin(), config->s_Links.at(link_i)->endPin->links.end(), config->s_Links.at(link_i)), config->s_Links.at(link_i)->endPin->links.end());
-                                            config->s_Links.at(link_i)->endPin = nullptr;
-                                        }
-                                        ed::DeleteLink(config->s_Links.at(link_i)->id);
+                                        UtilsDeleteLink(config->s_Links.at(link_i));
                                     }
                                 }
                                 
@@ -2557,21 +2479,7 @@ void Application_Frame()
                         if (ImGui::Selectable(PinTypeToString(pin->template_allowed_types[n]).c_str(), is_selected))
                         {
                             template_pin_type_selected_item = PinTypeToString(pin->template_allowed_types[n]);
-                            for (int link_i = 0; link_i < pin->links.size(); link_i++)
-                            {
-                                if (pin->links.at(link_i)->startPin)
-                                {
-                                    pin->links.at(link_i)->startPin->links.erase(std::remove(pin->links.at(link_i)->startPin->links.begin(), pin->links.at(link_i)->startPin->links.end(), pin->links.at(link_i)), pin->links.at(link_i)->startPin->links.end());
-                                    pin->links.at(link_i)->startPin = nullptr;
-                                }
-                                if (pin->links.at(link_i)->endPin)
-                                {
-                                    pin->links.at(link_i)->endPin->links.erase(std::remove(pin->links.at(link_i)->endPin->links.begin(), pin->links.at(link_i)->endPin->links.end(), pin->links.at(link_i)), pin->links.at(link_i)->endPin->links.end());
-                                    pin->links.at(link_i)->endPin = nullptr;
-                                }
-                                ed::DeleteLink(pin->links.at(link_i)->id);
-                            }
-                            pin->links.clear();
+                            UtilsDeleteLinks(pin);
                             UtilsChangePinType(pin->node, pin->kind, pin->pin_key, pin->template_allowed_types[n], pin->isArr);
                         }
                         if (is_selected)
@@ -2606,17 +2514,7 @@ void Application_Frame()
         ImGui::Separator();
         if (ImGui::MenuItem("Delete"))
         {
-            if (link->startPin)
-            {
-                link->startPin->links.erase(std::remove(link->startPin->links.begin(), link->startPin->links.end(), link), link->startPin->links.end());
-                link->startPin = nullptr;
-            }
-            if (link->endPin)
-            {
-                link->endPin->links.erase(std::remove(link->endPin->links.begin(), link->endPin->links.end(), link), link->endPin->links.end());
-                link->endPin = nullptr;
-            }
-            ed::DeleteLink(contextLinkId);
+            UtilsDeleteLink(link);
         }
         ImGui::EndPopup();
     }

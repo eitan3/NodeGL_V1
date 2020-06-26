@@ -35,21 +35,7 @@ void Sequence_Func::UpdateNodeInspector()
             if (ImGui::Button("Delete Output"))
             {
                 std::string id = std::to_string(parent_node->outputs.size());
-                for (int li = 0; li < parent_node->outputs.at(id)->links.size(); li++)
-                {
-                    std::shared_ptr<Link> link = parent_node->outputs.at(id)->links.at(li);
-                    if (link->startPin)
-                    {
-                        link->startPin->links.erase(std::remove(link->startPin->links.begin(), link->startPin->links.end(), link), link->startPin->links.end());
-                        link->startPin = nullptr;
-                    }
-                    if (link->endPin)
-                    {
-                        link->endPin->links.erase(std::remove(link->endPin->links.begin(), link->endPin->links.end(), link), link->endPin->links.end());
-                        link->endPin = nullptr;
-                    }
-                    ed::DeleteLink(link->id);
-                }
+                UtilsDeleteLinks(parent_node->outputs.at(id));
                 parent_node->outputs.erase(id);
                 BuildNode(parent_node);
             }
