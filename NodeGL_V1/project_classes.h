@@ -102,10 +102,8 @@ public:
         node = nullptr;
         links.clear();
         template_allowed_types.clear();
-        if (value)
-            value->clear();
-        if (default_value)
-            default_value->clear();
+        value = nullptr;
+        default_value = nullptr;
     }
 
     std::shared_ptr<std::vector<T>> GetValue()

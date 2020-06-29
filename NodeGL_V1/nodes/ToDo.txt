@@ -1,10 +1,8 @@
-Add Arrays
-Check if template array work
 Add iVec2, iVec3, iVec4 data types, vectors, nodes, and connect them to shaders (via uniforms)
-pass vector as a uniform
 
-Add multisample option for Framebuffer
 Add Functions
+Add multisample option for Framebuffer
+pass vector as a uniform
 Create Camera Object (?)
 
 Need to freeze the editor when other window open up

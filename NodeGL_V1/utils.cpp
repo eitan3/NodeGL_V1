@@ -385,7 +385,6 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
                                     if (ImGui::Selectable(PinTypeToString(input->template_allowed_types[n]).c_str(), is_selected))
                                     {
                                         template_pin_type_selected_item = PinTypeToString(input->template_allowed_types[n]);
-                                        UtilsDeleteLinks(input);
                                         UtilsChangePinType(input->node, input->kind, input->pin_key, input->template_allowed_types[n], input->isArr);
                                     }
                                     if (is_selected)
@@ -411,7 +410,6 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
                                     if (ImGui::Selectable(PinTypeToString(output->template_allowed_types[n]).c_str(), is_selected))
                                     {
                                         template_pin_type_selected_item = PinTypeToString(output->template_allowed_types[n]);
-                                        UtilsDeleteLinks(output);
                                         UtilsChangePinType(output->node, output->kind, output->pin_key, output->template_allowed_types[n], output->isArr);
                                     }
                                     if (is_selected)
@@ -431,6 +429,10 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
 
 void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::string index, PinType type, bool isArr)
 {
+    if (kind == PinKind::Input)
+        UtilsDeleteLinks(parent_node->inputs.at(index));
+    else
+        UtilsDeleteLinks(parent_node->outputs.at(index));
     if (isArr == false)
     {
         if (kind == PinKind::Input)

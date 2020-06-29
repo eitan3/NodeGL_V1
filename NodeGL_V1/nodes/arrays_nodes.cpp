@@ -23,6 +23,7 @@ void GetArrayNode_Func::Delete()
 
 void GetArrayNode_Func::NoFlowUpdatePinsValues()
 {
+    auto config = InstanceConfig::instance();
     if (arrayPH_type == PinType::String)
     {
         std::shared_ptr<std::vector<std::string>> ph_value;
@@ -1901,7 +1902,6 @@ void ArrayGetValueNode_Func::UpdateNodeUI()
 {
     if (parent_node->inputs.at("input")->type != parent_node->outputs.at("object")->type)
     {
-        UtilsDeleteLinks(parent_node->outputs.at("object"));
         UtilsChangePinType(parent_node, PinKind::Output, "object", parent_node->inputs.at("input")->type, false);
     }
 }

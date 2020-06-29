@@ -1198,7 +1198,6 @@ void SetProgramUniformNode_Func::UniformChanged()
         }
         if (parent_node->inputs.at("uni_pin")->type != uniform_type)
         {
-            UtilsDeleteLinks(parent_node->inputs.at("uni_pin"));
             UtilsChangePinType(parent_node, PinKind::Input, "uni_pin", uniform_type, uniform_isArr);
 
             if (tmp_loaded_value && uniform_isArr == false)

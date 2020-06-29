@@ -319,10 +319,16 @@ void DrawPinIcon(std::shared_ptr<BasePin> pin, bool connected, int alpha)
     }
     else
     {
+        //if (pin->isTemplate)
+        //    iconType = IconType::DiamondGrid;
+        //else
+        //    iconType = IconType::Grid;
         iconType = IconType::Grid;
     }
 
     ax::Widgets::Icon(ImVec2(s_PinIconSize, s_PinIconSize), iconType, connected, color, ImColor(32, 32, 32, alpha));
+    if (pin->isTemplate && pin->isArr)
+        ax::Widgets::Icon(ImVec2(s_PinIconSize, s_PinIconSize), iconType, connected, color, ImColor(32, 32, 32, alpha));
 };
 #pragma endregion
 
@@ -801,11 +807,7 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
                 prev_ph = nullptr;
             }
             std::dynamic_pointer_cast<SetPlaceholder_Func>(node->node_funcs)->placeholder = ph;
-            if (node->inputs.count("placeholder_pin") > 0)
-            {
-                UtilsDeleteLinks(node->inputs.at("placeholder_pin"));
-            }
-            else
+            if (node->inputs.count("placeholder_pin") == 0)
             {
                 node->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 1, GetNextId(), "Value", PinType::String, "")));
                 BuildNode(node);
@@ -823,11 +825,7 @@ void ShowSelectPlaceholderWindow(bool* show = nullptr)
             std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder = ph;
             std::dynamic_pointer_cast<GetPlaceholder_Func>(node->node_funcs)->placeholder_type = ph->type;
             
-            if (node->outputs.count("placeholder_pin") > 0)
-            {
-                UtilsDeleteLinks(node->outputs.at("placeholder_pin"));
-            }
-            else
+            if (node->outputs.count("placeholder_pin") == 0)
             {
                 node->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<std::string>>>("placeholder_pin", new PinValue<std::string>("placeholder_pin", 0, GetNextId(), "Value", PinType::String, "")));
                 BuildNode(node);
@@ -1141,11 +1139,7 @@ void ShowSelectArrayWindow(bool* show = nullptr)
         std::dynamic_pointer_cast<GetArrayNode_Func>(node->node_funcs)->arrayPH = ph;
         std::dynamic_pointer_cast<GetArrayNode_Func>(node->node_funcs)->arrayPH_type = ph->type;
 
-        if (node->outputs.count("array_pin") > 0)
-        {
-            UtilsDeleteLinks(node->outputs.at("array_pin"));
-        }
-        else
+        if (node->outputs.count("array_pin") == 0)
         {
             node->outputs.insert(std::pair<std::string, std::shared_ptr<PinArrValue<std::string>>>("array_pin", new PinArrValue<std::string>("array_pin", 0, GetNextId(), "Value", PinType::String, std::make_shared<std::vector<std::string>>())));
             BuildNode(node);
@@ -2479,7 +2473,6 @@ void Application_Frame()
                         if (ImGui::Selectable(PinTypeToString(pin->template_allowed_types[n]).c_str(), is_selected))
                         {
                             template_pin_type_selected_item = PinTypeToString(pin->template_allowed_types[n]);
-                            UtilsDeleteLinks(pin);
                             UtilsChangePinType(pin->node, pin->kind, pin->pin_key, pin->template_allowed_types[n], pin->isArr);
                         }
                         if (is_selected)

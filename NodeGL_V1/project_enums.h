@@ -13,6 +13,10 @@ enum class PinType
     Int,
     Float,
 
+    VectorI2,
+    VectorI3,
+    VectorI4,
+
     Vector2,
     Vector3,
     Vector4,

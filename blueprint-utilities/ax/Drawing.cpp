@@ -193,6 +193,100 @@ void ax::Drawing::DrawIcon(ImDrawList* drawList, const ImVec2& a, const ImVec2& 
                 drawList->PathStroke(color, true, 2.0f * outline_scale);
             }
         }
+        else if (type == IconType::DiamondGrid)
+        {
+            const auto r = 0.5f * rect.w / 2.0f;
+            const auto w = ceilf(r / 3.0f);
+
+            const auto baseTl = ImVec2(floorf(rect.center_x() - w * 2.5f), floorf(rect.center_y() - w * 2.5f));
+            const auto baseBr = ImVec2(floorf(baseTl.x + w), floorf(baseTl.y + w));
+
+            auto tl = baseTl;
+            auto br = baseBr;
+            ImVec2 c;
+            for (int i = 0; i < 3; ++i)
+            {
+                tl.x = baseTl.x;
+                br.x = baseBr.x;
+                c = tl;// ImVec2((tl.x + br.x) / 2.0, (tl.y + br.y) / 2.0);
+                if (filled)
+                {
+                    drawList->PathLineTo(c + ImVec2(0, -r));
+                    drawList->PathLineTo(c + ImVec2(r, 0));
+                    drawList->PathLineTo(c + ImVec2(0, r));
+                    drawList->PathLineTo(c + ImVec2(-r, 0));
+                    drawList->PathFillConvex(color);
+                }
+                else
+                {
+                    drawList->PathLineTo(c + ImVec2(0, -r));
+                    drawList->PathLineTo(c + ImVec2(r, 0));
+                    drawList->PathLineTo(c + ImVec2(0, r));
+                    drawList->PathLineTo(c + ImVec2(-r, 0));
+
+                    if (innerColor & 0xFF000000)
+                        drawList->AddConvexPolyFilled(drawList->_Path.Data, drawList->_Path.Size, innerColor);
+
+                    drawList->PathStroke(color, true, 2.0f * outline_scale);
+                }
+
+
+                tl.x += w * 2;
+                br.x += w * 2;
+                c = tl;//ImVec2((tl.x + br.x) / 2.0, (tl.y + br.y) / 2.0);
+                if (i != 1 || filled) 
+                {
+                    if (filled)
+                    {                        
+                        drawList->PathLineTo(c + ImVec2(0, -r));
+                        drawList->PathLineTo(c + ImVec2(r, 0));
+                        drawList->PathLineTo(c + ImVec2(0, r));
+                        drawList->PathLineTo(c + ImVec2(-r, 0));
+                        drawList->PathFillConvex(color);
+                    }
+                    else
+                    {
+                        drawList->PathLineTo(c + ImVec2(0, -r));
+                        drawList->PathLineTo(c + ImVec2(r, 0));
+                        drawList->PathLineTo(c + ImVec2(0, r));
+                        drawList->PathLineTo(c + ImVec2(-r, 0));
+
+                        if (innerColor & 0xFF000000)
+                            drawList->AddConvexPolyFilled(drawList->_Path.Data, drawList->_Path.Size, innerColor);
+
+                        drawList->PathStroke(color, true, 2.0f * outline_scale);
+                    }
+                }
+
+                tl.x += w * 2;
+                br.x += w * 2;
+                c = tl;//ImVec2((tl.x + br.x) / 2.0, (tl.y + br.y) / 2.0);
+                if (filled)
+                {
+                    drawList->PathLineTo(c + ImVec2(0, -r));
+                    drawList->PathLineTo(c + ImVec2(r, 0));
+                    drawList->PathLineTo(c + ImVec2(0, r));
+                    drawList->PathLineTo(c + ImVec2(-r, 0));
+                    drawList->PathFillConvex(color);
+                }
+                else
+                {
+                    drawList->PathLineTo(c + ImVec2(0, -r));
+                    drawList->PathLineTo(c + ImVec2(r, 0));
+                    drawList->PathLineTo(c + ImVec2(0, r));
+                    drawList->PathLineTo(c + ImVec2(-r, 0));
+
+                    if (innerColor & 0xFF000000)
+                        drawList->AddConvexPolyFilled(drawList->_Path.Data, drawList->_Path.Size, innerColor);
+
+                    drawList->PathStroke(color, true, 2.0f * outline_scale);
+                }
+
+                tl.y += w * 2;
+                br.y += w * 2;
+                c = tl;//ImVec2((tl.x + br.x) / 2.0, (tl.y + br.y) / 2.0);
+            }
+        }
         else
         {
             const auto triangleTip = triangleStart + rect.w * (0.45f - 0.32f);
