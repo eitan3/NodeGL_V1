@@ -290,6 +290,8 @@ public:
             value->clear();
         if (default_value)
             default_value->clear();
+        value = nullptr;
+        default_value = nullptr;
     }
 
     std::shared_ptr<std::vector<T>> value;
