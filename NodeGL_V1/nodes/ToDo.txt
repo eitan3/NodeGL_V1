@@ -1,4 +1,6 @@
 Add 'Plane Mesh' node and 'Points Mesh' node
+Choose how to draw the mesh, as points, lines, triangles..
+Add Functions
 
 Recreate some samples from shadertoy and vertexshaderart
 https://www.shadertoy.com/view/wtjczR
@@ -6,9 +8,17 @@ https://www.shadertoy.com/view/3lSyRh
 https://www.shadertoy.com/view/ldl3W8
 https://www.shadertoy.com/view/ttscWn
 https://www.shadertoy.com/view/3tGSR3
+https://www.vertexshaderart.com/art/4SRkNtncZayGZ5xBF/revision/FzfQeKEgtaDW7JK9X
+https://www.vertexshaderart.com/art/RzDd4oDNK7htc9dqe
+https://www.vertexshaderart.com/art/hhsdvkiJ32bCTcezv
+https://www.vertexshaderart.com/art/7fkuNErcdiCoyDFPM
+https://www.vertexshaderart.com/art/FDoMDz4QxPmpEY7FJ
+https://www.vertexshaderart.com/art/u9hvPc2WxibcTmT6F
+https://www.vertexshaderart.com/art/fKYmuHmgGeNTPniPK
 
 
-Add Functions
+
+
 Custom mesh attributes
 
 Add multisample option for Framebuffer
@@ -22,3 +32,10 @@ Add Resources (import assimp meshes and so on)
 
 Recreate https://cables.gl/p/j8R1Q7
 Blend Textures (draw fullscreen rectangle and draw 2 textures with blend)
+
+
+Inspiration:
+https://www.youtube.com/watch?v=6cGFFWcmmVw
+https://www.youtube.com/watch?v=_9NfQUp8ims&t=117s
+https://www.youtube.com/watch?v=pDci05pzA_4
+https://www.youtube.com/watch?v=55FWt_EnJtI
