@@ -91,6 +91,12 @@ std::string PinTypeToString(PinType type)
         return "Int";
     else if (type == PinType::String)
         return "String";
+    else if (type == PinType::VectorI2)
+        return "Int Vector 2";
+    else if (type == PinType::VectorI3)
+        return "Int Vector 3";
+    else if (type == PinType::VectorI4)
+        return "Int Vector 4";
     else if (type == PinType::Vector2)
         return "Vector 2";
     else if (type == PinType::Vector3)
@@ -123,6 +129,12 @@ PinType StringToPinType(std::string str)
         return PinType::Int;
     else if (str == "String")
         return PinType::String;
+    else if (str == "Int Vector 2")
+        return PinType::VectorI2;
+    else if (str == "Int Vector 3")
+        return PinType::VectorI3;
+    else if (str == "Int Vector 4")
+        return PinType::VectorI4;
     else if (str == "Vector 2")
         return PinType::Vector2;
     else if (str == "Vector 3")
@@ -163,6 +175,7 @@ bool CanAddToInputsTab(std::shared_ptr<BasePin> pin)
 {
     if (pin->isArr == false)
         if (pin->type == PinType::Bool || pin->type == PinType::Float || pin->type == PinType::Int || pin->type == PinType::String || 
+            pin->type == PinType::VectorI2 || pin->type == PinType::VectorI3 || pin->type == PinType::VectorI4 ||
             pin->type == PinType::Vector2 || pin->type == PinType::Vector3 || pin->type == PinType::Vector4)
             return true;
     return false;
@@ -359,6 +372,71 @@ void AddInputPinsTab(std::shared_ptr<Node> node)
                                     isEditDefaultActive = false;
                                 }
                             }
+                            else if (input->type == PinType::VectorI2)
+                            {
+                                std::shared_ptr<PinValue<glm::ivec2>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::ivec2>>(input);
+                                ImGui::PushItemWidth(150.0f);
+
+                                int float2[2] = { input_pin_value->default_value.x, input_pin_value->default_value.y };
+                                ImGui::InputInt2("##edit", float2);
+                                input_pin_value->default_value = glm::ivec2(float2[0], float2[1]);
+
+                                ImGui::PopItemWidth();
+                                if (ImGui::IsItemActive() && !isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(false);
+                                    isEditDefaultActive = true;
+                                }
+                                else if (!ImGui::IsItemActive() && isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(true);
+                                    isEditDefaultActive = false;
+                                }
+                            }
+                            else if (input->type == PinType::VectorI3)
+                            {
+                                std::shared_ptr<PinValue<glm::ivec3>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::ivec3>>(input);
+                                ImGui::PushItemWidth(150.0f);
+
+                                //ImGui::InputFloat("##edit", &input_pin_value->default_value, 0.0, 0.0, "%.6f", 0);
+                                int float3[3] = { input_pin_value->default_value.x, input_pin_value->default_value.y, input_pin_value->default_value.z };
+                                ImGui::InputInt3("##edit", float3);
+                                input_pin_value->default_value = glm::ivec3(float3[0], float3[1], float3[2]);
+
+                                ImGui::PopItemWidth();
+                                if (ImGui::IsItemActive() && !isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(false);
+                                    isEditDefaultActive = true;
+                                }
+                                else if (!ImGui::IsItemActive() && isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(true);
+                                    isEditDefaultActive = false;
+                                }
+                            }
+                            else if (input->type == PinType::VectorI4)
+                            {
+                                std::shared_ptr<PinValue<glm::ivec4>> input_pin_value = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(input);
+                                ImGui::PushItemWidth(150.0f);
+
+                                //ImGui::InputFloat("##edit", &input_pin_value->default_value, 0.0, 0.0, "%.6f", 0);
+                                int float4[4] = { input_pin_value->default_value.x, input_pin_value->default_value.y, input_pin_value->default_value.z, input_pin_value->default_value.w };
+                                ImGui::InputInt4("##edit", float4);
+                                input_pin_value->default_value = glm::ivec4(float4[0], float4[1], float4[2], float4[3]);
+
+                                ImGui::PopItemWidth();
+                                if (ImGui::IsItemActive() && !isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(false);
+                                    isEditDefaultActive = true;
+                                }
+                                else if (!ImGui::IsItemActive() && isEditDefaultActive)
+                                {
+                                    ed::EnableShortcuts(true);
+                                    isEditDefaultActive = false;
+                                }
+                            }
 
                             ImGui::EndHorizontal();
                         }
@@ -461,6 +539,21 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::st
                 std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, "");
                 parent_node->inputs.at(index) = new_node;
             }
+            else if (type == PinType::VectorI2)
+            {
+                std::shared_ptr<PinValue<glm::ivec2>> new_node = std::make_shared<PinValue<glm::ivec2>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::ivec2(0));
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::VectorI3)
+            {
+                std::shared_ptr<PinValue<glm::ivec3>> new_node = std::make_shared<PinValue<glm::ivec3>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::ivec3(0));
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::VectorI4)
+            {
+                std::shared_ptr<PinValue<glm::ivec4>> new_node = std::make_shared<PinValue<glm::ivec4>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::ivec4(0));
+                parent_node->inputs.at(index) = new_node;
+            }
             else if (type == PinType::Vector2)
             {
                 std::shared_ptr<PinValue<glm::vec2>> new_node = std::make_shared<PinValue<glm::vec2>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, glm::vec2(0));
@@ -536,6 +629,21 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::st
             else if (type == PinType::String)
             {
                 std::shared_ptr<PinValue<std::string>> new_node = std::make_shared<PinValue<std::string>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, "");
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::VectorI2)
+            {
+                std::shared_ptr<PinValue<glm::ivec2>> new_node = std::make_shared<PinValue<glm::ivec2>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::ivec2(0));
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::VectorI3)
+            {
+                std::shared_ptr<PinValue<glm::ivec3>> new_node = std::make_shared<PinValue<glm::ivec3>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::ivec3(0));
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::VectorI4)
+            {
+                std::shared_ptr<PinValue<glm::ivec4>> new_node = std::make_shared<PinValue<glm::ivec4>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, glm::ivec4(0));
                 parent_node->outputs.at(index) = new_node;
             }
             else if (type == PinType::Vector2)
@@ -618,6 +726,21 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::st
                 std::shared_ptr<PinArrValue<std::string>> new_node = std::make_shared<PinArrValue<std::string>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::string>>());
                 parent_node->inputs.at(index) = new_node;
             }
+            else if (type == PinType::VectorI2)
+            {
+                std::shared_ptr<PinArrValue<glm::ivec2>> new_node = std::make_shared<PinArrValue<glm::ivec2>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::ivec2>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::VectorI3)
+            {
+                std::shared_ptr<PinArrValue<glm::ivec3>> new_node = std::make_shared<PinArrValue<glm::ivec3>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::ivec3>>());
+                parent_node->inputs.at(index) = new_node;
+            }
+            else if (type == PinType::VectorI4)
+            {
+                std::shared_ptr<PinArrValue<glm::ivec4>> new_node = std::make_shared<PinArrValue<glm::ivec4>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::ivec4>>());
+                parent_node->inputs.at(index) = new_node;
+            }
             else if (type == PinType::Vector2)
             {
                 std::shared_ptr<PinArrValue<glm::vec2>> new_node = std::make_shared<PinArrValue<glm::vec2>>(index, parent_node->inputs.at(index)->order, parent_node->inputs.at(index)->id.Get(), parent_node->inputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::vec2>>());
@@ -693,6 +816,21 @@ void UtilsChangePinType(std::shared_ptr<Node> parent_node, PinKind kind, std::st
             else if (type == PinType::String)
             {
                 std::shared_ptr<PinArrValue<std::string>> new_node = std::make_shared<PinArrValue<std::string>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<std::string>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::VectorI2)
+            {
+                std::shared_ptr<PinArrValue<glm::ivec2>> new_node = std::make_shared<PinArrValue<glm::ivec2>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::ivec2>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::VectorI3)
+            {
+                std::shared_ptr<PinArrValue<glm::ivec3>> new_node = std::make_shared<PinArrValue<glm::ivec3>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::ivec3>>());
+                parent_node->outputs.at(index) = new_node;
+            }
+            else if (type == PinType::VectorI4)
+            {
+                std::shared_ptr<PinArrValue<glm::ivec4>> new_node = std::make_shared<PinArrValue<glm::ivec4>>(index, parent_node->outputs.at(index)->order, parent_node->outputs.at(index)->id.Get(), parent_node->outputs.at(index)->name.c_str(), type, std::make_shared<std::vector<glm::ivec4>>());
                 parent_node->outputs.at(index) = new_node;
             }
             else if (type == PinType::Vector2)
@@ -873,6 +1011,9 @@ template bool GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string p
 template int GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template float GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::string GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template glm::ivec2 GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template glm::ivec3 GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template glm::ivec4 GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template glm::vec2 GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template glm::vec3 GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template glm::vec4 GetInputPinValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
@@ -888,6 +1029,9 @@ template std::shared_ptr<std::vector<bool>> GetInputPinArrValue(std::shared_ptr<
 template std::shared_ptr<std::vector<int>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<std::vector<float>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<std::vector<std::string>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::ivec2>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::ivec3>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::ivec4>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<std::vector<glm::vec2>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<std::vector<glm::vec3>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<std::vector<glm::vec4>> GetInputPinArrValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
@@ -903,6 +1047,9 @@ template std::shared_ptr<std::vector<bool>> GetInputPinArrDefaultValue(std::shar
 template std::shared_ptr<std::vector<int>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<std::vector<float>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<std::vector<std::string>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::ivec2>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::ivec3>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
+template std::shared_ptr<std::vector<glm::ivec4>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<std::vector<glm::vec2>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<std::vector<glm::vec3>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);
 template std::shared_ptr<std::vector<glm::vec4>> GetInputPinArrDefaultValue(std::shared_ptr<Node>& parent_node, std::string pin_key);

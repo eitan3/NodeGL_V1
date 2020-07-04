@@ -76,6 +76,45 @@ void GetArrayNode_Func::NoFlowUpdatePinsValues()
         output_pin->value = ph_value;
         output_pin->default_value = ph_def_value;
     }
+    else if (arrayPH_type == PinType::VectorI2)
+    {
+        std::shared_ptr<std::vector<glm::ivec2>> ph_value;
+        std::shared_ptr<std::vector<glm::ivec2>> ph_def_value;
+        if (arrayPH)
+        {
+            ph_value = std::dynamic_pointer_cast<ArrayValue<glm::ivec2>>(arrayPH)->value;
+            ph_def_value = std::dynamic_pointer_cast<ArrayValue<glm::ivec2>>(arrayPH)->default_value;
+        }
+        std::shared_ptr<PinArrValue<glm::ivec2>> output_pin = std::dynamic_pointer_cast<PinArrValue<glm::ivec2>>(parent_node->outputs.at("array_pin"));
+        output_pin->value = ph_value;
+        output_pin->default_value = ph_def_value;
+    }
+    else if (arrayPH_type == PinType::VectorI3)
+    {
+        std::shared_ptr<std::vector<glm::ivec3>> ph_value;
+        std::shared_ptr<std::vector<glm::ivec3>> ph_def_value;
+        if (arrayPH)
+        {
+            ph_value = std::dynamic_pointer_cast<ArrayValue<glm::ivec3>>(arrayPH)->value;
+            ph_def_value = std::dynamic_pointer_cast<ArrayValue<glm::ivec3>>(arrayPH)->default_value;
+        }
+        std::shared_ptr<PinArrValue<glm::ivec3>> output_pin = std::dynamic_pointer_cast<PinArrValue<glm::ivec3>>(parent_node->outputs.at("array_pin"));
+        output_pin->value = ph_value;
+        output_pin->default_value = ph_def_value;
+    }
+    else if (arrayPH_type == PinType::VectorI4)
+    {
+        std::shared_ptr<std::vector<glm::ivec4>> ph_value;
+        std::shared_ptr<std::vector<glm::ivec4>> ph_def_value;
+        if (arrayPH)
+        {
+            ph_value = std::dynamic_pointer_cast<ArrayValue<glm::ivec4>>(arrayPH)->value;
+            ph_def_value = std::dynamic_pointer_cast<ArrayValue<glm::ivec4>>(arrayPH)->default_value;
+        }
+        std::shared_ptr<PinArrValue<glm::ivec4>> output_pin = std::dynamic_pointer_cast<PinArrValue<glm::ivec4>>(parent_node->outputs.at("array_pin"));
+        output_pin->value = ph_value;
+        output_pin->default_value = ph_def_value;
+    }
     else if (arrayPH_type == PinType::Vector2)
     {
         std::shared_ptr<std::vector<glm::vec2>> ph_value;
@@ -297,6 +336,24 @@ void GetArraySizeNode_Func::NoFlowUpdatePinsValues()
         std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("size"));
         output_pin->value = input->size();
     }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI2)
+    {
+        std::shared_ptr<std::vector<glm::ivec2>> input = GetInputPinArrValue<glm::ivec2>(parent_node, "input");
+        std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("size"));
+        output_pin->value = input->size();
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI3)
+    {
+        std::shared_ptr<std::vector<glm::ivec3>> input = GetInputPinArrValue<glm::ivec3>(parent_node, "input");
+        std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("size"));
+        output_pin->value = input->size();
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI4)
+    {
+        std::shared_ptr<std::vector<glm::ivec4>> input = GetInputPinArrValue<glm::ivec4>(parent_node, "input");
+        std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("size"));
+        output_pin->value = input->size();
+    }
     else if (parent_node->inputs.at("input")->type == PinType::Vector2)
     {
         std::shared_ptr<std::vector<glm::vec2>> input = GetInputPinArrValue<glm::vec2>(parent_node, "input");
@@ -404,6 +461,24 @@ void ArrayInsertNode_Func::Run(std::string called_pin)
         int obj = GetInputPinValue<int>(parent_node, "object");
         input->push_back(obj);
     }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI2)
+    {
+        std::shared_ptr<std::vector<glm::ivec2>> input = GetInputPinArrValue<glm::ivec2>(parent_node, "input");
+        glm::ivec2 obj = GetInputPinValue<glm::ivec2>(parent_node, "object");
+        input->push_back(obj);
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI3)
+    {
+        std::shared_ptr<std::vector<glm::ivec3>> input = GetInputPinArrValue<glm::ivec3>(parent_node, "input");
+        glm::ivec3 obj = GetInputPinValue<glm::ivec3>(parent_node, "object");
+        input->push_back(obj);
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI4)
+    {
+        std::shared_ptr<std::vector<glm::ivec4>> input = GetInputPinArrValue<glm::ivec4>(parent_node, "input");
+        glm::ivec4 obj = GetInputPinValue<glm::ivec4>(parent_node, "object");
+        input->push_back(obj);
+    }
     else if (parent_node->inputs.at("input")->type == PinType::Vector2)
     {
         std::shared_ptr<std::vector<glm::vec2>> input = GetInputPinArrValue<glm::vec2>(parent_node, "input");
@@ -490,6 +565,18 @@ void ArrayInsertNode_Func::UpdateNodeUI()
             {
                 std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<float>>(tmp_loaded_value)->value;
             }
+            else if (tmp_loaded_value->type == PinType::VectorI2)
+            {
+                std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec2>>(tmp_loaded_value)->value;
+            }
+            else if (tmp_loaded_value->type == PinType::VectorI3)
+            {
+                std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec3>>(tmp_loaded_value)->value;
+            }
+            else if (tmp_loaded_value->type == PinType::VectorI4)
+            {
+                std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec4>>(tmp_loaded_value)->value;
+            }
             else if (tmp_loaded_value->type == PinType::Vector2)
             {
                 std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec2>>(tmp_loaded_value)->value;
@@ -540,6 +627,36 @@ void ArrayInsertNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffe
         writer.Key("object");
         bool obj_value = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("object"))->default_value;
         writer.Bool(obj_value);
+    }
+    else if (parent_node->inputs.at("object")->type == PinType::VectorI2)
+    {
+        writer.Key("object");
+        glm::ivec2 obj_value = std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at("object"))->default_value;
+        writer.StartArray();
+        writer.Int(obj_value.x);
+        writer.Int(obj_value.y);
+        writer.EndArray();
+    }
+    else if (parent_node->inputs.at("object")->type == PinType::VectorI3)
+    {
+        writer.Key("object");
+        glm::ivec3 obj_value = std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at("object"))->default_value;
+        writer.StartArray();
+        writer.Int(obj_value.x);
+        writer.Int(obj_value.y);
+        writer.Int(obj_value.z);
+        writer.EndArray();
+    }
+    else if (parent_node->inputs.at("object")->type == PinType::VectorI4)
+    {
+        writer.Key("object");
+        glm::ivec4 obj_value = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("object"))->default_value;
+        writer.StartArray();
+        writer.Int(obj_value.x);
+        writer.Int(obj_value.y);
+        writer.Int(obj_value.z);
+        writer.Int(obj_value.w);
+        writer.EndArray();
     }
     else if (parent_node->inputs.at("object")->type == PinType::Vector2)
     {
@@ -608,6 +725,30 @@ void ArrayInsertNode_Func::LoadNodeData(rapidjson::Value& node_obj)
         {
             float uni_value = node_obj["object"].GetFloat();
             tmp_loaded_value = std::make_shared<PlaceholderValue<float>>("tmp", array_type, uni_value);
+        }
+        if (array_type == PinType::VectorI2)
+        {
+            glm::ivec2 uni_value;
+            uni_value.x = node_obj["object"].GetArray()[0].GetInt();
+            uni_value.y = node_obj["object"].GetArray()[1].GetInt();
+            tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec2>>("tmp", array_type, uni_value);
+        }
+        else if (array_type == PinType::VectorI3)
+        {
+            glm::ivec3 uni_value;
+            uni_value.x = node_obj["object"].GetArray()[0].GetInt();
+            uni_value.y = node_obj["object"].GetArray()[1].GetInt();
+            uni_value.z = node_obj["object"].GetArray()[2].GetInt();
+            tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec3>>("tmp", array_type, uni_value);
+        }
+        else if (array_type == PinType::VectorI4)
+        {
+            glm::ivec4 uni_value;
+            uni_value.x = node_obj["object"].GetArray()[0].GetInt();
+            uni_value.y = node_obj["object"].GetArray()[1].GetInt();
+            uni_value.z = node_obj["object"].GetArray()[2].GetInt();
+            uni_value.w = node_obj["object"].GetArray()[3].GetInt();
+            tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec4>>("tmp", array_type, uni_value);
         }
         if (array_type == PinType::Vector2)
         {
@@ -698,6 +839,24 @@ void ArrayInsertDefaultNode_Func::Run(std::string called_pin)
         int obj = GetInputPinValue<int>(parent_node, "object");
         input->push_back(obj);
     }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI2)
+    {
+        std::shared_ptr<std::vector<glm::ivec2>> input = GetInputPinArrDefaultValue<glm::ivec2>(parent_node, "input");
+        glm::ivec2 obj = GetInputPinValue<glm::ivec2>(parent_node, "object");
+        input->push_back(obj);
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI3)
+    {
+        std::shared_ptr<std::vector<glm::ivec3>> input = GetInputPinArrDefaultValue<glm::ivec3>(parent_node, "input");
+        glm::ivec3 obj = GetInputPinValue<glm::ivec3>(parent_node, "object");
+        input->push_back(obj);
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI4)
+    {
+        std::shared_ptr<std::vector<glm::ivec4>> input = GetInputPinArrDefaultValue<glm::ivec4>(parent_node, "input");
+        glm::ivec4 obj = GetInputPinValue<glm::ivec4>(parent_node, "object");
+        input->push_back(obj);
+    }
     else if (parent_node->inputs.at("input")->type == PinType::Vector2)
     {
         std::shared_ptr<std::vector<glm::vec2>> input = GetInputPinArrDefaultValue<glm::vec2>(parent_node, "input");
@@ -784,6 +943,18 @@ void ArrayInsertDefaultNode_Func::UpdateNodeUI()
             {
                 std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<float>>(tmp_loaded_value)->value;
             }
+            else if (tmp_loaded_value->type == PinType::VectorI2)
+            {
+                std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec2>>(tmp_loaded_value)->value;
+            }
+            else if (tmp_loaded_value->type == PinType::VectorI3)
+            {
+                std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec3>>(tmp_loaded_value)->value;
+            }
+            else if (tmp_loaded_value->type == PinType::VectorI4)
+            {
+                std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec4>>(tmp_loaded_value)->value;
+            }
             else if (tmp_loaded_value->type == PinType::Vector2)
             {
                 std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec2>>(tmp_loaded_value)->value;
@@ -834,6 +1005,36 @@ void ArrayInsertDefaultNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::Stri
         writer.Key("object");
         bool obj_value = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("object"))->default_value;
         writer.Bool(obj_value);
+    }
+    else if (parent_node->inputs.at("object")->type == PinType::VectorI2)
+    {
+        writer.Key("object");
+        glm::ivec2 obj_value = std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at("object"))->default_value;
+        writer.StartArray();
+        writer.Int(obj_value.x);
+        writer.Int(obj_value.y);
+        writer.EndArray();
+    }
+    else if (parent_node->inputs.at("object")->type == PinType::VectorI3)
+    {
+        writer.Key("object");
+        glm::ivec3 obj_value = std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at("object"))->default_value;
+        writer.StartArray();
+        writer.Int(obj_value.x);
+        writer.Int(obj_value.y);
+        writer.Int(obj_value.z);
+        writer.EndArray();
+    }
+    else if (parent_node->inputs.at("object")->type == PinType::VectorI4)
+    {
+        writer.Key("object");
+        glm::ivec4 obj_value = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("object"))->default_value;
+        writer.StartArray();
+        writer.Int(obj_value.x);
+        writer.Int(obj_value.y);
+        writer.Int(obj_value.z);
+        writer.Int(obj_value.w);
+        writer.EndArray();
     }
     else if (parent_node->inputs.at("object")->type == PinType::Vector2)
     {
@@ -902,6 +1103,30 @@ void ArrayInsertDefaultNode_Func::LoadNodeData(rapidjson::Value& node_obj)
         {
             float uni_value = node_obj["object"].GetFloat();
             tmp_loaded_value = std::make_shared<PlaceholderValue<float>>("tmp", array_type, uni_value);
+        }
+        if (array_type == PinType::VectorI2)
+        {
+            glm::ivec2 uni_value;
+            uni_value.x = node_obj["object"].GetArray()[0].GetInt();
+            uni_value.y = node_obj["object"].GetArray()[1].GetInt();
+            tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec2>>("tmp", array_type, uni_value);
+        }
+        else if (array_type == PinType::VectorI3)
+        {
+            glm::ivec3 uni_value;
+            uni_value.x = node_obj["object"].GetArray()[0].GetInt();
+            uni_value.y = node_obj["object"].GetArray()[1].GetInt();
+            uni_value.z = node_obj["object"].GetArray()[2].GetInt();
+            tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec3>>("tmp", array_type, uni_value);
+        }
+        else if (array_type == PinType::VectorI4)
+        {
+            glm::ivec4 uni_value;
+            uni_value.x = node_obj["object"].GetArray()[0].GetInt();
+            uni_value.y = node_obj["object"].GetArray()[1].GetInt();
+            uni_value.z = node_obj["object"].GetArray()[2].GetInt();
+            uni_value.w = node_obj["object"].GetArray()[3].GetInt();
+            tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec4>>("tmp", array_type, uni_value);
         }
         if (array_type == PinType::Vector2)
         {
@@ -985,6 +1210,21 @@ void ArrayClearValuesNode_Func::Run(std::string called_pin)
     else if (parent_node->inputs.at("input")->type == PinType::Int)
     {
         std::shared_ptr<std::vector<int>> input = GetInputPinArrValue<int>(parent_node, "input");
+        input->clear();
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI2)
+    {
+        std::shared_ptr<std::vector<glm::ivec2>> input = GetInputPinArrValue<glm::ivec2>(parent_node, "input");
+        input->clear();
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI3)
+    {
+        std::shared_ptr<std::vector<glm::ivec3>> input = GetInputPinArrValue<glm::ivec3>(parent_node, "input");
+        input->clear();
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI4)
+    {
+        std::shared_ptr<std::vector<glm::ivec4>> input = GetInputPinArrValue<glm::ivec4>(parent_node, "input");
         input->clear();
     }
     else if (parent_node->inputs.at("input")->type == PinType::Vector2)
@@ -1084,6 +1324,21 @@ void ArrayClearDefaultValuesNode_Func::Run(std::string called_pin)
     else if (parent_node->inputs.at("input")->type == PinType::Int)
     {
         std::shared_ptr<std::vector<int>> input = GetInputPinArrDefaultValue<int>(parent_node, "input");
+        input->clear();
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI2)
+    {
+        std::shared_ptr<std::vector<glm::ivec2>> input = GetInputPinArrDefaultValue<glm::ivec2>(parent_node, "input");
+        input->clear();
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI3)
+    {
+        std::shared_ptr<std::vector<glm::ivec3>> input = GetInputPinArrDefaultValue<glm::ivec3>(parent_node, "input");
+        input->clear();
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI4)
+    {
+        std::shared_ptr<std::vector<glm::ivec4>> input = GetInputPinArrDefaultValue<glm::ivec4>(parent_node, "input");
         input->clear();
     }
     else if (parent_node->inputs.at("input")->type == PinType::Vector2)
@@ -1200,6 +1455,36 @@ void ArrayClearToDefaultValuesNode_Func::Run(std::string called_pin)
         std::shared_ptr<std::vector<int>> input = GetInputPinArrValue<int>(parent_node, "input");
         input->clear();
         std::shared_ptr<std::vector<int>> default_input = GetInputPinArrDefaultValue<int>(parent_node, "input");
+        for (int i = 0; i < default_input->size(); i++)
+        {
+            input->push_back(default_input->at(i));
+        }
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI2)
+    {
+        std::shared_ptr<std::vector<glm::ivec2>> input = GetInputPinArrValue<glm::ivec2>(parent_node, "input");
+        input->clear();
+        std::shared_ptr<std::vector<glm::ivec2>> default_input = GetInputPinArrDefaultValue<glm::ivec2>(parent_node, "input");
+        for (int i = 0; i < default_input->size(); i++)
+        {
+            input->push_back(default_input->at(i));
+        }
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI3)
+    {
+        std::shared_ptr<std::vector<glm::ivec3>> input = GetInputPinArrValue<glm::ivec3>(parent_node, "input");
+        input->clear();
+        std::shared_ptr<std::vector<glm::ivec3>> default_input = GetInputPinArrDefaultValue<glm::ivec3>(parent_node, "input");
+        for (int i = 0; i < default_input->size(); i++)
+        {
+            input->push_back(default_input->at(i));
+        }
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI4)
+    {
+        std::shared_ptr<std::vector<glm::ivec4>> input = GetInputPinArrValue<glm::ivec4>(parent_node, "input");
+        input->clear();
+        std::shared_ptr<std::vector<glm::ivec4>> default_input = GetInputPinArrDefaultValue<glm::ivec4>(parent_node, "input");
         for (int i = 0; i < default_input->size(); i++)
         {
             input->push_back(default_input->at(i));
@@ -1382,6 +1667,45 @@ void ArraySetValueNode_Func::Run(std::string called_pin)
             }
         }
     }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI2)
+    {
+        std::shared_ptr<std::vector<glm::ivec2>> input = GetInputPinArrValue<glm::ivec2>(parent_node, "input");
+        glm::ivec2 obj = GetInputPinValue<glm::ivec2>(parent_node, "object");
+        int inx = GetInputPinValue<int>(parent_node, "index");
+        if (input)
+        {
+            if (inx < input->size() && inx >= 0)
+            {
+                input->at(inx) = obj;
+            }
+        }
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI3)
+    {
+        std::shared_ptr<std::vector<glm::ivec3>> input = GetInputPinArrValue<glm::ivec3>(parent_node, "input");
+        glm::ivec3 obj = GetInputPinValue<glm::ivec3>(parent_node, "object");
+        int inx = GetInputPinValue<int>(parent_node, "index");
+        if (input)
+        {
+            if (inx < input->size() && inx >= 0)
+            {
+                input->at(inx) = obj;
+            }
+        }
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI4)
+    {
+        std::shared_ptr<std::vector<glm::ivec4>> input = GetInputPinArrValue<glm::ivec4>(parent_node, "input");
+        glm::ivec4 obj = GetInputPinValue<glm::ivec4>(parent_node, "object");
+        int inx = GetInputPinValue<int>(parent_node, "index");
+        if (input)
+        {
+            if (inx < input->size() && inx >= 0)
+            {
+                input->at(inx) = obj;
+            }
+        }
+    }
     else if (parent_node->inputs.at("input")->type == PinType::Vector2)
     {
         std::shared_ptr<std::vector<glm::vec2>> input = GetInputPinArrValue<glm::vec2>(parent_node, "input");
@@ -1531,6 +1855,18 @@ void ArraySetValueNode_Func::UpdateNodeUI()
             {
                 std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<float>>(tmp_loaded_value)->value;
             }
+            else if (tmp_loaded_value->type == PinType::VectorI2)
+            {
+                std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec2>>(tmp_loaded_value)->value;
+            }
+            else if (tmp_loaded_value->type == PinType::VectorI3)
+            {
+                std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec3>>(tmp_loaded_value)->value;
+            }
+            else if (tmp_loaded_value->type == PinType::VectorI4)
+            {
+                std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec4>>(tmp_loaded_value)->value;
+            }
             else if (tmp_loaded_value->type == PinType::Vector2)
             {
                 std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->inputs.at("object"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec2>>(tmp_loaded_value)->value;
@@ -1584,6 +1920,36 @@ void ArraySetValueNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuf
         writer.Key("object");
         bool obj_value = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("object"))->default_value;
         writer.Bool(obj_value);
+    }
+    else if (parent_node->inputs.at("object")->type == PinType::VectorI2)
+    {
+        writer.Key("object");
+        glm::ivec2 obj_value = std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at("object"))->default_value;
+        writer.StartArray();
+        writer.Int(obj_value.x);
+        writer.Int(obj_value.y);
+        writer.EndArray();
+    }
+    else if (parent_node->inputs.at("object")->type == PinType::VectorI3)
+    {
+        writer.Key("object");
+        glm::ivec3 obj_value = std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at("object"))->default_value;
+        writer.StartArray();
+        writer.Int(obj_value.x);
+        writer.Int(obj_value.y);
+        writer.Int(obj_value.z);
+        writer.EndArray();
+    }
+    else if (parent_node->inputs.at("object")->type == PinType::VectorI4)
+    {
+        writer.Key("object");
+        glm::ivec4 obj_value = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("object"))->default_value;
+        writer.StartArray();
+        writer.Int(obj_value.x);
+        writer.Int(obj_value.y);
+        writer.Int(obj_value.z);
+        writer.Int(obj_value.w);
+        writer.EndArray();
     }
     else if (parent_node->inputs.at("object")->type == PinType::Vector2)
     {
@@ -1655,6 +2021,30 @@ void ArraySetValueNode_Func::LoadNodeData(rapidjson::Value& node_obj)
         {
             float uni_value = node_obj["object"].GetFloat();
             tmp_loaded_value = std::make_shared<PlaceholderValue<float>>("tmp", array_type, uni_value);
+        }
+        if (array_type == PinType::VectorI2)
+        {
+            glm::ivec2 uni_value;
+            uni_value.x = node_obj["object"].GetArray()[0].GetInt();
+            uni_value.y = node_obj["object"].GetArray()[1].GetInt();
+            tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec2>>("tmp", array_type, uni_value);
+        }
+        else if (array_type == PinType::VectorI3)
+        {
+            glm::ivec3 uni_value;
+            uni_value.x = node_obj["object"].GetArray()[0].GetInt();
+            uni_value.y = node_obj["object"].GetArray()[1].GetInt();
+            uni_value.z = node_obj["object"].GetArray()[2].GetInt();
+            tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec3>>("tmp", array_type, uni_value);
+        }
+        else if (array_type == PinType::VectorI4)
+        {
+            glm::ivec4 uni_value;
+            uni_value.x = node_obj["object"].GetArray()[0].GetInt();
+            uni_value.y = node_obj["object"].GetArray()[1].GetInt();
+            uni_value.z = node_obj["object"].GetArray()[2].GetInt();
+            uni_value.w = node_obj["object"].GetArray()[3].GetInt();
+            tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec4>>("tmp", array_type, uni_value);
         }
         if (array_type == PinType::Vector2)
         {
@@ -1770,6 +2160,45 @@ void ArrayGetValueNode_Func::NoFlowUpdatePinsValues()
     {
         std::shared_ptr<std::vector<int>> input = GetInputPinArrValue<int>(parent_node, "input");
         std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("object"));
+        int inx = GetInputPinValue<int>(parent_node, "index");
+        if (input)
+        {
+            if (inx < input->size() && inx >= 0)
+            {
+                output_pin->value = input->at(inx);
+            }
+        }
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI2)
+    {
+        std::shared_ptr<std::vector<glm::ivec2>> input = GetInputPinArrValue<glm::ivec2>(parent_node, "input");
+        std::shared_ptr<PinValue<glm::ivec2>> output_pin = std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->outputs.at("object"));
+        int inx = GetInputPinValue<int>(parent_node, "index");
+        if (input)
+        {
+            if (inx < input->size() && inx >= 0)
+            {
+                output_pin->value = input->at(inx);
+            }
+        }
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI3)
+    {
+        std::shared_ptr<std::vector<glm::ivec3>> input = GetInputPinArrValue<glm::ivec3>(parent_node, "input");
+        std::shared_ptr<PinValue<glm::ivec3>> output_pin = std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->outputs.at("object"));
+        int inx = GetInputPinValue<int>(parent_node, "index");
+        if (input)
+        {
+            if (inx < input->size() && inx >= 0)
+            {
+                output_pin->value = input->at(inx);
+            }
+        }
+    }
+    else if (parent_node->inputs.at("input")->type == PinType::VectorI4)
+    {
+        std::shared_ptr<std::vector<glm::ivec4>> input = GetInputPinArrValue<glm::ivec4>(parent_node, "input");
+        std::shared_ptr<PinValue<glm::ivec4>> output_pin = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->outputs.at("object"));
         int inx = GetInputPinValue<int>(parent_node, "index");
         if (input)
         {

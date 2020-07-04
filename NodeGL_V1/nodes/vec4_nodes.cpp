@@ -123,6 +123,129 @@ std::shared_ptr<Node> BreakVector4Node(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 
+void MakeVectorI4_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void MakeVectorI4_Func::NoFlowUpdatePinsValues()
+{
+    int pin_0_value = GetInputPinValue<int>(parent_node, "x");
+    int pin_1_value = GetInputPinValue<int>(parent_node, "y");
+    int pin_2_value = GetInputPinValue<int>(parent_node, "z");
+    int pin_3_value = GetInputPinValue<int>(parent_node, "w");
+    std::shared_ptr<PinValue<glm::ivec4>> output_pin = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->outputs.at("out"));
+    output_pin->value = glm::ivec4(pin_0_value, pin_1_value, pin_2_value, pin_3_value);
+}
+
+void MakeVectorI4_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    writer.Key("x");
+    writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x"))->default_value);
+    writer.Key("y");
+    writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("y"))->default_value);
+    writer.Key("z");
+    writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("z"))->default_value);
+    writer.Key("w");
+    writer.Int(std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("w"))->default_value);
+}
+
+void MakeVectorI4_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("x"))->default_value = node_obj["x"].GetInt();
+    std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("y"))->default_value = node_obj["y"].GetInt();
+    std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("z"))->default_value = node_obj["z"].GetInt();
+    std::dynamic_pointer_cast<PinValue<int>>(parent_node->inputs.at("w"))->default_value = node_obj["w"].GetInt();
+}
+
+std::string makeVectorI4NodeName = "Make Vector Int 4";
+std::shared_ptr<Node> MakeVectorI4Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), makeVectorI4NodeName.c_str(), true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("x", new PinValue<int>("x", 0, GetNextId(), "X", PinType::Int, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("y", new PinValue<int>("y", 1, GetNextId(), "Y", PinType::Int, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("z", new PinValue<int>("z", 2, GetNextId(), "Z", PinType::Int, 0)));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("w", new PinValue<int>("w", 3, GetNextId(), "W", PinType::Int, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::ivec4>>>("out", new PinValue<glm::ivec4>("out", 0, GetNextId(), "Out", PinType::VectorI4, glm::ivec4(0))));
+
+    s_Nodes.back()->node_funcs = std::make_shared<MakeVectorI4_Func>();
+    std::dynamic_pointer_cast<MakeVectorI4_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
+void BreakVectorI4_Func::Delete()
+{
+    parent_node = nullptr;
+}
+
+void BreakVectorI4_Func::NoFlowUpdatePinsValues()
+{
+    glm::ivec4 pin_0_value = GetInputPinValue<glm::ivec4>(parent_node, "in");
+    std::shared_ptr<PinValue<int>> output_pin_1 = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("x"));
+    std::shared_ptr<PinValue<int>> output_pin_2 = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("y"));
+    std::shared_ptr<PinValue<int>> output_pin_3 = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("z"));
+    std::shared_ptr<PinValue<int>> output_pin_4 = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("w"));
+    output_pin_1->value = pin_0_value.x;
+    output_pin_2->value = pin_0_value.y;
+    output_pin_3->value = pin_0_value.z;
+    output_pin_4->value = pin_0_value.w;
+}
+
+void BreakVectorI4_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    glm::ivec4 pin_0_value = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("in"))->default_value;
+    writer.Key("x");
+    writer.Int(pin_0_value.x);
+    writer.Key("y");
+    writer.Int(pin_0_value.y);
+    writer.Key("z");
+    writer.Int(pin_0_value.z);
+    writer.Key("w");
+    writer.Int(pin_0_value.w);
+}
+
+void BreakVectorI4_Func::LoadNodeData(rapidjson::Value& node_obj)
+{
+    int x = node_obj["x"].GetInt();
+    int y = node_obj["y"].GetInt();
+    int z = node_obj["z"].GetInt();
+    int w = node_obj["w"].GetInt();
+    std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("in"))->default_value = glm::ivec4(x, y, z, w);
+}
+
+std::string breakVectorI4NodeName = "Break Vector Int 4";
+std::shared_ptr<Node> BreakVectorI4Node(std::vector<std::shared_ptr<Node>>& s_Nodes)
+{
+    s_Nodes.emplace_back(new Node(GetNextId(), breakVectorI4NodeName.c_str(), true));
+    s_Nodes.back()->inputs.insert(std::pair<std::string, std::shared_ptr<PinValue<glm::ivec4>>>("in", new PinValue<glm::ivec4>("in", 0, GetNextId(), "In", PinType::VectorI4, glm::ivec4(0))));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("x", new PinValue<int>("x", 0, GetNextId(), "X", PinType::Int, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("y", new PinValue<int>("y", 1, GetNextId(), "Y", PinType::Int, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("z", new PinValue<int>("z", 2, GetNextId(), "Z", PinType::Int, 0)));
+    s_Nodes.back()->outputs.insert(std::pair<std::string, std::shared_ptr<PinValue<int>>>("w", new PinValue<int>("w", 3, GetNextId(), "W", PinType::Int, 0)));
+
+    s_Nodes.back()->node_funcs = std::make_shared<BreakVectorI4_Func>();
+    std::dynamic_pointer_cast<BreakVectorI4_Func>(s_Nodes.back()->node_funcs)->parent_node = s_Nodes.back();
+
+    s_Nodes.back()->node_funcs->Initialize();
+
+    BuildNode(s_Nodes.back());
+
+    return s_Nodes.back();
+}
+
+
+
+
+
 void Vector4Normalize_Func::Delete()
 {
     parent_node = nullptr;
@@ -190,9 +313,17 @@ void Vec4NodesSearchSetup(std::vector<SearchNodeObj>& search_nodes_vector)
     std::vector<std::string> keywords_2{ "Break", "Vector", "4" };
     search_nodes_vector.push_back(SearchNodeObj("Break Vector 4", "Vector 4", keywords_2, func_2));
 
-    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = Vector4NormalizeNode;
-    std::vector<std::string> keywords_3{ "Normalize", "Vector", "4" };
-    search_nodes_vector.push_back(SearchNodeObj("Normalize - Vector 4", "Vector 4", keywords_3, func_3));
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_3 = MakeVectorI4Node;
+    std::vector<std::string> keywords_3{ "Make", "Vector", "Int", "4" };
+    search_nodes_vector.push_back(SearchNodeObj("Make Vector Int 4", "Vector 4", keywords_3, func_3));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_4 = BreakVectorI4Node;
+    std::vector<std::string> keywords_4{ "Break", "Vector", "Int", "4" };
+    search_nodes_vector.push_back(SearchNodeObj("Break Vector Int 4", "Vector 4", keywords_4, func_4));
+
+    std::function<std::shared_ptr<Node>(std::vector<std::shared_ptr<Node>>&)> func_5 = Vector4NormalizeNode;
+    std::vector<std::string> keywords_5{ "Normalize", "Vector", "4" };
+    search_nodes_vector.push_back(SearchNodeObj("Normalize - Vector 4", "Vector 4", keywords_5, func_5));
 }
 
 std::shared_ptr<Node> Vec4NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_Nodes, std::string node_key)
@@ -203,6 +334,12 @@ std::shared_ptr<Node> Vec4NodesLoadSetup(std::vector<std::shared_ptr<Node>>& s_N
     }
     else if (loaded_node == nullptr && node_key.rfind(breakVector4NodeName, 0) == 0) {
         loaded_node = BreakVector4Node(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(makeVectorI4NodeName, 0) == 0) {
+        loaded_node = MakeVectorI4Node(s_Nodes);
+    }
+    else if (loaded_node == nullptr && node_key.rfind(breakVectorI4NodeName, 0) == 0) {
+        loaded_node = BreakVectorI4Node(s_Nodes);
     }
     else if (loaded_node == nullptr && node_key.rfind(vector4NormalizeNodeName, 0) == 0) {
         loaded_node = Vector4NormalizeNode(s_Nodes);

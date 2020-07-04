@@ -38,6 +38,37 @@ public:
 std::shared_ptr<Node> BreakVector3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
 
 
+class MakeVectorI3_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run(std::string called_pin) {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
+
+std::shared_ptr<Node> MakeVectorI3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class BreakVectorI3_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run(std::string called_pin) {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
+
+std::shared_ptr<Node> BreakVectorI3Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
 
 class Vector3Cross_Func : public NodeFunctions {
 public:

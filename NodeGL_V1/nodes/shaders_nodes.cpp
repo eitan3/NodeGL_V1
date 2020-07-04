@@ -507,6 +507,33 @@ void BindProgramWithUniforms_Func::Run(std::string called_pin)
                 glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
                 std::cout << glGetError() << ", " << get_values[0] << std::endl;*/
             }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::VectorI2)
+            {
+                glm::ivec2 uni_value = GetInputPinValue<glm::ivec2>(parent_node, pin_key);
+                glUniform2iv(glGetUniformLocation(in_program->object_id, uniName.c_str()), 1, glm::value_ptr(uni_value));
+
+                /*GLfloat get_values[2];
+                glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                std::cout << glGetError() << ", " << get_values[0] << ", " << get_values[1] << std::endl;*/
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::VectorI3)
+            {
+                glm::ivec3 uni_value = GetInputPinValue<glm::ivec3>(parent_node, pin_key);
+                glUniform3iv(glGetUniformLocation(in_program->object_id, uniName.c_str()), 1, glm::value_ptr(uni_value));
+
+                /*GLfloat get_values[3];
+                glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                std::cout << glGetError() << ", " << get_values[0] << ", " << get_values[1] << ", " << get_values[2] << std::endl;*/
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::VectorI4)
+            {
+                glm::ivec4 uni_value = GetInputPinValue<glm::ivec4>(parent_node, pin_key);
+                glUniform4iv(glGetUniformLocation(in_program->object_id, uniName.c_str()), 1, glm::value_ptr(uni_value));
+
+                //GLfloat get_values[4];
+                //glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                //std::cout << glGetError() << ", " << get_values[0] << ", " << get_values[1] << ", " << get_values[2] << ", " << get_values[3] << std::endl;
+            }
             else if (parent_node->inputs.at(pin_key)->type == PinType::Vector2)
             {
                 glm::vec2 uni_value = GetInputPinValue<glm::vec2>(parent_node, pin_key);
@@ -622,7 +649,34 @@ void BindProgramWithUniforms_Func::SaveNodeData(rapidjson::Writer<rapidjson::Str
                 float uni_value = std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at(pin_key))->default_value;
                 writer.Double(uni_value);
             }
-            if (parent_node->inputs.at(pin_key)->type == PinType::Vector2)
+            else if (parent_node->inputs.at(pin_key)->type == PinType::VectorI2)
+            {
+                glm::ivec2 uni_value = std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at(pin_key))->default_value;
+                writer.StartArray();
+                writer.Int(uni_value.x);
+                writer.Int(uni_value.y);
+                writer.EndArray();
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::VectorI3)
+            {
+                glm::ivec3 uni_value = std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at(pin_key))->default_value;
+                writer.StartArray();
+                writer.Int(uni_value.x);
+                writer.Int(uni_value.y);
+                writer.Int(uni_value.z);
+                writer.EndArray();
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::VectorI4)
+            {
+                glm::ivec4 uni_value = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at(pin_key))->default_value;
+                writer.StartArray();
+                writer.Int(uni_value.x);
+                writer.Int(uni_value.y);
+                writer.Int(uni_value.z);
+                writer.Int(uni_value.w);
+                writer.EndArray();
+            }
+            else if (parent_node->inputs.at(pin_key)->type == PinType::Vector2)
             {
                 glm::vec2 uni_value = std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->inputs.at(pin_key))->default_value;
                 writer.StartArray();
@@ -689,7 +743,34 @@ void BindProgramWithUniforms_Func::LoadNodeData(rapidjson::Value& node_obj)
             std::shared_ptr<PlaceholderValue<float>> tmp_ph = std::make_shared<PlaceholderValue<float>>("tmp", uniform_type, uni_value);
             tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
         }
-        if (uniform_type == PinType::Vector2)
+        else if (uniform_type == PinType::VectorI2)
+        {
+            glm::ivec2 uni_value;
+            uni_value.x = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[0].GetInt();
+            uni_value.y = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[1].GetInt();
+            std::shared_ptr<PlaceholderValue<glm::ivec2>> tmp_ph = std::make_shared<PlaceholderValue<glm::ivec2>>("tmp", uniform_type, uni_value);
+            tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
+        }
+        else if (uniform_type == PinType::VectorI3)
+        {
+            glm::ivec3 uni_value;
+            uni_value.x = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[0].GetInt();
+            uni_value.y = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[1].GetInt();
+            uni_value.z = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[2].GetInt();
+            std::shared_ptr<PlaceholderValue<glm::ivec3>> tmp_ph = std::make_shared<PlaceholderValue<glm::ivec3>>("tmp", uniform_type, uni_value);
+            tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
+        }
+        else if (uniform_type == PinType::VectorI4)
+        {
+            glm::ivec4 uni_value;
+            uni_value.x = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[0].GetInt();
+            uni_value.y = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[1].GetInt();
+            uni_value.z = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[2].GetInt();
+            uni_value.w = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[3].GetInt();
+            std::shared_ptr<PlaceholderValue<glm::ivec4>> tmp_ph = std::make_shared<PlaceholderValue<glm::ivec4>>("tmp", uniform_type, uni_value);
+            tmp_loaded_value.insert(std::pair<std::string, std::shared_ptr<BasePlaceholder>>(uniform_name, tmp_ph));
+        }
+        else if (uniform_type == PinType::Vector2)
         {
             glm::vec2 uni_value;
             uni_value.x = node_obj["uniforms"].GetArray()[uni_i][2].GetArray()[0].GetFloat();
@@ -775,7 +856,22 @@ void BindProgramWithUniforms_Func::ProgramChanged()
                         if (tmp_loaded_value.count(uniName) > 0)
                             std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<float>>(tmp_loaded_value.at(uniName))->value;
                     }
-                    if (uniform_type == PinType::Vector2)
+                    else if (uniform_type == PinType::VectorI2)
+                    {
+                        if (tmp_loaded_value.count(uniName) > 0)
+                            std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec2>>(tmp_loaded_value.at(uniName))->value;
+                    }
+                    else if (uniform_type == PinType::VectorI3)
+                    {
+                        if (tmp_loaded_value.count(uniName) > 0)
+                            std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec3>>(tmp_loaded_value.at(uniName))->value;
+                    }
+                    else if (uniform_type == PinType::VectorI4)
+                    {
+                        if (tmp_loaded_value.count(uniName) > 0)
+                            std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec4>>(tmp_loaded_value.at(uniName))->value;
+                    }
+                    else if (uniform_type == PinType::Vector2)
                     {
                         if (tmp_loaded_value.count(uniName) > 0)
                             std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->inputs.at(pin_key))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::vec2>>(tmp_loaded_value.at(uniName))->value;
@@ -884,6 +980,33 @@ void SetProgramUniformNode_Func::Run(std::string called_pin)
                 /*GLfloat get_values[1];
                 glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
                 std::cout << glGetError() << ", " << get_values[0] << std::endl;*/
+            }
+            else if (parent_node->inputs.at("uni_pin")->type == PinType::VectorI2)
+            {
+                glm::ivec2 uni_value = GetInputPinValue<glm::ivec2>(parent_node, "uni_pin");
+                glUniform2iv(glGetUniformLocation(in_program->object_id, current_uniform.c_str()), 1, glm::value_ptr(uni_value));
+
+                /*GLfloat get_values[2];
+                glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                std::cout << glGetError() << ", " << get_values[0] << ", " << get_values[1] << std::endl;*/
+            }
+            else if (parent_node->inputs.at("uni_pin")->type == PinType::VectorI3)
+            {
+                glm::ivec3 uni_value = GetInputPinValue<glm::ivec3>(parent_node, "uni_pin");
+                glUniform3iv(glGetUniformLocation(in_program->object_id, current_uniform.c_str()), 1, glm::value_ptr(uni_value));
+
+                /*GLfloat get_values[3];
+                glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                std::cout << glGetError() << ", " << get_values[0] << ", " << get_values[1] << ", " << get_values[2] << std::endl;*/
+            }
+            else if (parent_node->inputs.at("uni_pin")->type == PinType::VectorI4)
+            {
+                glm::ivec4 uni_value = GetInputPinValue<glm::ivec4>(parent_node, "uni_pin");
+                glUniform4iv(glGetUniformLocation(in_program->object_id, current_uniform.c_str()), 1, glm::value_ptr(uni_value));
+
+                //GLfloat get_values[4];
+                //glGetUniformfv(in_program->object_id, glGetUniformLocation(in_program->object_id, current_uniform.c_str()), get_values);
+                //std::cout << glGetError() << ", " << get_values[0] << ", " << get_values[1] << ", " << get_values[2] << ", " << get_values[3] << std::endl;
             }
             else if (parent_node->inputs.at("uni_pin")->type == PinType::Vector2)
             {
@@ -1063,7 +1186,37 @@ void SetProgramUniformNode_Func::SaveNodeData(rapidjson::Writer<rapidjson::Strin
             writer.Key("uniform_value");
             writer.Double(uni_value);
         }
-        if (parent_node->inputs.at("uni_pin")->type == PinType::Vector2)
+        else if (parent_node->inputs.at("uni_pin")->type == PinType::VectorI2)
+        {
+            glm::ivec2 uni_value = std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at("uni_pin"))->default_value;
+            writer.Key("uniform_value");
+            writer.StartArray();
+            writer.Int(uni_value.x);
+            writer.Int(uni_value.y);
+            writer.EndArray();
+        }
+        else if (parent_node->inputs.at("uni_pin")->type == PinType::VectorI3)
+        {
+            glm::ivec3 uni_value = std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at("uni_pin"))->default_value;
+            writer.Key("uniform_value");
+            writer.StartArray();
+            writer.Int(uni_value.x);
+            writer.Int(uni_value.y);
+            writer.Int(uni_value.z);
+            writer.EndArray();
+        }
+        else if (parent_node->inputs.at("uni_pin")->type == PinType::VectorI4)
+        {
+            glm::ivec4 uni_value = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("uni_pin"))->default_value;
+            writer.Key("uniform_value");
+            writer.StartArray();
+            writer.Int(uni_value.x);
+            writer.Int(uni_value.y);
+            writer.Int(uni_value.z);
+            writer.Int(uni_value.w);
+            writer.EndArray();
+        }
+        else if (parent_node->inputs.at("uni_pin")->type == PinType::Vector2)
         {
             glm::vec2 uni_value = std::dynamic_pointer_cast<PinValue<glm::vec2>>(parent_node->inputs.at("uni_pin"))->default_value;
             writer.Key("uniform_value");
@@ -1138,7 +1291,31 @@ void SetProgramUniformNode_Func::LoadNodeData(rapidjson::Value& node_obj)
                 float uni_value = node_obj["uniform_value"].GetFloat();
                 tmp_loaded_value = std::make_shared<PlaceholderValue<float>>("tmp", uniform_type, uni_value);
             }
-            if (uniform_type == PinType::Vector2)
+            else if (uniform_type == PinType::VectorI2)
+            {
+                glm::ivec2 uni_value;
+                uni_value.x = node_obj["uniform_value"].GetArray()[0].GetInt();
+                uni_value.y = node_obj["uniform_value"].GetArray()[1].GetInt();
+                tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec2>>("tmp", uniform_type, uni_value);
+            }
+            else if (uniform_type == PinType::VectorI3)
+            {
+                glm::ivec3 uni_value;
+                uni_value.x = node_obj["uniform_value"].GetArray()[0].GetInt();
+                uni_value.y = node_obj["uniform_value"].GetArray()[1].GetInt();
+                uni_value.z = node_obj["uniform_value"].GetArray()[2].GetInt();
+                tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec3>>("tmp", uniform_type, uni_value);
+            }
+            else if (uniform_type == PinType::VectorI4)
+            {
+                glm::ivec4 uni_value;
+                uni_value.x = node_obj["uniform_value"].GetArray()[0].GetInt();
+                uni_value.y = node_obj["uniform_value"].GetArray()[1].GetInt();
+                uni_value.z = node_obj["uniform_value"].GetArray()[2].GetInt();
+                uni_value.w = node_obj["uniform_value"].GetArray()[3].GetInt();
+                tmp_loaded_value = std::make_shared<PlaceholderValue<glm::ivec4>>("tmp", uniform_type, uni_value);
+            }
+            else if (uniform_type == PinType::Vector2)
             {
                 glm::vec2 uni_value;
                 uni_value.x = node_obj["uniform_value"].GetArray()[0].GetFloat();
@@ -1213,6 +1390,18 @@ void SetProgramUniformNode_Func::UniformChanged()
                 else if (uniform_type == PinType::Float)
                 {
                     std::dynamic_pointer_cast<PinValue<float>>(parent_node->inputs.at("uni_pin"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<float>>(tmp_loaded_value)->value;
+                }
+                else if (uniform_type == PinType::VectorI2)
+                {
+                    std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at("uni_pin"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec2>>(tmp_loaded_value)->value;
+                }
+                else if (uniform_type == PinType::VectorI3)
+                {
+                    std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at("uni_pin"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec3>>(tmp_loaded_value)->value;
+                }
+                else if (uniform_type == PinType::VectorI4)
+                {
+                    std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("uni_pin"))->default_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec4>>(tmp_loaded_value)->value;
                 }
                 else if (uniform_type == PinType::Vector2)
                 {

@@ -262,6 +262,24 @@ void SetPlaceholder_Func::Run(std::string called_pin)
             std::shared_ptr<PlaceholderValue<bool>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<bool>>(placeholder);
             ph_value->value = placeholder_value;
         }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::VectorI2)
+        {
+            glm::ivec2 placeholder_value = GetInputPinValue<glm::ivec2>(parent_node, "placeholder_pin");
+            std::shared_ptr<PlaceholderValue<glm::ivec2>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec2>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::VectorI3)
+        {
+            glm::ivec3 placeholder_value = GetInputPinValue<glm::ivec3>(parent_node, "placeholder_pin");
+            std::shared_ptr<PlaceholderValue<glm::ivec3>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec3>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::VectorI4)
+        {
+            glm::ivec4 placeholder_value = GetInputPinValue<glm::ivec4>(parent_node, "placeholder_pin");
+            std::shared_ptr<PlaceholderValue<glm::ivec4>> ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec4>>(placeholder);
+            ph_value->value = placeholder_value;
+        }
         else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Vector2)
         {
             glm::vec2 placeholder_value = GetInputPinValue<glm::vec2>(parent_node, "placeholder_pin");
@@ -386,6 +404,36 @@ void SetPlaceholder_Func::SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer
             bool placeholder_value = std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("placeholder_pin"))->default_value;
             writer.Bool(placeholder_value);
         }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::VectorI2)
+        {
+            writer.Key("placeholder_value");
+            glm::ivec2 placeholder_value = std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at("placeholder_pin"))->default_value;
+            writer.StartArray();
+            writer.Int(placeholder_value.x);
+            writer.Int(placeholder_value.y);
+            writer.EndArray();
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::VectorI3)
+        {
+            writer.Key("placeholder_value");
+            glm::ivec3 placeholder_value = std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at("placeholder_pin"))->default_value;
+            writer.StartArray();
+            writer.Int(placeholder_value.x);
+            writer.Int(placeholder_value.y);
+            writer.Int(placeholder_value.z);
+            writer.EndArray();
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::VectorI4)
+        {
+            writer.Key("placeholder_value");
+            glm::ivec4 placeholder_value = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("placeholder_pin"))->default_value;
+            writer.StartArray();
+            writer.Int(placeholder_value.x);
+            writer.Int(placeholder_value.y);
+            writer.Int(placeholder_value.z);
+            writer.Int(placeholder_value.w);
+            writer.EndArray();
+        }
         else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Vector2)
         {
             writer.Key("placeholder_value");
@@ -457,6 +505,27 @@ void SetPlaceholder_Func::LoadNodeData(rapidjson::Value& node_obj)
         else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Bool)
         {
             std::dynamic_pointer_cast<PinValue<bool>>(parent_node->inputs.at("placeholder_pin"))->default_value = node_obj["placeholder_value"].GetBool();
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::VectorI2)
+        {
+            glm::ivec2 load_val = glm::ivec2(node_obj["placeholder_value"].GetArray()[0].GetInt(),
+                node_obj["placeholder_value"].GetArray()[1].GetInt());
+            std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->inputs.at("placeholder_pin"))->default_value = load_val;
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::VectorI3)
+        {
+            glm::ivec3 load_val = glm::ivec3(node_obj["placeholder_value"].GetArray()[0].GetInt(),
+                node_obj["placeholder_value"].GetArray()[1].GetInt(),
+                node_obj["placeholder_value"].GetArray()[2].GetInt());
+            std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->inputs.at("placeholder_pin"))->default_value = load_val;
+        }
+        else if (parent_node->inputs.at("placeholder_pin")->type == PinType::VectorI4)
+        {
+            glm::ivec4 load_val = glm::ivec4(node_obj["placeholder_value"].GetArray()[0].GetInt(),
+                node_obj["placeholder_value"].GetArray()[1].GetInt(),
+                node_obj["placeholder_value"].GetArray()[2].GetInt(),
+                node_obj["placeholder_value"].GetArray()[3].GetInt());
+            std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->inputs.at("placeholder_pin"))->default_value = load_val;
         }
         else if (parent_node->inputs.at("placeholder_pin")->type == PinType::Vector2)
         {
@@ -562,6 +631,30 @@ void GetPlaceholder_Func::NoFlowUpdatePinsValues()
         if (placeholder)
             ph_value = std::dynamic_pointer_cast<PlaceholderValue<int>>(placeholder)->value;
         std::shared_ptr<PinValue<int>> output_pin = std::dynamic_pointer_cast<PinValue<int>>(parent_node->outputs.at("placeholder_pin"));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::VectorI2)
+    {
+        glm::ivec2 ph_value = glm::ivec2(0);
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec2>>(placeholder)->value;
+        std::shared_ptr<PinValue<glm::ivec2>> output_pin = std::dynamic_pointer_cast<PinValue<glm::ivec2>>(parent_node->outputs.at("placeholder_pin"));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::VectorI3)
+    {
+        glm::ivec3 ph_value = glm::ivec3(0);
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec3>>(placeholder)->value;
+        std::shared_ptr<PinValue<glm::ivec3>> output_pin = std::dynamic_pointer_cast<PinValue<glm::ivec3>>(parent_node->outputs.at("placeholder_pin"));
+        output_pin->value = ph_value;
+    }
+    else if (placeholder_type == PinType::VectorI4)
+    {
+        glm::ivec4 ph_value = glm::ivec4(0);
+        if (placeholder)
+            ph_value = std::dynamic_pointer_cast<PlaceholderValue<glm::ivec4>>(placeholder)->value;
+        std::shared_ptr<PinValue<glm::ivec4>> output_pin = std::dynamic_pointer_cast<PinValue<glm::ivec4>>(parent_node->outputs.at("placeholder_pin"));
         output_pin->value = ph_value;
     }
     else if (placeholder_type == PinType::Vector2)

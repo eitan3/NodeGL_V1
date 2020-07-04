@@ -1,6 +1,16 @@
-Add iVec2, iVec3, iVec4 data types, vectors, nodes, and connect them to shaders (via uniforms)
+Add 'Plane Mesh' node and 'Points Mesh' node
+
+Recreate some samples from shadertoy and vertexshaderart
+https://www.shadertoy.com/view/wtjczR
+https://www.shadertoy.com/view/3lSyRh
+https://www.shadertoy.com/view/ldl3W8
+https://www.shadertoy.com/view/ttscWn
+https://www.shadertoy.com/view/3tGSR3
+
 
 Add Functions
+Custom mesh attributes
+
 Add multisample option for Framebuffer
 pass vector as a uniform
 Create Camera Object (?)

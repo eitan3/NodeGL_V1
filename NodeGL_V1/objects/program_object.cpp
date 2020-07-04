@@ -67,6 +67,18 @@ void ProgramObject::FindUniforms()
 		{
 			uniforms_arr.push_back(UniformInfo(std::string(name), PinType::Float));
 		}
+		else if (type == GL_INT_VEC2)
+		{
+			uniforms_arr.push_back(UniformInfo(std::string(name), PinType::VectorI2));
+		}
+		else if (type == GL_INT_VEC3)
+		{
+			uniforms_arr.push_back(UniformInfo(std::string(name), PinType::VectorI3));
+		}
+		else if (type == GL_INT_VEC4)
+		{
+			uniforms_arr.push_back(UniformInfo(std::string(name), PinType::VectorI4));
+		}
 		else if (type == GL_FLOAT_VEC2)
 		{
 			uniforms_arr.push_back(UniformInfo(std::string(name), PinType::Vector2));

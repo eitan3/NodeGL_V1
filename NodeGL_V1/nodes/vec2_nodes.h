@@ -39,6 +39,38 @@ std::shared_ptr<Node> BreakVector2Node(std::vector<std::shared_ptr<Node>>& s_Nod
 
 
 
+class MakeVectorI2_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run(std::string called_pin) {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
+
+std::shared_ptr<Node> MakeVectorI2Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
+class BreakVectorI2_Func : public NodeFunctions {
+public:
+    void Initialize() {};
+    void Run(std::string called_pin) {};
+    void Delete();
+    void NoFlowUpdatePinsValues();
+    void UpdateNodeUI() {};
+    void UpdateNodeInspector() {};
+    void SaveNodeData(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    void LoadNodeData(rapidjson::Value& node_obj);
+};
+
+std::shared_ptr<Node> BreakVectorI2Node(std::vector<std::shared_ptr<Node>>& s_Nodes);
+
+
+
 class Vector2Normalize_Func : public NodeFunctions {
 public:
     void Initialize() {};
